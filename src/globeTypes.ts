@@ -10,8 +10,6 @@ export interface ChoroplethGlobeData {
   value: number;
   /** Optional caller-owned display name. */
   label?: string;
-  /** Optional caller-owned formatted value for a tooltip or legend. */
-  formattedValue?: string | null;
 }
 
 /** Color settings used to generate the country texture. */
@@ -73,6 +71,8 @@ export interface ChoroplethGlobeProps {
   onActiveEntryChange?: (id: string | null) => void;
   /** Called when pointer hit-testing enters or leaves a country. */
   onCountryHover?: (alpha2: string | null) => void;
+  /** Formats a numeric entry value for the tooltip. */
+  formatValue?: (value: number, entry: ChoroplethGlobeData) => string;
   /** Optional caller-owned tooltip UI. No tooltip DOM is rendered by default. */
   renderTooltip?: (tooltip: ChoroplethGlobeTooltip) => ReactNode;
   /** Accessible name for the interactive globe, or its image alternative. */

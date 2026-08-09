@@ -32,13 +32,13 @@ vi.mock(import('../worldGeoData'), () => ({
 const data = [
   {
     alpha2: 'US',
-    formattedValue: '42 tCO₂e',
     id: 'us',
     label: 'United States',
     value: 42,
   },
 ];
 const colors = { filled: ['#000000', '#ffffff'] as const, missing: '#cccccc' };
+const formatValue = (value: number) => `${value} tCO₂e`;
 
 const globe = {
   destroy: vi.fn(),
@@ -141,6 +141,7 @@ describe(ChoroplethGlobe, () => {
         colors={colors}
         data={data}
         defaultActiveEntryId="us"
+        formatValue={formatValue}
         onActiveEntryChange={onActiveEntryChange}
         ref={ref}
         renderTooltip={renderTooltip}
@@ -155,6 +156,7 @@ describe(ChoroplethGlobe, () => {
           alpha2: 'US',
           entry: data[0],
           entryId: 'us',
+          formattedValue: '42 tCO₂e',
           source: 'entry',
         })
       );
@@ -180,6 +182,7 @@ describe(ChoroplethGlobe, () => {
       <ChoroplethGlobe
         colors={colors}
         data={data}
+        formatValue={formatValue}
         onCountryHover={onCountryHover}
         renderTooltip={renderTooltip}
         size={200}

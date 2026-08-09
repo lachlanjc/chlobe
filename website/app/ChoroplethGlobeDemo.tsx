@@ -12,47 +12,43 @@ import type {
 const data: ChoroplethGlobeData[] = [
   {
     alpha2: 'US',
-    formattedValue: '43.2M tCO₂e',
     id: 'us',
     label: 'United States',
     value: 43.2,
   },
   {
     alpha2: 'CN',
-    formattedValue: '31.0M tCO₂e',
     id: 'cn',
     label: 'China',
     value: 31,
   },
   {
     alpha2: 'BR',
-    formattedValue: '15.8M tCO₂e',
     id: 'br',
     label: 'Brazil',
     value: 15.8,
   },
   {
     alpha2: 'IN',
-    formattedValue: '12.4M tCO₂e',
     id: 'in',
     label: 'India',
     value: 12.4,
   },
   {
     alpha2: 'DE',
-    formattedValue: '8.1M tCO₂e',
     id: 'de',
     label: 'Germany',
     value: 8.1,
   },
   {
     alpha2: 'AU',
-    formattedValue: '5.7M tCO₂e',
     id: 'au',
     label: 'Australia',
     value: 5.7,
   },
 ];
+
+const formatValue = (value: number) => `${value.toFixed(1)}M tCO₂e`;
 
 const styles = stylex.create({
   countryButton: {
@@ -147,6 +143,7 @@ const ChoroplethGlobeDemo = () => {
           }}
           colorScheme="light"
           data={data}
+          formatValue={formatValue}
           renderTooltip={({ formattedValue, label, x, y }) => (
             <div
               {...stylex.props(styles.tooltip)}
@@ -178,7 +175,7 @@ const ChoroplethGlobeDemo = () => {
                 type="button"
               >
                 <span>{entry.label}</span>
-                <strong>{entry.formattedValue}</strong>
+                <strong>{formatValue(entry.value)}</strong>
               </button>
             </li>
           ))}

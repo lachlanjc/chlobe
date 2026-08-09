@@ -36,6 +36,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
       colorScheme = 'light',
       data,
       defaultActiveEntryId = null,
+      formatValue,
       globe: globeOptions,
       onActiveEntryChange,
       onCountryHover,
@@ -70,14 +71,18 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
     const activeEntryIdRef = useRef(activeEntryId);
     const optionsRef = useRef(globeOptions);
     const reducedMotionRef = useRef(prefersReducedMotion);
-    const callbacksRef = useRef({ onCountryHover, renderTooltip });
+    const callbacksRef = useRef({
+      formatValue,
+      onCountryHover,
+      renderTooltip,
+    });
 
     // The renderer has long-lived native event handlers and an animation
     // frame loop. Synchronizing its inputs after commit keeps render pure and
     // prevents those handlers from observing stale country data.
     useEffect(() => {
       activeEntryIdRef.current = activeEntryId;
-      callbacksRef.current = { onCountryHover, renderTooltip };
+      callbacksRef.current = { formatValue, onCountryHover, renderTooltip };
       centroidsRef.current = centroids;
       dataRef.current = data;
       optionsRef.current = globeOptions;
@@ -86,6 +91,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
       activeEntryId,
       centroids,
       data,
+      formatValue,
       globeOptions,
       onCountryHover,
       prefersReducedMotion,

@@ -10,7 +10,6 @@ import type {
 const data = [
   {
     alpha2: 'US',
-    formattedValue: '42 tCO₂e',
     id: 'united-states',
     label: 'United States',
     value: 42,
@@ -57,6 +56,11 @@ describe('public API', () => {
       },
       data,
       defaultActiveEntryId: null,
+      formatValue: (value, entry) => {
+        expectTypeOf(value).toEqualTypeOf<number>();
+        expectTypeOf(entry).toEqualTypeOf<ChoroplethGlobeData>();
+        return `${value} tCO₂e`;
+      },
       globe: { interactive: true },
       onActiveEntryChange: (entryId) => {
         expectTypeOf(entryId).toEqualTypeOf<string | null>();

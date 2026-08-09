@@ -15,6 +15,7 @@ const COUNTRY_LOOKUP_MIN_DEGREES = 0.5;
 const KEYBOARD_ROTATION_STEP = 0.25;
 
 interface GlobeCallbacks {
+  formatValue?: (value: number, entry: ChoroplethGlobeData) => string;
   onCountryHover?: (alpha2: string | null) => void;
   renderTooltip?: (tooltip: ChoroplethGlobeTooltip) => unknown;
 }
@@ -106,7 +107,8 @@ export const useGlobeRenderer = ({
         alpha2: entry.alpha2,
         entry,
         entryId: entry.id,
-        formattedValue: entry.formattedValue ?? null,
+        formattedValue:
+          refs.callbacks.current.formatValue?.(entry.value, entry) ?? null,
         label: entry.label ?? null,
         source: 'entry',
         x: projected.x * canvas.clientWidth,
@@ -212,7 +214,12 @@ export const useGlobeRenderer = ({
                   alpha2,
                   entry,
                   entryId: entry?.id ?? null,
-                  formattedValue: entry?.formattedValue ?? null,
+                  formattedValue: entry
+                    ? (refs.callbacks.current.formatValue?.(
+                        entry.value,
+                        entry
+                      ) ?? null)
+                    : null,
                   label: entry?.label ?? null,
                   source: 'pointer',
                   x,
