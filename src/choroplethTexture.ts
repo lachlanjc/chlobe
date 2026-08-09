@@ -50,8 +50,8 @@ export function computeCountryFill(input: {
   const share =
     input.maxMagnitude > 0 ? Math.abs(input.value) / input.maxMagnitude : 0;
   return {
-    fillStyle: getRangeInterpolator(input.filledColorRange)(share),
     alpha: FILLED_ALPHA_BASE + FILLED_ALPHA_RANGE * share,
+    fillStyle: getRangeInterpolator(input.filledColorRange)(share),
   };
 }
 
@@ -114,17 +114,17 @@ export async function generateChoroplethTexture(input: {
       numericId === null ? undefined : valuesByNumericId.get(numericId);
     context.beginPath();
     path(countryFeature);
-    if (value !== undefined) {
+    if (value === undefined) {
+      context.globalAlpha = missingAlpha;
+      context.fillStyle = missingColor;
+    } else {
       const { fillStyle, alpha } = computeCountryFill({
-        value,
-        maxMagnitude,
         filledColorRange,
+        maxMagnitude,
+        value,
       });
       context.globalAlpha = alpha;
       context.fillStyle = fillStyle;
-    } else {
-      context.globalAlpha = missingAlpha;
-      context.fillStyle = missingColor;
     }
     context.fill();
   }

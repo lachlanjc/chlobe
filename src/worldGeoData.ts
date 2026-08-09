@@ -59,9 +59,8 @@ export function getCountryFeatureNumericId(
   return null;
 }
 
-let allCountryFeaturesPromise: Promise<
-  ReadonlyArray<WorldCountryFeature>
-> | null = null;
+let allCountryFeaturesPromise: Promise<readonly WorldCountryFeature[]> | null =
+  null;
 
 /**
  * All country polygon features from the world-atlas dataset, including
@@ -70,7 +69,7 @@ let allCountryFeaturesPromise: Promise<
  * bundle; the loaded features are memoized.
  */
 export function getAllCountryFeatures(): Promise<
-  ReadonlyArray<WorldCountryFeature>
+  readonly WorldCountryFeature[]
 > {
   allCountryFeaturesPromise ??= import('world-atlas/countries-110m.json').then(
     (module) => {
@@ -81,7 +80,7 @@ export function getAllCountryFeatures(): Promise<
   return allCountryFeaturesPromise;
 }
 
-type JoinedCountryFeature = {
+interface JoinedCountryFeature {
   feature: WorldCountryFeature;
   alpha2: string;
   /**
@@ -90,22 +89,19 @@ type JoinedCountryFeature = {
    * minLng > maxLng.
    */
   bounds: [[number, number], [number, number]];
-};
+}
 
-let countryFeaturesPromise: Promise<
-  ReadonlyArray<JoinedCountryFeature>
-> | null = null;
+let countryFeaturesPromise: Promise<readonly JoinedCountryFeature[]> | null =
+  null;
 
 /**
  * Country polygon features joined to their ISO 3166-1 alpha-2 codes and
  * bounding boxes, memoized (hover hit-testing calls this repeatedly).
  * Features whose id has no alpha-2 mapping are excluded.
  */
-export function getCountryFeatures(): Promise<
-  ReadonlyArray<JoinedCountryFeature>
-> {
+export function getCountryFeatures(): Promise<readonly JoinedCountryFeature[]> {
   countryFeaturesPromise ??= getAllCountryFeatures().then((allFeatures) => {
-    const joined: Array<JoinedCountryFeature> = [];
+    const joined: JoinedCountryFeature[] = [];
     for (const countryFeature of allFeatures) {
       const numericId = getCountryFeatureNumericId(countryFeature);
       const alpha2 =
@@ -114,9 +110,9 @@ export function getCountryFeatures(): Promise<
           : NUMERIC_COUNTRY_ID_TO_ALPHA2.get(numericId);
       if (alpha2 !== undefined) {
         joined.push({
-          feature: countryFeature,
           alpha2,
           bounds: geoBounds(countryFeature),
+          feature: countryFeature,
         });
       }
     }

@@ -43,9 +43,9 @@ export function stepPhiTowardTarget(
 ): { phi: number; done: boolean } {
   const delta = shortestPhiDelta(currentPhi, targetPhi);
   if (Math.abs(delta) < PHI_SNAP_THRESHOLD) {
-    return { phi: targetPhi, done: true };
+    return { done: true, phi: targetPhi };
   }
-  return { phi: currentPhi + delta * PHI_EASING_FACTOR, done: false };
+  return { done: false, phi: currentPhi + delta * PHI_EASING_FACTOR };
 }
 
 /**

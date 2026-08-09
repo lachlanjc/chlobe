@@ -7,18 +7,18 @@ import {
   getCountryFeatures,
 } from '../worldGeoData';
 
-describe('ALPHA2_TO_NUMERIC_COUNTRY_ID', () => {
+describe(ALPHA2_TO_NUMERIC_COUNTRY_ID, () => {
   it('maps alpha-2 codes to zero-padded numeric ids', () => {
-    expect(ALPHA2_TO_NUMERIC_COUNTRY_ID.get('US')).toEqual('840');
-    expect(ALPHA2_TO_NUMERIC_COUNTRY_ID.get('AU')).toEqual('036');
+    expect(ALPHA2_TO_NUMERIC_COUNTRY_ID.get('US')).toBe('840');
+    expect(ALPHA2_TO_NUMERIC_COUNTRY_ID.get('AU')).toBe('036');
   });
 
   it('maps Kosovo to the Natural Earth sentinel id', () => {
-    expect(ALPHA2_TO_NUMERIC_COUNTRY_ID.get('XK')).toEqual('-99');
+    expect(ALPHA2_TO_NUMERIC_COUNTRY_ID.get('XK')).toBe('-99');
   });
 });
 
-describe('getCountryFeatures', () => {
+describe(getCountryFeatures, () => {
   it('joins alpha-2 codes onto world-atlas features for major countries', async () => {
     const countryFeatures = await getCountryFeatures();
     const alpha2Codes = new Set(countryFeatures.map((entry) => entry.alpha2));
@@ -28,7 +28,7 @@ describe('getCountryFeatures', () => {
   });
 });
 
-describe('getCountryCentroids', () => {
+describe(getCountryCentroids, () => {
   it('returns a plausible [lat, lng] centroid for the US', async () => {
     const centroids = await getCountryCentroids();
     const us = centroids.get('US');
@@ -41,20 +41,20 @@ describe('getCountryCentroids', () => {
   });
 });
 
-describe('getCountryAtCoordinates', () => {
-  const cases: Array<{ lng: number; lat: number; expected: string | null }> = [
-    { lng: -98, lat: 39, expected: 'US' },
-    { lng: 2, lat: 47, expected: 'FR' },
+describe(getCountryAtCoordinates, () => {
+  const cases: { lng: number; lat: number; expected: string | null }[] = [
+    { expected: 'US', lat: 39, lng: -98 },
+    { expected: 'FR', lat: 47, lng: 2 },
     // The (0, 0) point is in the Gulf of Guinea, i.e. open ocean.
-    { lng: 0, lat: 0, expected: null },
+    { expected: null, lat: 0, lng: 0 },
     // Chukotka: Russia's bounding box crosses the antimeridian.
-    { lng: 178, lat: 65, expected: 'RU' },
+    { expected: 'RU', lat: 65, lng: 178 },
   ];
 
   it.each(cases)(
     'returns $expected for ($lng, $lat)',
     async ({ lng, lat, expected }) => {
-      await expect(getCountryAtCoordinates(lng, lat)).resolves.toEqual(
+      await expect(getCountryAtCoordinates(lng, lat)).resolves.toStrictEqual(
         expected
       );
     }

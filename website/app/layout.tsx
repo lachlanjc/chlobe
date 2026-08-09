@@ -1,36 +1,36 @@
-import localFont from "next/font/local";
-import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import type { Metadata } from 'next';
+import localFont from 'next/font/local';
+import type { ReactNode } from 'react';
 
-import "@stylexswc/webpack-plugin/stylex.css";
-import "./globals.css";
+import '@stylexswc/webpack-plugin/stylex.css';
+import './globals.css';
 
 const booton = localFont({
-  display: "swap",
+  display: 'swap',
   src: [
     {
-      path: "./fonts/Booton-Regular.woff2",
-      style: "normal",
-      weight: "400",
+      path: './fonts/Booton-Regular.woff2',
+      style: 'normal',
+      weight: '400',
     },
     {
-      path: "./fonts/Booton-Medium.woff2",
-      style: "normal",
-      weight: "500",
+      path: './fonts/Booton-Medium.woff2',
+      style: 'normal',
+      weight: '500',
     },
     {
-      path: "./fonts/Booton-SemiBold.woff2",
-      style: "normal",
-      weight: "600",
+      path: './fonts/Booton-SemiBold.woff2',
+      style: 'normal',
+      weight: '600',
     },
   ],
-  variable: "--font-booton",
+  variable: '--font-booton',
 });
 
 export const metadata: Metadata = {
   description:
-    "Lightweight WebGL globe for rendering values of countries as shaded regions.",
-  title: "Cobe Countries",
+    'Lightweight WebGL globe for rendering values of countries as shaded regions.',
+  title: 'Cobe Countries',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

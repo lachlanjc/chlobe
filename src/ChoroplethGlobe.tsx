@@ -4,12 +4,12 @@ import {
   useImperativeHandle,
   useRef,
   useState,
-  type CSSProperties,
-  type ReactNode,
 } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { generateChoroplethTexture } from './choroplethTexture';
-import createGlobe, { type Globe } from './globeRenderer';
+import createGlobe from './globeRenderer';
+import type { Globe } from './globeRenderer';
 import {
   AUTO_ROTATE_PHI_PER_FRAME,
   stepPhiTowardTarget,
@@ -24,7 +24,7 @@ import { getCountryAtCoordinates, getCountryCentroids } from './worldGeoData';
 const COUNTRY_LOOKUP_MIN_DEGREES = 0.5;
 
 /** A data row the globe can navigate to and show a hover tooltip for. */
-export type ChoroplethGlobeEntry = {
+export interface ChoroplethGlobeEntry {
   id: string;
   /** User-facing label (e.g. the localized country name). */
   label: string;
@@ -32,31 +32,31 @@ export type ChoroplethGlobeEntry = {
   formattedValue: string | null;
   /** ISO 3166-1 alpha-2 code the row resolved to. */
   alpha2: string;
-};
+}
 
 /** Inputs for asynchronously generating the country choropleth texture. */
-export type ChoroplethGlobeInput = {
+export interface ChoroplethGlobeInput {
   /** [alpha2, value] entries (an array so the input JSON-serializes). */
-  valuesByAlpha2: Array<[string, number]>;
+  valuesByAlpha2: [string, number][];
   /** Fill color ramp from the smallest to the largest magnitude. */
   filledColorRange: [string, string];
   /** Fill for countries without data. */
   missingColor: string;
   missingAlpha: number;
-};
+}
 
 /**
  * Imperative interactions, e.g. for a legend rendered next to the globe:
  * hovering an entry rotates to it and anchors a tooltip on it.
  */
-export type ChoroplethGlobeHandle = {
+export interface ChoroplethGlobeHandle {
   hoverEntry: (id: string) => void;
   clearHoveredEntry: () => void;
   navigateToEntry: (id: string) => void;
-};
+}
 
 /** A tooltip anchor in CSS pixels relative to the globe's top-left. */
-export type ChoroplethGlobeTooltip = {
+export interface ChoroplethGlobeTooltip {
   /**
    * What anchors the tooltip: direct pointer hit-testing on the canvas, or
    * an externally hovered entry (which wins while active, since the globe
@@ -67,7 +67,7 @@ export type ChoroplethGlobeTooltip = {
   formattedValue: string | null;
   x: number;
   y: number;
-};
+}
 
 /** SSR-safe, reactive reduced-motion preference. */
 function usePrefersReducedMotion(): boolean {
@@ -106,9 +106,9 @@ function usePrefersReducedMotion(): boolean {
  *
  * Degrades gracefully without WebGL (blank canvas, interactions no-op).
  */
-export type ChoroplethGlobeProps = {
+export interface ChoroplethGlobeProps {
   /** Rows with data, sorted by descending magnitude (entries[0] is top). */
-  entries: Array<ChoroplethGlobeEntry>;
+  entries: ChoroplethGlobeEntry[];
   choroplethInput: ChoroplethGlobeInput;
   /** Square canvas size in CSS pixels. */
   size: number;
@@ -129,10 +129,10 @@ export type ChoroplethGlobeProps = {
    * own all tooltip UI and positioning.
    */
   renderTooltip?: (tooltip: ChoroplethGlobeTooltip) => ReactNode;
-};
+}
 
 const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
-  function ChoroplethGlobe(
+  (
     {
       entries,
       choroplethInput,
@@ -144,7 +144,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
       renderTooltip,
     },
     ref
-  ) {
+  ) => {
     const isDarkMode = colorScheme === 'dark';
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -196,9 +196,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
     // Either the tooltip from canvas pointer hit-testing, or the one anchored
     // to an externally hovered entry (positioned each frame by the rAF loop);
     // see ChoroplethGlobeTooltip.source for the precedence rule.
-    const [tooltip, setTooltip] = useState<ChoroplethGlobeTooltip | null>(
-      null
-    );
+    const [tooltip, setTooltip] = useState<ChoroplethGlobeTooltip | null>(null);
 
     // Serialized so the effect only re-runs when contents change, not on every
     // render (the input object is rebuilt by the parent each render).
@@ -208,10 +206,10 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
       const input: ChoroplethGlobeInput = JSON.parse(choroplethKey);
       let cancelled = false;
       generateChoroplethTexture({
-        valuesByAlpha2: new Map(input.valuesByAlpha2),
         filledColorRange: input.filledColorRange,
-        missingColor: input.missingColor,
         missingAlpha: input.missingAlpha,
+        missingColor: input.missingColor,
+        valuesByAlpha2: new Map(input.valuesByAlpha2),
       })
         .then((texture) => {
           if (cancelled) {
@@ -294,14 +292,14 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
         }
       };
       return {
+        clearHoveredEntry: () => {
+          hoveredEntryIdRef.current = null;
+        },
         hoverEntry: (id: string) => {
           if (entriesRef.current.some((e) => e.id === id)) {
             hoveredEntryIdRef.current = id;
             rotateToEntry(id);
           }
-        },
-        clearHoveredEntry: () => {
-          hoveredEntryIdRef.current = null;
         },
         navigateToEntry: rotateToEntry,
       };
@@ -330,7 +328,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
         theta: 0.2,
         dark: isDarkMode ? 1 : 0,
         diffuse: 1.2,
-        mapSamples: 16000,
+        mapSamples: 16_000,
         mapBrightness: 6,
         // The sphere occupies 80% of the canvas at scale 1; zoom in so it
         // nearly fills the canvas for legibility (its soft outer glow still
@@ -400,9 +398,9 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
           shownHoveredEntry.formattedValue !== hovered.formattedValue
         ) {
           shownHoveredEntry = {
-            source: 'entry',
-            label: hovered.label,
             formattedValue: hovered.formattedValue,
+            label: hovered.label,
+            source: 'entry',
             x,
             y,
           };
@@ -489,8 +487,8 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
             const entry = entriesRef.current.find((e) => e.alpha2 === alpha2);
             if (entry) {
               showPointerTooltip({
-                label: entry.label,
                 formattedValue: entry.formattedValue,
+                label: entry.label,
                 x,
                 y,
               });
@@ -499,7 +497,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
             // Countries without a data row get a name-only tooltip.
             const label = getCountryLabelRef.current(alpha2);
             if (label) {
-              showPointerTooltip({ label, formattedValue: null, x, y });
+              showPointerTooltip({ formattedValue: null, label, x, y });
             } else {
               clearPointerTooltip();
             }
@@ -520,8 +518,8 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
       };
       const onPointerDown = (event: PointerEvent) => {
         dragRef.current = {
-          startX: event.clientX,
           startPhi: currentPhiRef.current,
+          startX: event.clientX,
         };
         targetPhiRef.current = null;
         countryLookupSeqRef.current++;
@@ -576,21 +574,21 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
       <div
         className={className}
         style={{
+          aspectRatio: '1',
+          maxWidth: '100%',
           position: 'relative',
           width: size,
-          maxWidth: '100%',
-          aspectRatio: '1',
           ...style,
         }}
       >
         <canvas
           ref={canvasRef}
           style={{
-            display: 'block',
-            width: '100%',
-            height: '100%',
             cursor: 'grab',
+            display: 'block',
+            height: '100%',
             touchAction: 'none',
+            width: '100%',
           }}
         />
         {tooltip ? renderTooltip?.(tooltip) : null}

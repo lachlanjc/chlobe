@@ -253,7 +253,9 @@ function compileShader(
   source: string
 ): WebGLShader | null {
   const shader = gl.createShader(type);
-  if (!shader) return null;
+  if (!shader) {
+    return null;
+  }
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -270,9 +272,13 @@ function createProgram(
 ): WebGLProgram | null {
   const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexSource);
   const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
-  if (!vertexShader || !fragmentShader) return null;
+  if (!vertexShader || !fragmentShader) {
+    return null;
+  }
   const program = gl.createProgram();
-  if (!program) return null;
+  if (!program) {
+    return null;
+  }
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
   gl.linkProgram(program);
@@ -290,24 +296,24 @@ function getGlobeUniformLocations(
   program: WebGLProgram
 ) {
   return {
-    uResolution: gl.getUniformLocation(program, 'uResolution'),
-    rotation: gl.getUniformLocation(program, 'rotation'),
-    dots: gl.getUniformLocation(program, 'dots'),
-    scale: gl.getUniformLocation(program, 'scale'),
-    offset: gl.getUniformLocation(program, 'offset'),
     baseColor: gl.getUniformLocation(program, 'baseColor'),
+    dots: gl.getUniformLocation(program, 'dots'),
     glowColor: gl.getUniformLocation(program, 'glowColor'),
+    offset: gl.getUniformLocation(program, 'offset'),
     renderParams: gl.getUniformLocation(program, 'renderParams'),
+    rotation: gl.getUniformLocation(program, 'rotation'),
+    scale: gl.getUniformLocation(program, 'scale'),
+    uResolution: gl.getUniformLocation(program, 'uResolution'),
     uTexture: gl.getUniformLocation(program, 'uTexture'),
   };
 }
 
 const NOOP_GLOBE: Globe = {
   destroy: () => {},
+  project: () => ({ visible: false, x: 0, y: 0 }),
+  unproject: () => null,
   update: () => {},
   updateTexture: () => {},
-  project: () => ({ x: 0, y: 0, visible: false }),
-  unproject: () => null,
 };
 
 export default function createGlobe(
@@ -316,16 +322,18 @@ export default function createGlobe(
 ): Globe {
   const contextAttributes: WebGLContextAttributes = {
     alpha: true,
-    stencil: false,
     antialias: true,
     depth: false,
     preserveDrawingBuffer: false,
+    stencil: false,
     ...opts.context,
   };
   const glContext =
     canvas.getContext('webgl2', contextAttributes) ??
     canvas.getContext('webgl', contextAttributes);
-  if (!glContext) return NOOP_GLOBE;
+  if (!glContext) {
+    return NOOP_GLOBE;
+  }
   // Rebind after the null check so closures below see a non-null context.
   const gl = glContext;
 
@@ -350,7 +358,9 @@ export default function createGlobe(
     GLOBE_VERTEX_SHADER,
     GLOBE_FRAGMENT_SHADER
   );
-  if (!globeProgram) return NOOP_GLOBE;
+  if (!globeProgram) {
+    return NOOP_GLOBE;
+  }
 
   // Fullscreen quad (2 triangles) that the globe fragment shader fills.
   const quadBuffer = gl.createBuffer();
@@ -400,21 +410,43 @@ export default function createGlobe(
   }
 
   function render(state: Partial<GlobeOptions>): void {
-    if (state.phi !== undefined) phi = state.phi;
-    if (state.theta !== undefined) theta = state.theta;
+    if (state.phi !== undefined) {
+      phi = state.phi;
+    }
+    if (state.theta !== undefined) {
+      theta = state.theta;
+    }
     if (state.width && state.height) {
       canvas.width = state.width * devicePixelRatio;
       canvas.height = state.height * devicePixelRatio;
     }
-    if (state.mapSamples !== undefined) mapSamples = state.mapSamples;
-    if (state.mapBrightness !== undefined) mapBrightness = state.mapBrightness;
-    if (state.baseColor !== undefined) baseColor = state.baseColor;
-    if (state.glowColor !== undefined) glowColor = state.glowColor;
-    if (state.diffuse !== undefined) diffuse = state.diffuse;
-    if (state.dark !== undefined) dark = state.dark;
-    if (state.opacity !== undefined) opacity = state.opacity;
-    if (state.offset !== undefined) offset = state.offset;
-    if (state.scale !== undefined) scale = state.scale;
+    if (state.mapSamples !== undefined) {
+      mapSamples = state.mapSamples;
+    }
+    if (state.mapBrightness !== undefined) {
+      mapBrightness = state.mapBrightness;
+    }
+    if (state.baseColor !== undefined) {
+      baseColor = state.baseColor;
+    }
+    if (state.glowColor !== undefined) {
+      glowColor = state.glowColor;
+    }
+    if (state.diffuse !== undefined) {
+      diffuse = state.diffuse;
+    }
+    if (state.dark !== undefined) {
+      dark = state.dark;
+    }
+    if (state.opacity !== undefined) {
+      opacity = state.opacity;
+    }
+    if (state.offset !== undefined) {
+      offset = state.offset;
+    }
+    if (state.scale !== undefined) {
+      scale = state.scale;
+    }
 
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 0);
@@ -495,6 +527,7 @@ export default function createGlobe(
       sinTheta * point[1] +
       cosPhi * cosTheta * point[2];
     return {
+      visible: rotatedZ >= 0,
       x:
         ((rotatedX / (canvas.width / canvas.height)) * scale +
           (offset[0] * scale * devicePixelRatio) / canvas.width +
@@ -505,7 +538,6 @@ export default function createGlobe(
           (offset[1] * scale * devicePixelRatio) / canvas.height +
           1) /
         2,
-      visible: rotatedZ >= 0,
     };
   }
 
@@ -519,7 +551,9 @@ export default function createGlobe(
       -(ny * 2 - 1 - (offset[1] * scale * devicePixelRatio) / canvas.height) /
       scale;
     const radialSq = worldX * worldX + worldY * worldY;
-    if (radialSq > GLOBE_RADIUS * GLOBE_RADIUS) return null;
+    if (radialSq > GLOBE_RADIUS * GLOBE_RADIUS) {
+      return null;
+    }
     const worldZ = Math.sqrt(GLOBE_RADIUS * GLOBE_RADIUS - radialSq);
     const cosTheta = Math.cos(theta);
     const cosPhi = Math.cos(phi);
@@ -543,17 +577,17 @@ export default function createGlobe(
   render({});
 
   return {
-    update: render,
-    project,
-    unproject,
-    updateTexture: (image: TexImageSource) => {
-      uploadTexture(image);
-      render({});
-    },
     destroy: () => {
       gl.deleteBuffer(quadBuffer);
       gl.deleteProgram(globeProgram);
       gl.deleteTexture(mapTexture);
+    },
+    project,
+    unproject,
+    update: render,
+    updateTexture: (image: TexImageSource) => {
+      uploadTexture(image);
+      render({});
     },
   };
 }

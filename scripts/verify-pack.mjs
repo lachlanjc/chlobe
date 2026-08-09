@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 
 const output = execFileSync('npm', ['pack', '--dry-run', '--json'], {
-  encoding: 'utf8',
+  encoding: 'utf-8',
   env: {
     ...process.env,
     npm_config_cache: join(process.cwd(), '.npm-cache'),

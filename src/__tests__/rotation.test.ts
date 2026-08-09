@@ -10,8 +10,8 @@ import {
 
 const TWO_PI = 2 * Math.PI;
 
-describe('phiForLongitude', () => {
-  const cases: Array<[lonDegrees: number, expectedPhi: number]> = [
+describe(phiForLongitude, () => {
+  const cases: [lonDegrees: number, expectedPhi: number][] = [
     [0, (3 * Math.PI) / 2],
     [90, Math.PI],
     [180, Math.PI / 2],
@@ -24,7 +24,7 @@ describe('phiForLongitude', () => {
   });
 });
 
-describe('shortestPhiDelta', () => {
+describe(shortestPhiDelta, () => {
   it('returns the plain difference when it is already short', () => {
     expect(shortestPhiDelta(1, 1.5)).toBeCloseTo(0.5, 10);
     expect(shortestPhiDelta(1.5, 1)).toBeCloseTo(-0.5, 10);
@@ -47,11 +47,11 @@ describe('shortestPhiDelta', () => {
   });
 });
 
-describe('stepPhiTowardTarget', () => {
+describe(stepPhiTowardTarget, () => {
   it('moves a fraction of the remaining delta each step', () => {
     const { phi, done } = stepPhiTowardTarget(0, 1);
     expect(phi).toBeCloseTo(PHI_EASING_FACTOR, 10);
-    expect(done).toBe(false);
+    expect(done).toBeFalsy();
   });
 
   it('eases along the shortest path across the 2π wrap', () => {
@@ -63,7 +63,7 @@ describe('stepPhiTowardTarget', () => {
   it('snaps to the target when the remaining delta is below the threshold', () => {
     const { phi, done } = stepPhiTowardTarget(1, 1.005);
     expect(phi).toBe(1.005);
-    expect(done).toBe(true);
+    expect(done).toBeTruthy();
   });
 
   it('converges to done within a bounded number of steps', () => {
@@ -72,12 +72,12 @@ describe('stepPhiTowardTarget', () => {
     for (let i = 0; i < 200 && !done; i++) {
       ({ phi, done } = stepPhiTowardTarget(phi, Math.PI));
     }
-    expect(done).toBe(true);
+    expect(done).toBeTruthy();
     expect(phi).toBeCloseTo(Math.PI, 10);
   });
 });
 
-describe('targetPhiForLongitude', () => {
+describe(targetPhiForLongitude, () => {
   it('returns phiForLongitude when starting from zero', () => {
     expect(targetPhiForLongitude(0, 0)).toBeCloseTo(
       shortestPhiDelta(0, phiForLongitude(0)),
