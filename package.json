@@ -39,6 +39,7 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --clean --watch",
     "generate": "pnpm generate:country-data && pnpm generate:globe-shaders",
     "generate:country-data": "node scripts/generate-country-data.mjs",
+    "pull:environmental-data": "node scripts/pull-environmental-data.mjs",
     "generate:globe-shaders": "node scripts/generate-globe-shaders.mjs",
     "prebuild": "pnpm generate",
     "test": "vitest run",

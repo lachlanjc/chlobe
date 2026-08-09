@@ -1,0 +1,1255 @@
+{
+  "entries": [
+    {
+      "alpha2": "AD",
+      "label": "Andorra",
+      "value": 93.3403907227408,
+      "year": 2021
+    },
+    {
+      "alpha2": "AE",
+      "label": "United Arab Emirates",
+      "value": 4.20134583903604,
+      "year": 2021
+    },
+    {
+      "alpha2": "AF",
+      "label": "Afghanistan",
+      "value": 78.2344746063241,
+      "year": 2021
+    },
+    {
+      "alpha2": "AG",
+      "label": "Antigua and Barbuda",
+      "value": 5.65579264886605,
+      "year": 2021
+    },
+    {
+      "alpha2": "AL",
+      "label": "Albania",
+      "value": 98.6105941302792,
+      "year": 2011
+    },
+    {
+      "alpha2": "AM",
+      "label": "Armenia",
+      "value": 30.0380758979566,
+      "year": 2021
+    },
+    {
+      "alpha2": "AO",
+      "label": "Angola",
+      "value": 91.1643122192566,
+      "year": 2021
+    },
+    {
+      "alpha2": "AR",
+      "label": "Argentina",
+      "value": 25.5361113468556,
+      "year": 2021
+    },
+    {
+      "alpha2": "AS",
+      "label": "American Samoa",
+      "value": 3.8725406815218,
+      "year": 2021
+    },
+    {
+      "alpha2": "AT",
+      "label": "Austria",
+      "value": 79.9114280061055,
+      "year": 2021
+    },
+    {
+      "alpha2": "AU",
+      "label": "Australia",
+      "value": 26.6608674695166,
+      "year": 2021
+    },
+    {
+      "alpha2": "AW",
+      "label": "Aruba",
+      "value": 14.7971787957078,
+      "year": 2021
+    },
+    {
+      "alpha2": "AZ",
+      "label": "Azerbaijan",
+      "value": 5.79875927851687,
+      "year": 2021
+    },
+    {
+      "alpha2": "BA",
+      "label": "Bosnia and Herzegovina",
+      "value": 39.3396633577902,
+      "year": 2021
+    },
+    {
+      "alpha2": "BB",
+      "label": "Barbados",
+      "value": 7.32507956609401,
+      "year": 2021
+    },
+    {
+      "alpha2": "BD",
+      "label": "Bangladesh",
+      "value": 1.50701993704092,
+      "year": 2021
+    },
+    {
+      "alpha2": "BE",
+      "label": "Belgium",
+      "value": 23.5431574128442,
+      "year": 2021
+    },
+    {
+      "alpha2": "BF",
+      "label": "Burkina Faso",
+      "value": 13.9238095238095,
+      "year": 2021
+    },
+    {
+      "alpha2": "BG",
+      "label": "Bulgaria",
+      "value": 22.1918096199125,
+      "year": 2021
+    },
+    {
+      "alpha2": "BH",
+      "label": "Bahrain",
+      "value": 0.0374420435657423,
+      "year": 2021
+    },
+    {
+      "alpha2": "BI",
+      "label": "Burundi",
+      "value": 61.3041849395068,
+      "year": 2021
+    },
+    {
+      "alpha2": "BJ",
+      "label": "Benin",
+      "value": 0.257548845470693,
+      "year": 2021
+    },
+    {
+      "alpha2": "BN",
+      "label": "Brunei Darussalam",
+      "value": 0.0196525706264257,
+      "year": 2021
+    },
+    {
+      "alpha2": "BO",
+      "label": "Bolivia",
+      "value": 38.2375964718853,
+      "year": 2021
+    },
+    {
+      "alpha2": "BR",
+      "label": "Brazil",
+      "value": 77.3753492178891,
+      "year": 2021
+    },
+    {
+      "alpha2": "BS",
+      "label": "Bahamas, The",
+      "value": 0.480875807854305,
+      "year": 2021
+    },
+    {
+      "alpha2": "BT",
+      "label": "Bhutan",
+      "value": 100,
+      "year": 2021
+    },
+    {
+      "alpha2": "BW",
+      "label": "Botswana",
+      "value": 0.248679398618448,
+      "year": 2021
+    },
+    {
+      "alpha2": "BY",
+      "label": "Belarus",
+      "value": 3.1465360459759,
+      "year": 2021
+    },
+    {
+      "alpha2": "BZ",
+      "label": "Belize",
+      "value": 92.8601757887138,
+      "year": 2021
+    },
+    {
+      "alpha2": "CA",
+      "label": "Canada",
+      "value": 67.0163805768966,
+      "year": 2021
+    },
+    {
+      "alpha2": "CD",
+      "label": "Congo, Dem. Rep.",
+      "value": 90.4325595509028,
+      "year": 2021
+    },
+    {
+      "alpha2": "CF",
+      "label": "Central African Republic",
+      "value": 96.473071423708,
+      "year": 2021
+    },
+    {
+      "alpha2": "CG",
+      "label": "Congo, Rep.",
+      "value": 31.7064705882353,
+      "year": 2021
+    },
+    {
+      "alpha2": "CH",
+      "label": "Switzerland",
+      "value": 67.8762344840083,
+      "year": 2021
+    },
+    {
+      "alpha2": "CI",
+      "label": "Cote d'Ivoire",
+      "value": 22.7753265853448,
+      "year": 2021
+    },
+    {
+      "alpha2": "CL",
+      "label": "Chile",
+      "value": 48.0821990956395,
+      "year": 2021
+    },
+    {
+      "alpha2": "CM",
+      "label": "Cameroon",
+      "value": 61.8966686856451,
+      "year": 2021
+    },
+    {
+      "alpha2": "CN",
+      "label": "China",
+      "value": 28.427997926748,
+      "year": 2021
+    },
+    {
+      "alpha2": "CO",
+      "label": "Colombia",
+      "value": 75.1246222666381,
+      "year": 2021
+    },
+    {
+      "alpha2": "CR",
+      "label": "Costa Rica",
+      "value": 99.3668053701814,
+      "year": 2021
+    },
+    {
+      "alpha2": "CU",
+      "label": "Cuba",
+      "value": 4.77073999691024,
+      "year": 2021
+    },
+    {
+      "alpha2": "CV",
+      "label": "Cabo Verde",
+      "value": 18.2655949281105,
+      "year": 2021
+    },
+    {
+      "alpha2": "CW",
+      "label": "Curacao",
+      "value": 18.2624113475177,
+      "year": 2021
+    },
+    {
+      "alpha2": "CY",
+      "label": "Cyprus",
+      "value": 15.1349873022075,
+      "year": 2021
+    },
+    {
+      "alpha2": "CZ",
+      "label": "Czechia",
+      "value": 14.0234899723578,
+      "year": 2021
+    },
+    {
+      "alpha2": "DE",
+      "label": "Germany",
+      "value": 39.8305665158005,
+      "year": 2021
+    },
+    {
+      "alpha2": "DJ",
+      "label": "Djibouti",
+      "value": 35.3535353535354,
+      "year": 2021
+    },
+    {
+      "alpha2": "DK",
+      "label": "Denmark",
+      "value": 78.958880484115,
+      "year": 2021
+    },
+    {
+      "alpha2": "DM",
+      "label": "Dominica",
+      "value": 20.2875714004333,
+      "year": 2021
+    },
+    {
+      "alpha2": "DO",
+      "label": "Dominican Republic",
+      "value": 17.0566127087997,
+      "year": 2021
+    },
+    {
+      "alpha2": "DZ",
+      "label": "Algeria",
+      "value": 0.913584728890971,
+      "year": 2021
+    },
+    {
+      "alpha2": "EC",
+      "label": "Ecuador",
+      "value": 80.9483764822748,
+      "year": 2021
+    },
+    {
+      "alpha2": "EE",
+      "label": "Estonia",
+      "value": 39.9573847862299,
+      "year": 2021
+    },
+    {
+      "alpha2": "EG",
+      "label": "Egypt, Arab Rep.",
+      "value": 12.1959401781537,
+      "year": 2021
+    },
+    {
+      "alpha2": "ER",
+      "label": "Eritrea",
+      "value": 5.05022831050228,
+      "year": 2021
+    },
+    {
+      "alpha2": "ES",
+      "label": "Spain",
+      "value": 47.0149136749395,
+      "year": 2021
+    },
+    {
+      "alpha2": "ET",
+      "label": "Ethiopia",
+      "value": 95.4343696574432,
+      "year": 2020
+    },
+    {
+      "alpha2": "FI",
+      "label": "Finland",
+      "value": 52.9302986606029,
+      "year": 2021
+    },
+    {
+      "alpha2": "FJ",
+      "label": "Fiji",
+      "value": 60.0656085236255,
+      "year": 2021
+    },
+    {
+      "alpha2": "FM",
+      "label": "Micronesia, Fed. Sts.",
+      "value": 4.94750949296404,
+      "year": 2021
+    },
+    {
+      "alpha2": "FO",
+      "label": "Faroe Islands",
+      "value": 38.0840018876829,
+      "year": 2021
+    },
+    {
+      "alpha2": "FR",
+      "label": "France",
+      "value": 22.8038733642766,
+      "year": 2021
+    },
+    {
+      "alpha2": "GA",
+      "label": "Gabon",
+      "value": 31.5882541720154,
+      "year": 2021
+    },
+    {
+      "alpha2": "GB",
+      "label": "United Kingdom",
+      "value": 40.1999760236135,
+      "year": 2021
+    },
+    {
+      "alpha2": "GD",
+      "label": "Grenada",
+      "value": 1.96573875802998,
+      "year": 2021
+    },
+    {
+      "alpha2": "GE",
+      "label": "Georgia",
+      "value": 81.3667062079873,
+      "year": 2021
+    },
+    {
+      "alpha2": "GH",
+      "label": "Ghana",
+      "value": 34.867098938968,
+      "year": 2021
+    },
+    {
+      "alpha2": "GI",
+      "label": "Gibraltar",
+      "value": 0,
+      "year": 2015
+    },
+    {
+      "alpha2": "GL",
+      "label": "Greenland",
+      "value": 77.0421783235451,
+      "year": 2021
+    },
+    {
+      "alpha2": "GM",
+      "label": "Gambia, The",
+      "value": 1.60250694249828,
+      "year": 2021
+    },
+    {
+      "alpha2": "GN",
+      "label": "Guinea",
+      "value": 88.1321934987129,
+      "year": 2021
+    },
+    {
+      "alpha2": "GQ",
+      "label": "Equatorial Guinea",
+      "value": 8.82316227461859,
+      "year": 2021
+    },
+    {
+      "alpha2": "GR",
+      "label": "Greece",
+      "value": 40.5640135246276,
+      "year": 2021
+    },
+    {
+      "alpha2": "GT",
+      "label": "Guatemala",
+      "value": 60.6103116732271,
+      "year": 2021
+    },
+    {
+      "alpha2": "GU",
+      "label": "Guam",
+      "value": 4.80077087647049,
+      "year": 2021
+    },
+    {
+      "alpha2": "GW",
+      "label": "Guinea-Bissau",
+      "value": 7.08661417322835,
+      "year": 2021
+    },
+    {
+      "alpha2": "GY",
+      "label": "Guyana",
+      "value": 7.1061714531072,
+      "year": 2021
+    },
+    {
+      "alpha2": "HK",
+      "label": "Hong Kong SAR, China",
+      "value": 0.83458081824279,
+      "year": 2021
+    },
+    {
+      "alpha2": "HN",
+      "label": "Honduras",
+      "value": 64.6209532374101,
+      "year": 2021
+    },
+    {
+      "alpha2": "HR",
+      "label": "Croatia",
+      "value": 69.8809993425378,
+      "year": 2021
+    },
+    {
+      "alpha2": "HT",
+      "label": "Haiti",
+      "value": 20.5416248746239,
+      "year": 2021
+    },
+    {
+      "alpha2": "HU",
+      "label": "Hungary",
+      "value": 19.1445182724252,
+      "year": 2021
+    },
+    {
+      "alpha2": "ID",
+      "label": "Indonesia",
+      "value": 15.5300398228856,
+      "year": 2021
+    },
+    {
+      "alpha2": "IE",
+      "label": "Ireland",
+      "value": 37.1541775946047,
+      "year": 2021
+    },
+    {
+      "alpha2": "IL",
+      "label": "Israel",
+      "value": 7.63056263212098,
+      "year": 2021
+    },
+    {
+      "alpha2": "IN",
+      "label": "India",
+      "value": 19.131292447169,
+      "year": 2021
+    },
+    {
+      "alpha2": "IQ",
+      "label": "Iraq",
+      "value": 3.77958595889556,
+      "year": 2021
+    },
+    {
+      "alpha2": "IR",
+      "label": "Iran, Islamic Rep.",
+      "value": 4.23813256684958,
+      "year": 2021
+    },
+    {
+      "alpha2": "IS",
+      "label": "Iceland",
+      "value": 99.9936388140162,
+      "year": 2016
+    },
+    {
+      "alpha2": "IT",
+      "label": "Italy",
+      "value": 40.9735703240403,
+      "year": 2021
+    },
+    {
+      "alpha2": "JM",
+      "label": "Jamaica",
+      "value": 12.7547999074717,
+      "year": 2021
+    },
+    {
+      "alpha2": "JO",
+      "label": "Jordan",
+      "value": 24.9181992606112,
+      "year": 2021
+    },
+    {
+      "alpha2": "JP",
+      "label": "Japan",
+      "value": 21.1036678422205,
+      "year": 2021
+    },
+    {
+      "alpha2": "KE",
+      "label": "Kenya",
+      "value": 78.0821751777634,
+      "year": 2021
+    },
+    {
+      "alpha2": "KG",
+      "label": "Kyrgyz Republic",
+      "value": 85.5934733782534,
+      "year": 2021
+    },
+    {
+      "alpha2": "KH",
+      "label": "Cambodia",
+      "value": 56.368745716244,
+      "year": 2021
+    },
+    {
+      "alpha2": "KI",
+      "label": "Kiribati",
+      "value": 16.3652802893309,
+      "year": 2021
+    },
+    {
+      "alpha2": "KM",
+      "label": "Comoros",
+      "value": 0,
+      "year": 2021
+    },
+    {
+      "alpha2": "KN",
+      "label": "St. Kitts and Nevis",
+      "value": 4.52674897119342,
+      "year": 2021
+    },
+    {
+      "alpha2": "KP",
+      "label": "Korea, Dem. People's Rep.",
+      "value": 63.0792789980882,
+      "year": 2021
+    },
+    {
+      "alpha2": "KR",
+      "label": "Korea, Rep.",
+      "value": 6.58834768589831,
+      "year": 2021
+    },
+    {
+      "alpha2": "KW",
+      "label": "Kuwait",
+      "value": 0.265012812418762,
+      "year": 2021
+    },
+    {
+      "alpha2": "KY",
+      "label": "Cayman Islands",
+      "value": 2.93933111462709,
+      "year": 2021
+    },
+    {
+      "alpha2": "KZ",
+      "label": "Kazakhstan",
+      "value": 10.9976885243053,
+      "year": 2021
+    },
+    {
+      "alpha2": "LA",
+      "label": "Lao PDR",
+      "value": 63.2882872854376,
+      "year": 2021
+    },
+    {
+      "alpha2": "LB",
+      "label": "Lebanon",
+      "value": 5.07230201863354,
+      "year": 2021
+    },
+    {
+      "alpha2": "LC",
+      "label": "St. Lucia",
+      "value": 2.54489148622662,
+      "year": 2021
+    },
+    {
+      "alpha2": "LK",
+      "label": "Sri Lanka",
+      "value": 49.2380351199357,
+      "year": 2021
+    },
+    {
+      "alpha2": "LR",
+      "label": "Liberia",
+      "value": 57.4209245742092,
+      "year": 2021
+    },
+    {
+      "alpha2": "LS",
+      "label": "Lesotho",
+      "value": 99.7862526718416,
+      "year": 2021
+    },
+    {
+      "alpha2": "LT",
+      "label": "Lithuania",
+      "value": 65.6144151240646,
+      "year": 2021
+    },
+    {
+      "alpha2": "LU",
+      "label": "Luxembourg",
+      "value": 89.0447963800905,
+      "year": 2021
+    },
+    {
+      "alpha2": "LV",
+      "label": "Latvia",
+      "value": 63.5961341087923,
+      "year": 2021
+    },
+    {
+      "alpha2": "LY",
+      "label": "Libya",
+      "value": 0.0223947103636625,
+      "year": 2021
+    },
+    {
+      "alpha2": "MA",
+      "label": "Morocco",
+      "value": 19.319165433143,
+      "year": 2021
+    },
+    {
+      "alpha2": "MD",
+      "label": "Moldova",
+      "value": 6.50390625,
+      "year": 2021
+    },
+    {
+      "alpha2": "ME",
+      "label": "Montenegro",
+      "value": 61.7770127118644,
+      "year": 2021
+    },
+    {
+      "alpha2": "MF",
+      "label": "St. Martin (French part)",
+      "value": 0.811168745171615,
+      "year": 2021
+    },
+    {
+      "alpha2": "MG",
+      "label": "Madagascar",
+      "value": 34.110314615691,
+      "year": 2021
+    },
+    {
+      "alpha2": "MH",
+      "label": "Marshall Islands",
+      "value": 2.4256748351785,
+      "year": 2021
+    },
+    {
+      "alpha2": "MK",
+      "label": "North Macedonia",
+      "value": 30.9676369553426,
+      "year": 2021
+    },
+    {
+      "alpha2": "ML",
+      "label": "Mali",
+      "value": 62.2933606249605,
+      "year": 2021
+    },
+    {
+      "alpha2": "MM",
+      "label": "Myanmar",
+      "value": 50.8374750664894,
+      "year": 2021
+    },
+    {
+      "alpha2": "MN",
+      "label": "Mongolia",
+      "value": 10.9483384905153,
+      "year": 2021
+    },
+    {
+      "alpha2": "MR",
+      "label": "Mauritania",
+      "value": 19.3554142491133,
+      "year": 2021
+    },
+    {
+      "alpha2": "MT",
+      "label": "Malta",
+      "value": 11.8897922312556,
+      "year": 2021
+    },
+    {
+      "alpha2": "MU",
+      "label": "Mauritius",
+      "value": 21.682820855615,
+      "year": 2021
+    },
+    {
+      "alpha2": "MV",
+      "label": "Maldives",
+      "value": 5.82133253659994,
+      "year": 2021
+    },
+    {
+      "alpha2": "MW",
+      "label": "Malawi",
+      "value": 80.0551584735492,
+      "year": 2021
+    },
+    {
+      "alpha2": "MX",
+      "label": "Mexico",
+      "value": 23.3762297959545,
+      "year": 2021
+    },
+    {
+      "alpha2": "MY",
+      "label": "Malaysia",
+      "value": 16.9995110757999,
+      "year": 2021
+    },
+    {
+      "alpha2": "MZ",
+      "label": "Mozambique",
+      "value": 82.7092499337397,
+      "year": 2021
+    },
+    {
+      "alpha2": "NA",
+      "label": "Namibia",
+      "value": 93.3683473389356,
+      "year": 2021
+    },
+    {
+      "alpha2": "NC",
+      "label": "New Caledonia",
+      "value": 22.4774047218117,
+      "year": 2021
+    },
+    {
+      "alpha2": "NE",
+      "label": "Niger",
+      "value": 7.8251273344652,
+      "year": 2021
+    },
+    {
+      "alpha2": "NG",
+      "label": "Nigeria",
+      "value": 22.2303049100539,
+      "year": 2021
+    },
+    {
+      "alpha2": "NI",
+      "label": "Nicaragua",
+      "value": 69.5093757417517,
+      "year": 2021
+    },
+    {
+      "alpha2": "NL",
+      "label": "Netherlands",
+      "value": 33.1271998035524,
+      "year": 2021
+    },
+    {
+      "alpha2": "NO",
+      "label": "Norway",
+      "value": 99.1038297387318,
+      "year": 2021
+    },
+    {
+      "alpha2": "NP",
+      "label": "Nepal",
+      "value": 83.9765900145018,
+      "year": 2021
+    },
+    {
+      "alpha2": "NR",
+      "label": "Naoero",
+      "value": 9.82367758186398,
+      "year": 2021
+    },
+    {
+      "alpha2": "NZ",
+      "label": "New Zealand",
+      "value": 81.4350720674273,
+      "year": 2021
+    },
+    {
+      "alpha2": "OM",
+      "label": "Oman",
+      "value": 1.93992360506721,
+      "year": 2021
+    },
+    {
+      "alpha2": "PA",
+      "label": "Panama",
+      "value": 79.278975629905,
+      "year": 2021
+    },
+    {
+      "alpha2": "PE",
+      "label": "Peru",
+      "value": 61.7794528000562,
+      "year": 2021
+    },
+    {
+      "alpha2": "PF",
+      "label": "French Polynesia",
+      "value": 23.7317475837087,
+      "year": 2021
+    },
+    {
+      "alpha2": "PG",
+      "label": "Papua New Guinea",
+      "value": 39.9588024788339,
+      "year": 2021
+    },
+    {
+      "alpha2": "PH",
+      "label": "Philippines",
+      "value": 22.6350488071458,
+      "year": 2021
+    },
+    {
+      "alpha2": "PK",
+      "label": "Pakistan",
+      "value": 28.276210800358,
+      "year": 2021
+    },
+    {
+      "alpha2": "PL",
+      "label": "Poland",
+      "value": 17.4599985525884,
+      "year": 2021
+    },
+    {
+      "alpha2": "PR",
+      "label": "Puerto Rico (US)",
+      "value": 4.57841328319192,
+      "year": 2021
+    },
+    {
+      "alpha2": "PS",
+      "label": "West Bank and Gaza",
+      "value": 24.4633507853403,
+      "year": 2021
+    },
+    {
+      "alpha2": "PT",
+      "label": "Portugal",
+      "value": 64.9061770532965,
+      "year": 2021
+    },
+    {
+      "alpha2": "PW",
+      "label": "Palau",
+      "value": 4.59829235675342,
+      "year": 2021
+    },
+    {
+      "alpha2": "PY",
+      "label": "Paraguay",
+      "value": 99.9973769403171,
+      "year": 2012
+    },
+    {
+      "alpha2": "QA",
+      "label": "Qatar",
+      "value": 0.276427644700916,
+      "year": 2021
+    },
+    {
+      "alpha2": "RO",
+      "label": "Romania",
+      "value": 44.8574239112157,
+      "year": 2021
+    },
+    {
+      "alpha2": "RS",
+      "label": "Serbia",
+      "value": 34.9821890937623,
+      "year": 2021
+    },
+    {
+      "alpha2": "RU",
+      "label": "Russian Federation",
+      "value": 19.1544751840582,
+      "year": 2021
+    },
+    {
+      "alpha2": "RW",
+      "label": "Rwanda",
+      "value": 59.8933601609658,
+      "year": 2021
+    },
+    {
+      "alpha2": "SA",
+      "label": "Saudi Arabia",
+      "value": 0.0652981651937175,
+      "year": 2021
+    },
+    {
+      "alpha2": "SB",
+      "label": "Solomon Islands",
+      "value": 6.5551580779271,
+      "year": 2021
+    },
+    {
+      "alpha2": "SC",
+      "label": "Seychelles",
+      "value": 4.51403741810568,
+      "year": 2021
+    },
+    {
+      "alpha2": "SD",
+      "label": "Sudan",
+      "value": 57.9598635588403,
+      "year": 2021
+    },
+    {
+      "alpha2": "SE",
+      "label": "Sweden",
+      "value": 67.3919370423404,
+      "year": 2021
+    },
+    {
+      "alpha2": "SG",
+      "label": "Singapore",
+      "value": 4.02215992761209,
+      "year": 2021
+    },
+    {
+      "alpha2": "SI",
+      "label": "Slovenia",
+      "value": 36.1126858150668,
+      "year": 2021
+    },
+    {
+      "alpha2": "SK",
+      "label": "Slovak Republic",
+      "value": 23.5607675906183,
+      "year": 2021
+    },
+    {
+      "alpha2": "SL",
+      "label": "Sierra Leone",
+      "value": 75.2819403676811,
+      "year": 2021
+    },
+    {
+      "alpha2": "SN",
+      "label": "Senegal",
+      "value": 13.2915360501567,
+      "year": 2021
+    },
+    {
+      "alpha2": "SO",
+      "label": "Somalia, Fed. Rep.",
+      "value": 11.2132448947616,
+      "year": 2021
+    },
+    {
+      "alpha2": "SR",
+      "label": "Suriname",
+      "value": 41.9336561743341,
+      "year": 2021
+    },
+    {
+      "alpha2": "SS",
+      "label": "South Sudan",
+      "value": 0.335664335664336,
+      "year": 2021
+    },
+    {
+      "alpha2": "ST",
+      "label": "Sao Tome and Principe",
+      "value": 6.05617320070216,
+      "year": 2021
+    },
+    {
+      "alpha2": "SV",
+      "label": "El Salvador",
+      "value": 95.5593380614657,
+      "year": 2021
+    },
+    {
+      "alpha2": "SX",
+      "label": "Sint Maarten (Dutch part)",
+      "value": 0,
+      "year": 2021
+    },
+    {
+      "alpha2": "SY",
+      "label": "Syrian Arab Republic",
+      "value": 3.39200288473096,
+      "year": 2021
+    },
+    {
+      "alpha2": "SZ",
+      "label": "Eswatini",
+      "value": 83.072202166065,
+      "year": 2021
+    },
+    {
+      "alpha2": "TC",
+      "label": "Turks and Caicos Islands",
+      "value": 1.48336829487564,
+      "year": 2021
+    },
+    {
+      "alpha2": "TD",
+      "label": "Chad",
+      "value": 4.61004784688995,
+      "year": 2021
+    },
+    {
+      "alpha2": "TG",
+      "label": "Togo",
+      "value": 25.3008,
+      "year": 2021
+    },
+    {
+      "alpha2": "TH",
+      "label": "Thailand",
+      "value": 19.9307401392503,
+      "year": 2021
+    },
+    {
+      "alpha2": "TJ",
+      "label": "Tajikistan",
+      "value": 93.3827887446305,
+      "year": 2021
+    },
+    {
+      "alpha2": "TL",
+      "label": "Timor-Leste",
+      "value": 0.371447028423773,
+      "year": 2021
+    },
+    {
+      "alpha2": "TM",
+      "label": "Turkmenistan",
+      "value": 0.0110915492957746,
+      "year": 2021
+    },
+    {
+      "alpha2": "TN",
+      "label": "Tunisia",
+      "value": 2.82000913659205,
+      "year": 2021
+    },
+    {
+      "alpha2": "TO",
+      "label": "Tonga",
+      "value": 14.2006227155814,
+      "year": 2021
+    },
+    {
+      "alpha2": "TR",
+      "label": "Turkiye",
+      "value": 35.4189464124067,
+      "year": 2021
+    },
+    {
+      "alpha2": "TT",
+      "label": "Trinidad and Tobago",
+      "value": 0.067595292085088,
+      "year": 2021
+    },
+    {
+      "alpha2": "TV",
+      "label": "Tuvalu",
+      "value": 15.8385093167702,
+      "year": 2021
+    },
+    {
+      "alpha2": "TZ",
+      "label": "Tanzania",
+      "value": 37.1995633187773,
+      "year": 2021
+    },
+    {
+      "alpha2": "UA",
+      "label": "Ukraine",
+      "value": 12.0136593335613,
+      "year": 2021
+    },
+    {
+      "alpha2": "UG",
+      "label": "Uganda",
+      "value": 90.0085291887794,
+      "year": 2021
+    },
+    {
+      "alpha2": "US",
+      "label": "United States",
+      "value": 20.2733089261925,
+      "year": 2021
+    },
+    {
+      "alpha2": "UY",
+      "label": "Uruguay",
+      "value": 84.3537980618944,
+      "year": 2021
+    },
+    {
+      "alpha2": "UZ",
+      "label": "Uzbekistan",
+      "value": 7.07677648080938,
+      "year": 2021
+    },
+    {
+      "alpha2": "VC",
+      "label": "St. Vincent and the Grenadines",
+      "value": 15.0174216027875,
+      "year": 2021
+    },
+    {
+      "alpha2": "VE",
+      "label": "Venezuela, RB",
+      "value": 81.7220757524342,
+      "year": 2021
+    },
+    {
+      "alpha2": "VG",
+      "label": "British Virgin Islands",
+      "value": 2.2534386889084,
+      "year": 2021
+    },
+    {
+      "alpha2": "VI",
+      "label": "Virgin Islands (U.S.)",
+      "value": 2.50440255203672,
+      "year": 2021
+    },
+    {
+      "alpha2": "VN",
+      "label": "Viet Nam",
+      "value": 41.1697321016349,
+      "year": 2021
+    },
+    {
+      "alpha2": "VU",
+      "label": "Vanuatu",
+      "value": 25.154847680445,
+      "year": 2021
+    },
+    {
+      "alpha2": "WS",
+      "label": "Samoa",
+      "value": 49.1406825435797,
+      "year": 2021
+    },
+    {
+      "alpha2": "YE",
+      "label": "Yemen, Rep.",
+      "value": 10.4517755831057,
+      "year": 2021
+    },
+    {
+      "alpha2": "ZA",
+      "label": "South Africa",
+      "value": 6.44786393924166,
+      "year": 2021
+    },
+    {
+      "alpha2": "ZM",
+      "label": "Zambia",
+      "value": 92.001184566787,
+      "year": 2021
+    },
+    {
+      "alpha2": "ZW",
+      "label": "Zimbabwe",
+      "value": 88.3095170454545,
+      "year": 2021
+    }
+  ],
+  "name": "Renewable electricity share",
+  "source": "World Bank World Development Indicators",
+  "unit": "percent of total electricity output"
+}

@@ -1,0 +1,1093 @@
+{
+  "entries": [
+    {
+      "alpha2": "AE",
+      "label": "United Arab Emirates",
+      "value": 224.80448342462716,
+      "year": 2022
+    },
+    {
+      "alpha2": "AF",
+      "label": "Afghanistan",
+      "value": 499.81712144471743,
+      "year": 2022
+    },
+    {
+      "alpha2": "AG",
+      "label": "Antigua and Barbuda",
+      "value": 47.39336492890995,
+      "year": 2022
+    },
+    {
+      "alpha2": "AL",
+      "label": "Albania",
+      "value": 325.0890425821778,
+      "year": 2022
+    },
+    {
+      "alpha2": "AM",
+      "label": "Armenia",
+      "value": 1034.6221204364813,
+      "year": 2022
+    },
+    {
+      "alpha2": "AO",
+      "label": "Angola",
+      "value": 19.80354779562548,
+      "year": 2022
+    },
+    {
+      "alpha2": "AR",
+      "label": "Argentina",
+      "value": 830.0317054933872,
+      "year": 2022
+    },
+    {
+      "alpha2": "AT",
+      "label": "Austria",
+      "value": 347.2740260816065,
+      "year": 2022
+    },
+    {
+      "alpha2": "AU",
+      "label": "Australia",
+      "value": 446.60150666129977,
+      "year": 2022
+    },
+    {
+      "alpha2": "AZ",
+      "label": "Azerbaijan",
+      "value": 1284.4915614219076,
+      "year": 2022
+    },
+    {
+      "alpha2": "BA",
+      "label": "Bosnia and Herzegovina",
+      "value": 97.3648294028773,
+      "year": 2022
+    },
+    {
+      "alpha2": "BB",
+      "label": "Barbados",
+      "value": 247.9473501512479,
+      "year": 2022
+    },
+    {
+      "alpha2": "BD",
+      "label": "Bangladesh",
+      "value": 211.76622376196858,
+      "year": 2022
+    },
+    {
+      "alpha2": "BE",
+      "label": "Belgium",
+      "value": 368.1453859990531,
+      "year": 2022
+    },
+    {
+      "alpha2": "BF",
+      "label": "Burkina Faso",
+      "value": 36.34095779659708,
+      "year": 2022
+    },
+    {
+      "alpha2": "BG",
+      "label": "Bulgaria",
+      "value": 841.9724966230206,
+      "year": 2022
+    },
+    {
+      "alpha2": "BH",
+      "label": "Bahrain",
+      "value": 101.72539652244747,
+      "year": 2022
+    },
+    {
+      "alpha2": "BI",
+      "label": "Burundi",
+      "value": 21.02679681710898,
+      "year": 2022
+    },
+    {
+      "alpha2": "BJ",
+      "label": "Benin",
+      "value": 9.448017046548419,
+      "year": 2022
+    },
+    {
+      "alpha2": "BN",
+      "label": "Brunei Darussalam",
+      "value": 202.03351121066385,
+      "year": 2022
+    },
+    {
+      "alpha2": "BO",
+      "label": "Bolivia",
+      "value": 29.815450809023385,
+      "year": 2022
+    },
+    {
+      "alpha2": "BR",
+      "label": "Brazil",
+      "value": 323.05243755878774,
+      "year": 2022
+    },
+    {
+      "alpha2": "BT",
+      "label": "Bhutan",
+      "value": 432.6980947966101,
+      "year": 2022
+    },
+    {
+      "alpha2": "BW",
+      "label": "Botswana",
+      "value": 87.40380270930025,
+      "year": 2022
+    },
+    {
+      "alpha2": "BY",
+      "label": "Belarus",
+      "value": 153.22812319064298,
+      "year": 2022
+    },
+    {
+      "alpha2": "BZ",
+      "label": "Belize",
+      "value": 250.78650123034367,
+      "year": 2022
+    },
+    {
+      "alpha2": "CA",
+      "label": "Canada",
+      "value": 927.5449952262036,
+      "year": 2022
+    },
+    {
+      "alpha2": "CD",
+      "label": "Congo, Dem. Rep.",
+      "value": 6.675978921563381,
+      "year": 2022
+    },
+    {
+      "alpha2": "CF",
+      "label": "Central African Republic",
+      "value": 14.221154447818073,
+      "year": 2022
+    },
+    {
+      "alpha2": "CG",
+      "label": "Congo, Rep.",
+      "value": 7.622072461385918,
+      "year": 2022
+    },
+    {
+      "alpha2": "CH",
+      "label": "Switzerland",
+      "value": 194.14183838648992,
+      "year": 2022
+    },
+    {
+      "alpha2": "CI",
+      "label": "Cote d'Ivoire",
+      "value": 38.229969519330844,
+      "year": 2022
+    },
+    {
+      "alpha2": "CL",
+      "label": "Chile",
+      "value": 1808.8239596142512,
+      "year": 2022
+    },
+    {
+      "alpha2": "CM",
+      "label": "Cameroon",
+      "value": 39.38801504923266,
+      "year": 2022
+    },
+    {
+      "alpha2": "CN",
+      "label": "China",
+      "value": 402.55634039690545,
+      "year": 2022
+    },
+    {
+      "alpha2": "CO",
+      "label": "Colombia",
+      "value": 468.97186328084473,
+      "year": 2022
+    },
+    {
+      "alpha2": "CR",
+      "label": "Costa Rica",
+      "value": 678.2741822968989,
+      "year": 2022
+    },
+    {
+      "alpha2": "CU",
+      "label": "Cuba",
+      "value": 629.1241629610608,
+      "year": 2022
+    },
+    {
+      "alpha2": "CV",
+      "label": "Cabo Verde",
+      "value": 344.50068399452806,
+      "year": 2022
+    },
+    {
+      "alpha2": "CY",
+      "label": "Cyprus",
+      "value": 167.49663880063395,
+      "year": 2022
+    },
+    {
+      "alpha2": "CZ",
+      "label": "Czechia",
+      "value": 135.3995523662688,
+      "year": 2022
+    },
+    {
+      "alpha2": "DE",
+      "label": "Germany",
+      "value": 310.08953072618056,
+      "year": 2022
+    },
+    {
+      "alpha2": "DJ",
+      "label": "Djibouti",
+      "value": 16.709231234653892,
+      "year": 2022
+    },
+    {
+      "alpha2": "DK",
+      "label": "Denmark",
+      "value": 158.28293131145884,
+      "year": 2022
+    },
+    {
+      "alpha2": "DM",
+      "label": "Dominica",
+      "value": 299.2847095441894,
+      "year": 2022
+    },
+    {
+      "alpha2": "DO",
+      "label": "Dominican Republic",
+      "value": 635.4882948879388,
+      "year": 2022
+    },
+    {
+      "alpha2": "DZ",
+      "label": "Algeria",
+      "value": 226.310265965357,
+      "year": 2022
+    },
+    {
+      "alpha2": "EC",
+      "label": "Ecuador",
+      "value": 556.3205397787027,
+      "year": 2022
+    },
+    {
+      "alpha2": "EE",
+      "label": "Estonia",
+      "value": 893.713673971709,
+      "year": 2022
+    },
+    {
+      "alpha2": "EG",
+      "label": "Egypt, Arab Rep.",
+      "value": 688.1655504325454,
+      "year": 2022
+    },
+    {
+      "alpha2": "ER",
+      "label": "Eritrea",
+      "value": 170.70216958937917,
+      "year": 2022
+    },
+    {
+      "alpha2": "ES",
+      "label": "Spain",
+      "value": 607.2895420513688,
+      "year": 2022
+    },
+    {
+      "alpha2": "ET",
+      "label": "Ethiopia",
+      "value": 84.12617124823623,
+      "year": 2022
+    },
+    {
+      "alpha2": "FI",
+      "label": "Finland",
+      "value": 539.9465021005718,
+      "year": 2022
+    },
+    {
+      "alpha2": "FJ",
+      "label": "Fiji",
+      "value": 92.34062269556308,
+      "year": 2022
+    },
+    {
+      "alpha2": "FR",
+      "label": "France",
+      "value": 358.2584752416522,
+      "year": 2022
+    },
+    {
+      "alpha2": "GA",
+      "label": "Gabon",
+      "value": 57.22520690141755,
+      "year": 2022
+    },
+    {
+      "alpha2": "GB",
+      "label": "United Kingdom",
+      "value": 124.47513158672898,
+      "year": 2022
+    },
+    {
+      "alpha2": "GD",
+      "label": "Grenada",
+      "value": 120.60249929434708,
+      "year": 2022
+    },
+    {
+      "alpha2": "GE",
+      "label": "Georgia",
+      "value": 348.3849975030316,
+      "year": 2022
+    },
+    {
+      "alpha2": "GH",
+      "label": "Ghana",
+      "value": 43.69945873728535,
+      "year": 2022
+    },
+    {
+      "alpha2": "GM",
+      "label": "Gambia, The",
+      "value": 38.5363762910255,
+      "year": 2022
+    },
+    {
+      "alpha2": "GN",
+      "label": "Guinea",
+      "value": 63.3220437481328,
+      "year": 2022
+    },
+    {
+      "alpha2": "GQ",
+      "label": "Equatorial Guinea",
+      "value": 10.978378693073918,
+      "year": 2022
+    },
+    {
+      "alpha2": "GR",
+      "label": "Greece",
+      "value": 962.5586988835296,
+      "year": 2022
+    },
+    {
+      "alpha2": "GT",
+      "label": "Guatemala",
+      "value": 186.2462409394686,
+      "year": 2022
+    },
+    {
+      "alpha2": "GW",
+      "label": "Guinea-Bissau",
+      "value": 83.114504715917,
+      "year": 2022
+    },
+    {
+      "alpha2": "GY",
+      "label": "Guyana",
+      "value": 1758.3190630412214,
+      "year": 2022
+    },
+    {
+      "alpha2": "HN",
+      "label": "Honduras",
+      "value": 153.5760376273716,
+      "year": 2022
+    },
+    {
+      "alpha2": "HR",
+      "label": "Croatia",
+      "value": 176.10560734259232,
+      "year": 2022
+    },
+    {
+      "alpha2": "HT",
+      "label": "Haiti",
+      "value": 126.04743243118723,
+      "year": 2022
+    },
+    {
+      "alpha2": "HU",
+      "label": "Hungary",
+      "value": 488.7854065465815,
+      "year": 2022
+    },
+    {
+      "alpha2": "ID",
+      "label": "Indonesia",
+      "value": 798.4599132615066,
+      "year": 2022
+    },
+    {
+      "alpha2": "IE",
+      "label": "Ireland",
+      "value": 320.9385447767779,
+      "year": 2022
+    },
+    {
+      "alpha2": "IL",
+      "label": "Israel",
+      "value": 163.26269287406365,
+      "year": 2021
+    },
+    {
+      "alpha2": "IN",
+      "label": "India",
+      "value": 454.25105649254715,
+      "year": 2022
+    },
+    {
+      "alpha2": "IQ",
+      "label": "Iraq",
+      "value": 962.63148604609,
+      "year": 2022
+    },
+    {
+      "alpha2": "IR",
+      "label": "Iran, Islamic Rep.",
+      "value": 1038.2662144956798,
+      "year": 2022
+    },
+    {
+      "alpha2": "IS",
+      "label": "Iceland",
+      "value": 759.1563417041227,
+      "year": 2022
+    },
+    {
+      "alpha2": "IT",
+      "label": "Italy",
+      "value": 572.4606132338802,
+      "year": 2022
+    },
+    {
+      "alpha2": "JM",
+      "label": "Jamaica",
+      "value": 472.04104018676054,
+      "year": 2022
+    },
+    {
+      "alpha2": "JO",
+      "label": "Jordan",
+      "value": 84.3859103149953,
+      "year": 2022
+    },
+    {
+      "alpha2": "JP",
+      "label": "Japan",
+      "value": 636.9630929597923,
+      "year": 2022
+    },
+    {
+      "alpha2": "KE",
+      "label": "Kenya",
+      "value": 74.31920922444421,
+      "year": 2022
+    },
+    {
+      "alpha2": "KG",
+      "label": "Kyrgyz Republic",
+      "value": 1104.9113863075286,
+      "year": 2022
+    },
+    {
+      "alpha2": "KH",
+      "label": "Cambodia",
+      "value": 126.96401825770486,
+      "year": 2022
+    },
+    {
+      "alpha2": "KM",
+      "label": "Comoros",
+      "value": 11.98770540933219,
+      "year": 2022
+    },
+    {
+      "alpha2": "KN",
+      "label": "St. Kitts and Nevis",
+      "value": 261.1916333040742,
+      "year": 2022
+    },
+    {
+      "alpha2": "KP",
+      "label": "Korea, Dem. People's Rep.",
+      "value": 328.8332625301262,
+      "year": 2022
+    },
+    {
+      "alpha2": "KR",
+      "label": "Korea, Rep.",
+      "value": 565.0386765171285,
+      "year": 2022
+    },
+    {
+      "alpha2": "KW",
+      "label": "Kuwait",
+      "value": 167.79082817552475,
+      "year": 2022
+    },
+    {
+      "alpha2": "KZ",
+      "label": "Kazakhstan",
+      "value": 1246.1436107887107,
+      "year": 2022
+    },
+    {
+      "alpha2": "LA",
+      "label": "Lao PDR",
+      "value": 972.3499396150844,
+      "year": 2022
+    },
+    {
+      "alpha2": "LB",
+      "label": "Lebanon",
+      "value": 315.43275650802013,
+      "year": 2022
+    },
+    {
+      "alpha2": "LC",
+      "label": "St. Lucia",
+      "value": 239.9583848395523,
+      "year": 2022
+    },
+    {
+      "alpha2": "LK",
+      "label": "Sri Lanka",
+      "value": 583.6526757134485,
+      "year": 2022
+    },
+    {
+      "alpha2": "LR",
+      "label": "Liberia",
+      "value": 27.15280422027903,
+      "year": 2022
+    },
+    {
+      "alpha2": "LS",
+      "label": "Lesotho",
+      "value": 19.159183066431623,
+      "year": 2022
+    },
+    {
+      "alpha2": "LT",
+      "label": "Lithuania",
+      "value": 106.07284332501425,
+      "year": 2022
+    },
+    {
+      "alpha2": "LU",
+      "label": "Luxembourg",
+      "value": 73.09719906354741,
+      "year": 2022
+    },
+    {
+      "alpha2": "LV",
+      "label": "Latvia",
+      "value": 91.69711548949842,
+      "year": 2022
+    },
+    {
+      "alpha2": "LY",
+      "label": "Libya",
+      "value": 791.8264681840111,
+      "year": 2022
+    },
+    {
+      "alpha2": "MA",
+      "label": "Morocco",
+      "value": 283.23774740239935,
+      "year": 2022
+    },
+    {
+      "alpha2": "MC",
+      "label": "Monaco",
+      "value": 128.4323546787907,
+      "year": 2022
+    },
+    {
+      "alpha2": "MD",
+      "label": "Moldova",
+      "value": 334.5653458322096,
+      "year": 2022
+    },
+    {
+      "alpha2": "ME",
+      "label": "Montenegro",
+      "value": 3539.2428691241535,
+      "year": 2022
+    },
+    {
+      "alpha2": "MG",
+      "label": "Madagascar",
+      "value": 442.1389953583537,
+      "year": 2022
+    },
+    {
+      "alpha2": "MK",
+      "label": "North Macedonia",
+      "value": 1185.5029611642005,
+      "year": 2022
+    },
+    {
+      "alpha2": "ML",
+      "label": "Mali",
+      "value": 224.76838367867742,
+      "year": 2022
+    },
+    {
+      "alpha2": "MM",
+      "label": "Myanmar",
+      "value": 618.1731062163369,
+      "year": 2022
+    },
+    {
+      "alpha2": "MN",
+      "label": "Mongolia",
+      "value": 134.6633474558995,
+      "year": 2022
+    },
+    {
+      "alpha2": "MR",
+      "label": "Mauritania",
+      "value": 276.51771450581737,
+      "year": 2022
+    },
+    {
+      "alpha2": "MT",
+      "label": "Malta",
+      "value": 69.0305151634398,
+      "year": 2022
+    },
+    {
+      "alpha2": "MU",
+      "label": "Mauritius",
+      "value": 500.5849398387198,
+      "year": 2022
+    },
+    {
+      "alpha2": "MV",
+      "label": "Maldives",
+      "value": 8.9676515819319,
+      "year": 2022
+    },
+    {
+      "alpha2": "MW",
+      "label": "Malawi",
+      "value": 65.9642151911387,
+      "year": 2022
+    },
+    {
+      "alpha2": "MX",
+      "label": "Mexico",
+      "value": 698.2491529227148,
+      "year": 2022
+    },
+    {
+      "alpha2": "MY",
+      "label": "Malaysia",
+      "value": 193.31041066342536,
+      "year": 2022
+    },
+    {
+      "alpha2": "MZ",
+      "label": "Mozambique",
+      "value": 45.10622562066687,
+      "year": 2022
+    },
+    {
+      "alpha2": "NA",
+      "label": "Namibia",
+      "value": 35.6302837494489,
+      "year": 2022
+    },
+    {
+      "alpha2": "NE",
+      "label": "Niger",
+      "value": 102.0587292819884,
+      "year": 2022
+    },
+    {
+      "alpha2": "NG",
+      "label": "Nigeria",
+      "value": 55.89043209577792,
+      "year": 2022
+    },
+    {
+      "alpha2": "NI",
+      "label": "Nicaragua",
+      "value": 189.13763803636317,
+      "year": 2022
+    },
+    {
+      "alpha2": "NL",
+      "label": "Netherlands",
+      "value": 465.18888048132015,
+      "year": 2022
+    },
+    {
+      "alpha2": "NO",
+      "label": "Norway",
+      "value": 492.5430542481419,
+      "year": 2022
+    },
+    {
+      "alpha2": "NP",
+      "label": "Nepal",
+      "value": 319.6015700392214,
+      "year": 2022
+    },
+    {
+      "alpha2": "NZ",
+      "label": "New Zealand",
+      "value": 1943.2473384890884,
+      "year": 2022
+    },
+    {
+      "alpha2": "OM",
+      "label": "Oman",
+      "value": 345.43804038115724,
+      "year": 2022
+    },
+    {
+      "alpha2": "PA",
+      "label": "Panama",
+      "value": 275.2698219153771,
+      "year": 2022
+    },
+    {
+      "alpha2": "PE",
+      "label": "Peru",
+      "value": 774.2691820791113,
+      "year": 2022
+    },
+    {
+      "alpha2": "PG",
+      "label": "Papua New Guinea",
+      "value": 38.42923703410185,
+      "year": 2022
+    },
+    {
+      "alpha2": "PH",
+      "label": "Philippines",
+      "value": 798.8191224345987,
+      "year": 2022
+    },
+    {
+      "alpha2": "PK",
+      "label": "Pakistan",
+      "value": 735.7386510558873,
+      "year": 2022
+    },
+    {
+      "alpha2": "PL",
+      "label": "Poland",
+      "value": 254.87654049241388,
+      "year": 2022
+    },
+    {
+      "alpha2": "PR",
+      "label": "Puerto Rico (US)",
+      "value": 271.72664113574905,
+      "year": 2022
+    },
+    {
+      "alpha2": "PS",
+      "label": "West Bank and Gaza",
+      "value": 68.01078015555943,
+      "year": 2021
+    },
+    {
+      "alpha2": "PT",
+      "label": "Portugal",
+      "value": 587.4386592261009,
+      "year": 2022
+    },
+    {
+      "alpha2": "PY",
+      "label": "Paraguay",
+      "value": 356.9281635106703,
+      "year": 2022
+    },
+    {
+      "alpha2": "QA",
+      "label": "Qatar",
+      "value": 94.07928927236443,
+      "year": 2022
+    },
+    {
+      "alpha2": "RO",
+      "label": "Romania",
+      "value": 427.9076643402195,
+      "year": 2022
+    },
+    {
+      "alpha2": "RS",
+      "label": "Serbia",
+      "value": 763.9041127030907,
+      "year": 2022
+    },
+    {
+      "alpha2": "RU",
+      "label": "Russian Federation",
+      "value": 449.3994613709652,
+      "year": 2022
+    },
+    {
+      "alpha2": "RW",
+      "label": "Rwanda",
+      "value": 44.685272832892466,
+      "year": 2022
+    },
+    {
+      "alpha2": "SA",
+      "label": "Saudi Arabia",
+      "value": 726.6460677942755,
+      "year": 2022
+    },
+    {
+      "alpha2": "SC",
+      "label": "Seychelles",
+      "value": 94.21244932347886,
+      "year": 2022
+    },
+    {
+      "alpha2": "SD",
+      "label": "Sudan",
+      "value": 545.4267922631245,
+      "year": 2022
+    },
+    {
+      "alpha2": "SE",
+      "label": "Sweden",
+      "value": 236.77066553535488,
+      "year": 2022
+    },
+    {
+      "alpha2": "SG",
+      "label": "Singapore",
+      "value": 35.396586353574634,
+      "year": 2022
+    },
+    {
+      "alpha2": "SI",
+      "label": "Slovenia",
+      "value": 391.5578795460012,
+      "year": 2022
+    },
+    {
+      "alpha2": "SK",
+      "label": "Slovak Republic",
+      "value": 103.76459013592668,
+      "year": 2022
+    },
+    {
+      "alpha2": "SL",
+      "label": "Sierra Leone",
+      "value": 25.637906018589053,
+      "year": 2022
+    },
+    {
+      "alpha2": "SN",
+      "label": "Senegal",
+      "value": 173.4509169200361,
+      "year": 2022
+    },
+    {
+      "alpha2": "SO",
+      "label": "Somalia, Fed. Rep.",
+      "value": 185.2611550330844,
+      "year": 2022
+    },
+    {
+      "alpha2": "SR",
+      "label": "Suriname",
+      "value": 988.3433574468359,
+      "year": 2022
+    },
+    {
+      "alpha2": "SS",
+      "label": "South Sudan",
+      "value": 59.70324222176996,
+      "year": 2022
+    },
+    {
+      "alpha2": "ST",
+      "label": "Sao Tome and Principe",
+      "value": 180.72954640860786,
+      "year": 2022
+    },
+    {
+      "alpha2": "SV",
+      "label": "El Salvador",
+      "value": 308.66627156996327,
+      "year": 2022
+    },
+    {
+      "alpha2": "SY",
+      "label": "Syrian Arab Republic",
+      "value": 621.6851771197738,
+      "year": 2022
+    },
+    {
+      "alpha2": "SZ",
+      "label": "Eswatini",
+      "value": 876.1876321357403,
+      "year": 2022
+    },
+    {
+      "alpha2": "TD",
+      "label": "Chad",
+      "value": 47.66106416167569,
+      "year": 2022
+    },
+    {
+      "alpha2": "TG",
+      "label": "Togo",
+      "value": 27.637949308778605,
+      "year": 2022
+    },
+    {
+      "alpha2": "TH",
+      "label": "Thailand",
+      "value": 798.8671802146471,
+      "year": 2022
+    },
+    {
+      "alpha2": "TJ",
+      "label": "Tajikistan",
+      "value": 1041.2265613537006,
+      "year": 2022
+    },
+    {
+      "alpha2": "TL",
+      "label": "Timor-Leste",
+      "value": 855.9149051154061,
+      "year": 2022
+    },
+    {
+      "alpha2": "TM",
+      "label": "Turkmenistan",
+      "value": 3629.916933061123,
+      "year": 2022
+    },
+    {
+      "alpha2": "TN",
+      "label": "Tunisia",
+      "value": 318.8294010215413,
+      "year": 2022
+    },
+    {
+      "alpha2": "TR",
+      "label": "Turkiye",
+      "value": 758.6456342924239,
+      "year": 2022
+    },
+    {
+      "alpha2": "TT",
+      "label": "Trinidad and Tobago",
+      "value": 246.15519785035198,
+      "year": 2022
+    },
+    {
+      "alpha2": "TZ",
+      "label": "Tanzania",
+      "value": 80.10901130413252,
+      "year": 2022
+    },
+    {
+      "alpha2": "UA",
+      "label": "Ukraine",
+      "value": 118.41768885330195,
+      "year": 2022
+    },
+    {
+      "alpha2": "UG",
+      "label": "Uganda",
+      "value": 13.463610070687334,
+      "year": 2022
+    },
+    {
+      "alpha2": "US",
+      "label": "United States",
+      "value": 1330.2243009251983,
+      "year": 2022
+    },
+    {
+      "alpha2": "UY",
+      "label": "Uruguay",
+      "value": 1329.274261828599,
+      "year": 2022
+    },
+    {
+      "alpha2": "UZ",
+      "label": "Uzbekistan",
+      "value": 1227.8558417102056,
+      "year": 2022
+    },
+    {
+      "alpha2": "VC",
+      "label": "St. Vincent and the Grenadines",
+      "value": 77.416067263783,
+      "year": 2022
+    },
+    {
+      "alpha2": "VE",
+      "label": "Venezuela, RB",
+      "value": 801.7965607861081,
+      "year": 2022
+    },
+    {
+      "alpha2": "VN",
+      "label": "Viet Nam",
+      "value": 821.2425971719388,
+      "year": 2022
+    },
+    {
+      "alpha2": "YE",
+      "label": "Yemen, Rep.",
+      "value": 93.26875350771617,
+      "year": 2022
+    },
+    {
+      "alpha2": "ZA",
+      "label": "South Africa",
+      "value": 338.4183726388666,
+      "year": 2022
+    },
+    {
+      "alpha2": "ZM",
+      "label": "Zambia",
+      "value": 78.00351492174491,
+      "year": 2022
+    },
+    {
+      "alpha2": "ZW",
+      "label": "Zimbabwe",
+      "value": 305.5362676562954,
+      "year": 2022
+    }
+  ],
+  "name": "Annual freshwater withdrawals per person",
+  "source": "World Bank World Development Indicators",
+  "unit": "cubic metres per person"
+}
