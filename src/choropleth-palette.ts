@@ -17,11 +17,15 @@ const interpolateChannel = (
 /** Returns the RGB color and alpha for a country with data. */
 export const computeCountryFill = (input: {
   value: number;
+  minMagnitude: number;
   maxMagnitude: number;
   filledColorRange: readonly [ChoroplethRgb, ChoroplethRgb];
 }): { color: ChoroplethRgb; alpha: number } => {
+  const magnitudeRange = input.maxMagnitude - input.minMagnitude;
   const share =
-    input.maxMagnitude > 0 ? Math.abs(input.value) / input.maxMagnitude : 0;
+    magnitudeRange > 0
+      ? (Math.abs(input.value) - input.minMagnitude) / magnitudeRange
+      : Number(input.maxMagnitude > 0);
   const [start, end] = input.filledColorRange;
   return {
     alpha: FILLED_ALPHA_BASE + FILLED_ALPHA_RANGE * share,
@@ -67,10 +71,13 @@ export const generateChoroplethPalette = (input: {
     writePaletteColor(palette, countryId, missingColor, missingAlpha);
   }
 
+  let minMagnitude = Number.POSITIVE_INFINITY;
   let maxMagnitude = 0;
   for (const [alpha2, value] of valuesByAlpha2) {
     if (idsByAlpha2.has(alpha2)) {
-      maxMagnitude = Math.max(maxMagnitude, Math.abs(value));
+      const magnitude = Math.abs(value);
+      minMagnitude = Math.min(minMagnitude, magnitude);
+      maxMagnitude = Math.max(maxMagnitude, magnitude);
     }
   }
   for (const [alpha2, value] of valuesByAlpha2) {
@@ -81,6 +88,7 @@ export const generateChoroplethPalette = (input: {
     const fill = computeCountryFill({
       filledColorRange,
       maxMagnitude,
+      minMagnitude,
       value,
     });
     writePaletteColor(palette, countryId, fill.color, fill.alpha);

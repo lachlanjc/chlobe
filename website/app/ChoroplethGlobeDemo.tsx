@@ -138,11 +138,12 @@ const ChoroplethGlobeDemo = () => {
           ref={globeRef}
           colors={{
             filled: [
-              [255, 251, 243],
-              [255, 102, 51],
+              [147, 174, 255],
+              // [38, 92, 255],
+              [11, 36, 113],
             ],
             missing: [86, 107, 168],
-            missingAlpha: 0.32,
+            missingAlpha: 0.15,
           }}
           colorScheme="light"
           data={data}

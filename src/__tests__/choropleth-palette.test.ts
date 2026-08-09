@@ -12,11 +12,12 @@ describe(computeCountryFill, () => {
     [0, 81, 195],
   ] as const;
 
-  it('returns the range start color at 70% alpha for a zero-share value', () => {
+  it('returns the range start color at 70% alpha for the minimum value', () => {
     const fill = computeCountryFill({
       filledColorRange,
       maxMagnitude: 100,
-      value: 0,
+      minMagnitude: 20,
+      value: 20,
     });
     expect(fill.color).toStrictEqual([130, 182, 255]);
     expect(fill.alpha).toBeCloseTo(0.7);
@@ -26,6 +27,7 @@ describe(computeCountryFill, () => {
     const fill = computeCountryFill({
       filledColorRange,
       maxMagnitude: 100,
+      minMagnitude: 20,
       value: 100,
     });
     expect(fill.color).toStrictEqual([0, 81, 195]);
@@ -36,15 +38,28 @@ describe(computeCountryFill, () => {
     const negative = computeCountryFill({
       filledColorRange,
       maxMagnitude: 100,
+      minMagnitude: 0,
       value: -50,
     });
     const positive = computeCountryFill({
       filledColorRange,
       maxMagnitude: 100,
+      minMagnitude: 0,
       value: 50,
     });
     expect(negative).toStrictEqual(positive);
     expect(negative.alpha).toBeCloseTo(0.85);
+  });
+
+  it('preserves the maximum color when every populated value is equal', () => {
+    const fill = computeCountryFill({
+      filledColorRange,
+      maxMagnitude: 50,
+      minMagnitude: 50,
+      value: 50,
+    });
+    expect(fill.color).toStrictEqual([0, 81, 195]);
+    expect(fill.alpha).toBeCloseTo(1);
   });
 });
 

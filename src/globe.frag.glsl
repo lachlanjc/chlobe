@@ -16,6 +16,8 @@ const float PI = 3.141593;
 const float kTau = 6.283185;
 const float kPhi = 1.618034;
 const float r = 0.8;
+const float dotRadius = 0.012;
+const float dotEdgeWidth = 0.003;
 
 float byDots;
 
@@ -113,7 +115,11 @@ void main() {
       vec2((countryId + 0.5) / 256.0, 0.5)
     );
 
-    float dotMask = smoothstep(0.018, 0.0, distance);
+    float dotMask = 1.0 - smoothstep(
+      dotRadius - dotEdgeWidth,
+      dotRadius,
+      distance
+    );
     float lighting = pow(dotNL, 1.2);
     float surfaceBrightness = mix(pow(dotNL, 0.4), 0.0, dark) + 0.1;
     vec3 surface = baseColor * surfaceBrightness
