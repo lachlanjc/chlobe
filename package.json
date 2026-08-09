@@ -1,0 +1,62 @@
+{
+  "name": "react-cobe-countries",
+  "version": "0.0.1",
+  "description": "Lightweight WebGL globe for rendering values of countries as shaded regions.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lachlanjc/react-cobe-countries.git"
+  },
+  "homepage": "https://github.com/lachlanjc/react-cobe-countries#readme",
+  "bugs": "https://github.com/lachlanjc/react-cobe-countries/issues",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "test": "vitest run",
+    "test:pack": "pnpm build && node scripts/verify-pack.mjs"
+  },
+  "keywords": [
+    "react",
+    "cobe",
+    "globe",
+    "webgl",
+    "choropleth",
+    "countries"
+  ],
+  "author": "lachlanjc",
+  "license": "MIT",
+  "dependencies": {
+    "d3-geo": "^3.1.1",
+    "d3-interpolate": "^3.0.1",
+    "iso-3166": "^4.1.0",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/geojson": "^7946.0.16",
+    "@types/d3-geo": "^3.1.0",
+    "@types/d3-interpolate": "^3.0.4",
+    "@types/react": "^18.0.0",
+    "@types/topojson-client": "^3.1.4",
+    "@types/topojson-specification": "^1.0.5",
+    "react": "^18.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  }
+}
