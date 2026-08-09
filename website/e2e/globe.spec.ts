@@ -1,24 +1,37 @@
 // oxlint-disable vitest/prefer-importing-vitest-globals
 import { expect, test } from '@playwright/test';
 
-test('renders and supports legend, keyboard, and pointer interaction', async ({
-  page,
-}) => {
+test('renders four distinct environmental globe sections', async ({ page }) => {
   await page.goto('/');
 
-  const canvas = page.getByLabel('Country choropleth globe');
-  await expect(canvas).toBeVisible();
-  await expect(canvas).toHaveAttribute('role', 'application');
+  await expect(
+    page.getByRole('heading', { name: 'Room to grow' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Where the oil comes from' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', {
+      name: 'How much freshwater does each person draw?',
+    })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'The almost-complete grid' })
+  ).toBeVisible();
 
-  await page.getByRole('button', { name: /United States/u }).hover();
-  await expect(page.getByTestId('globe-tooltip')).toContainText(
-    'United States'
-  );
+  const forestGlobe = page.getByLabel('Forest area per person by country');
+  await expect(forestGlobe).toHaveAttribute('role', 'img');
 
-  await canvas.focus();
+  const oilGlobe = page.getByLabel('Oil production by country');
+  await expect(oilGlobe).toHaveAttribute('role', 'application');
+
+  const oilSection = page.locator('section[aria-labelledby="oil-heading"]');
+  await expect(oilSection.getByRole('button')).toHaveCount(5);
+
+  await oilGlobe.focus();
   await page.keyboard.press('ArrowLeft');
 
-  const bounds = await canvas.boundingBox();
+  const bounds = await oilGlobe.boundingBox();
   if (!bounds) {
     throw new Error('Globe canvas has no bounding box');
   }

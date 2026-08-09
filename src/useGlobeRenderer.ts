@@ -4,6 +4,7 @@ import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import createGlobe from './globeRenderer';
 import type { Globe } from './globeRenderer';
 import type {
+  ChoroplethRgb,
   ChoroplethGlobeData,
   ChoroplethGlobeOptions,
   ChoroplethGlobeTooltip,
@@ -13,6 +14,12 @@ import { getCountryAtCoordinates } from './worldGeoData';
 
 const COUNTRY_LOOKUP_MIN_DEGREES = 0.5;
 const KEYBOARD_ROTATION_STEP = 0.25;
+
+const normalizeRgb = (color: ChoroplethRgb): [number, number, number] => [
+  color[0] / 255,
+  color[1] / 255,
+  color[2] / 255,
+];
 
 interface GlobeCallbacks {
   formatValue?: (value: number, entry: ChoroplethGlobeData) => string;
@@ -66,17 +73,24 @@ export const useGlobeRenderer = ({
     const isDark = colorScheme === 'dark';
     const options = globeOptions ?? {};
     const interactive = options.interactive ?? true;
+    const defaultBaseColor: [number, number, number] = isDark
+      ? [0.1, 0.1, 0.15]
+      : [1, 1, 1];
+    const defaultGlowColor: [number, number, number] = isDark
+      ? [0.08, 0.08, 0.15]
+      : [0.85, 0.85, 0.9];
+    const baseColor = options.baseColor
+      ? normalizeRgb(options.baseColor)
+      : defaultBaseColor;
+    const glowColor = options.glowColor
+      ? normalizeRgb(options.glowColor)
+      : defaultGlowColor;
     const globe = createGlobe(canvas, {
-      baseColor: [
-        ...(options.baseColor ?? (isDark ? [0.1, 0.1, 0.15] : [1, 1, 1])),
-      ] as [number, number, number],
+      baseColor,
       countryPalette: refs.palette.current ?? undefined,
       dark: isDark ? 1 : 0,
       devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
-      glowColor: [
-        ...(options.glowColor ??
-          (isDark ? [0.08, 0.08, 0.15] : [0.85, 0.85, 0.9])),
-      ] as [number, number, number],
+      glowColor,
       height: size,
       mapSamples: 16_000,
       phi: refs.currentPhi.current,

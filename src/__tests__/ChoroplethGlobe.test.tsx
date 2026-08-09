@@ -238,4 +238,23 @@ describe(ChoroplethGlobe, () => {
     expect(mocks.generatePalette).toHaveBeenCalledTimes(2);
     expect(globe.updatePalette).toHaveBeenCalledOnce();
   });
+
+  it('normalizes globe surface and glow colors from the public RGB contract', () => {
+    render(
+      <ChoroplethGlobe
+        colors={colors}
+        data={data}
+        globe={{ baseColor: [18, 70, 224], glowColor: [196, 231, 244] }}
+        size={200}
+      />
+    );
+
+    expect(mocks.createGlobe).toHaveBeenCalledWith(
+      expect.any(HTMLCanvasElement),
+      expect.objectContaining({
+        baseColor: [18 / 255, 70 / 255, 224 / 255],
+        glowColor: [196 / 255, 231 / 255, 244 / 255],
+      })
+    );
+  });
 });

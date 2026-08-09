@@ -33,10 +33,10 @@ export interface ChoroplethGlobeOptions {
   initialPhi?: number;
   /** Whether pointer and keyboard rotation are enabled. Defaults to true. */
   interactive?: boolean;
-  /** Neutral globe surface color. */
-  baseColor?: readonly [number, number, number];
-  /** Outer globe glow color. */
-  glowColor?: readonly [number, number, number];
+  /** Neutral globe surface color, with channels in the inclusive 0-255 range. */
+  baseColor?: ChoroplethRgb;
+  /** Outer globe glow color, with channels in the inclusive 0-255 range. */
+  glowColor?: ChoroplethRgb;
 }
 
 /** A rendered tooltip's country identity and CSS-pixel anchor. */

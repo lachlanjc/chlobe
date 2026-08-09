@@ -1,7 +1,11 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { ChoroplethGlobeDemo } from './ChoroplethGlobeDemo';
+import forest from '../public/data/forest-area-per-person.json';
+import oil from '../public/data/oil-production.json';
+import renewable from '../public/data/renewable-electricity-share.json';
+import water from '../public/data/water-withdrawals-per-person.json';
+import { ChoroplethGlobeDemo } from './choropleth-globe-demo';
 
 const styles = stylex.create({
   description: {
@@ -19,19 +23,23 @@ const styles = stylex.create({
     margin: 0,
     textTransform: 'uppercase',
   },
+  hero: {
+    backgroundColor: '#0B2471',
+    color: '#FFFBF3',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 16,
+    minHeight: '64svh',
+    padding: 'clamp(40px, 8vw, 120px) clamp(24px, 6vw, 88px)',
+  },
   intro: {
     display: 'flex',
     flexDirection: 'column',
     gap: 16,
   },
   shell: {
-    backgroundColor: '#0B2471',
-    color: '#FFFBF3',
     display: 'flex',
     flexDirection: 'column',
-    gap: 40,
-    minHeight: '100svh',
-    padding: 'clamp(24px, 6vw, 88px)',
   },
   title: {
     fontSize: 'clamp(38px, 7vw, 72px)',
@@ -48,18 +56,23 @@ const styles = stylex.create({
 
 const Home = () => (
   <main {...stylex.props(styles.shell)}>
-    <section {...stylex.props(styles.intro)}>
+    <section {...stylex.props(styles.hero, styles.intro)}>
       <p {...stylex.props(styles.eyebrow)}>Cobe Countries</p>
       <h1 {...stylex.props(styles.title)}>
         Visualize country data on a gl
         <span {...stylex.props(styles.titleGlobe)}></span>be.
       </h1>
       <p {...stylex.props(styles.description)}>
-        Hover a country or the legend to inspect its data. Drag the globe to
-        explore.
+        Four environmental datasets, each with a globe tailored to the story it
+        tells. Hover or drag the interactive maps to explore.
       </p>
     </section>
-    <ChoroplethGlobeDemo />
+    <ChoroplethGlobeDemo
+      forest={forest}
+      oil={oil}
+      renewable={renewable}
+      water={water}
+    />
   </main>
 );
 
