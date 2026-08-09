@@ -36,6 +36,9 @@
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "dev": "tsup src/index.ts --format cjs,esm --dts --clean --watch",
     "test": "vitest run",
+    "test:browser": "pnpm build && pnpm --filter website build && playwright test",
+    "test:consumer": "pnpm build && node scripts/verify-consumer.mjs",
+    "test:coverage": "vitest run --coverage",
     "test:pack": "pnpm build && node scripts/verify-pack.mjs",
     "check": "ultracite check",
     "fix": "ultracite fix"
@@ -48,12 +51,17 @@
     "world-atlas": "^2.0.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@testing-library/react": "^16.3.0",
     "@types/d3-geo": "^3.1.0",
     "@types/d3-interpolate": "^3.0.4",
     "@types/geojson": "^7946.0.16",
     "@types/react": "catalog:",
     "@types/topojson-client": "^3.1.4",
     "@types/topojson-specification": "^1.0.5",
+    "@vitest/coverage-v8": "^3.0.0",
+    "bundlemon": "^3.1.0",
+    "jsdom": "^26.0.0",
     "oxfmt": "^0.62.0",
     "oxlint": "^1.77.0",
     "oxlint-plugin-react-doctor": "^0.7.8",

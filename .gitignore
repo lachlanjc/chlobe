@@ -3,5 +3,6 @@ dist/
 .npm-cache/
 .pnpm-store/
 .next/
+coverage/
 *.tsbuildinfo
 .DS_Store

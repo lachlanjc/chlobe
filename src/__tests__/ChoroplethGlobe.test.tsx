@@ -1,0 +1,250 @@
+// @vitest-environment jsdom
+
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  waitFor,
+} from '@testing-library/react';
+import React, { createRef } from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import ChoroplethGlobe from '../ChoroplethGlobe';
+import type { ChoroplethGlobeHandle } from '../globeTypes';
+
+const mocks = vi.hoisted(() => ({
+  createGlobe: vi.fn(),
+  generateTexture: vi.fn(),
+  getCountryAtCoordinates: vi.fn(),
+  getCountryCentroids: vi.fn(),
+}));
+
+vi.mock(import('../globeRenderer'), () => ({ default: mocks.createGlobe }));
+vi.mock(import('../choroplethTexture'), () => ({
+  generateChoroplethTexture: mocks.generateTexture,
+}));
+vi.mock(import('../worldGeoData'), () => ({
+  getCountryAtCoordinates: mocks.getCountryAtCoordinates,
+  getCountryCentroids: mocks.getCountryCentroids,
+}));
+
+const data = [
+  {
+    alpha2: 'US',
+    formattedValue: '42 tCO₂e',
+    id: 'us',
+    label: 'United States',
+    value: 42,
+  },
+];
+const colors = { filled: ['#000000', '#ffffff'] as const, missing: '#cccccc' };
+
+const globe = {
+  destroy: vi.fn(),
+  project: vi.fn(() => ({ visible: true, x: 0.5, y: 0.5 })),
+  unproject: vi.fn(() => [39, -98] as [number, number]),
+  update: vi.fn(),
+  updateTexture: vi.fn(),
+};
+const animationFrames: FrameRequestCallback[] = [];
+
+const runAnimationFrame = () => {
+  const callback = animationFrames.at(-1);
+  if (!callback) {
+    throw new Error('No animation frame was requested');
+  }
+  act(() => callback(0));
+};
+
+class ResizeObserverMock {
+  static instances: ResizeObserverMock[] = [];
+  callback: ResizeObserverCallback;
+  disconnect = vi.fn();
+  observe = vi.fn();
+
+  constructor(callback: ResizeObserverCallback) {
+    this.callback = callback;
+    ResizeObserverMock.instances.push(this);
+  }
+}
+
+beforeEach(() => {
+  vi.resetAllMocks();
+  mocks.createGlobe.mockReturnValue(globe);
+  mocks.generateTexture.mockResolvedValue(document.createElement('canvas'));
+  mocks.getCountryAtCoordinates.mockResolvedValue('US');
+  mocks.getCountryCentroids.mockResolvedValue(new Map([['US', [39, -98]]]));
+  Object.defineProperty(HTMLCanvasElement.prototype, 'clientHeight', {
+    configurable: true,
+    get: () => 200,
+  });
+  Object.defineProperty(HTMLCanvasElement.prototype, 'clientWidth', {
+    configurable: true,
+    get: () => 200,
+  });
+  vi.stubGlobal('ResizeObserver', ResizeObserverMock);
+  vi.stubGlobal('matchMedia', () => ({
+    addEventListener: vi.fn(),
+    matches: false,
+    removeEventListener: vi.fn(),
+  }));
+  vi.stubGlobal('cancelAnimationFrame', vi.fn());
+  vi.stubGlobal(
+    'requestAnimationFrame',
+    vi.fn((callback: FrameRequestCallback) => {
+      animationFrames.push(callback);
+      return animationFrames.length;
+    })
+  );
+});
+
+afterEach(() => {
+  cleanup();
+  animationFrames.length = 0;
+  vi.unstubAllGlobals();
+  ResizeObserverMock.instances = [];
+});
+
+describe(ChoroplethGlobe, () => {
+  it('renders an accessible, non-interactive image and cleans up its renderer', async () => {
+    const { getByLabelText, unmount } = render(
+      <ChoroplethGlobe
+        ariaLabel="Country values"
+        colors={colors}
+        data={data}
+        globe={{ interactive: false }}
+        size={200}
+      />
+    );
+
+    const canvas = getByLabelText('Country values');
+    expect(canvas.getAttribute('role')).toBe('img');
+    expect(canvas.getAttribute('tabindex')).toBeNull();
+    fireEvent.keyDown(canvas, { key: 'ArrowLeft' });
+    expect(globe.update).not.toHaveBeenCalled();
+
+    const destroyCount = globe.destroy.mock.calls.length;
+    unmount();
+    expect(globe.destroy).toHaveBeenCalledTimes(destroyCount + 1);
+    expect(window.cancelAnimationFrame).toHaveBeenCalledWith();
+  });
+
+  it('provides entry identity to tooltip consumers and supports the imperative escape hatch', async () => {
+    const ref = createRef<ChoroplethGlobeHandle>();
+    const onActiveEntryChange = vi.fn();
+    const renderTooltip = vi.fn(() => null);
+    render(
+      <ChoroplethGlobe
+        colors={colors}
+        data={data}
+        defaultActiveEntryId="us"
+        onActiveEntryChange={onActiveEntryChange}
+        ref={ref}
+        renderTooltip={renderTooltip}
+        size={200}
+      />
+    );
+
+    await waitFor(() => {
+      runAnimationFrame();
+      expect(renderTooltip).toHaveBeenCalledWith(
+        expect.objectContaining({
+          alpha2: 'US',
+          entry: data[0],
+          entryId: 'us',
+          source: 'entry',
+        })
+      );
+    });
+
+    ref.current?.clearHoveredEntry();
+    expect(onActiveEntryChange).toHaveBeenLastCalledWith(null);
+    ref.current?.hoverEntry('us');
+    expect(onActiveEntryChange).toHaveBeenLastCalledWith('us');
+  });
+
+  it('only performs country hit testing for requested hover features', async () => {
+    const { getByLabelText, rerender } = render(
+      <ChoroplethGlobe colors={colors} data={data} size={200} />
+    );
+    const canvas = getByLabelText('Country choropleth globe');
+    fireEvent.pointerMove(canvas, { offsetX: 50, offsetY: 60 });
+    expect(mocks.getCountryAtCoordinates).not.toHaveBeenCalled();
+
+    const onCountryHover = vi.fn();
+    const renderTooltip = vi.fn(() => null);
+    rerender(
+      <ChoroplethGlobe
+        colors={colors}
+        data={data}
+        onCountryHover={onCountryHover}
+        renderTooltip={renderTooltip}
+        size={200}
+      />
+    );
+    fireEvent.pointerMove(canvas, { offsetX: 50, offsetY: 60 });
+
+    await waitFor(() => expect(onCountryHover).toHaveBeenCalledWith('US'));
+    expect(renderTooltip).toHaveBeenCalledWith(
+      expect.objectContaining({
+        alpha2: 'US',
+        entryId: 'us',
+        source: 'pointer',
+      })
+    );
+  });
+
+  it('rotates from keyboard input when interactive', () => {
+    const { getByLabelText } = render(
+      <ChoroplethGlobe
+        colors={colors}
+        data={data}
+        globe={{ autoRotate: false }}
+        size={200}
+      />
+    );
+    fireEvent.keyDown(getByLabelText('Country choropleth globe'), {
+      key: 'ArrowRight',
+    });
+    runAnimationFrame();
+    expect(globe.update).toHaveBeenCalledWith({ phi: 0.25 });
+  });
+
+  it('cancels stale texture generation after data changes', async () => {
+    let resolveFirst: (canvas: HTMLCanvasElement) => void;
+    let resolveSecond: (canvas: HTMLCanvasElement) => void;
+    mocks.generateTexture
+      .mockImplementationOnce(
+        () =>
+          new Promise<HTMLCanvasElement>((resolve) => {
+            resolveFirst = resolve;
+          })
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise<HTMLCanvasElement>((resolve) => {
+            resolveSecond = resolve;
+          })
+      );
+    const { rerender } = render(
+      <ChoroplethGlobe colors={colors} data={data} size={200} />
+    );
+    await waitFor(() => expect(mocks.generateTexture).toHaveBeenCalledOnce());
+
+    rerender(
+      <ChoroplethGlobe
+        colors={colors}
+        data={[{ ...data[0], value: 84 }]}
+        size={200}
+      />
+    );
+    await waitFor(() => expect(mocks.generateTexture).toHaveBeenCalledTimes(2));
+
+    await act(async () => resolveFirst!(document.createElement('canvas')));
+    expect(globe.updateTexture).not.toHaveBeenCalled();
+
+    resolveSecond!(document.createElement('canvas'));
+    await waitFor(() => expect(globe.updateTexture).toHaveBeenCalledOnce());
+  });
+});

@@ -142,13 +142,17 @@ const ChoroplethGlobeDemo = () => {
           ref={globeRef}
           colors={{
             filled: ['#FFFBF3', '#FF6633'],
-            missingAlpha: 0.32,
             missing: '#566ba8',
+            missingAlpha: 0.32,
           }}
           colorScheme="light"
           data={data}
           renderTooltip={({ formattedValue, label, x, y }) => (
-            <div {...stylex.props(styles.tooltip)} style={{ left: x, top: y }}>
+            <div
+              {...stylex.props(styles.tooltip)}
+              data-testid="globe-tooltip"
+              style={{ left: x, top: y }}
+            >
               <strong>{label}</strong>
               {formattedValue ? <span>{formattedValue}</span> : null}
             </div>

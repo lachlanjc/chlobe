@@ -2,7 +2,6 @@ packages:
   - 'website'
   - '.'
 
-minimumReleaseAge: 10080
 trustPolicy: no-downgrade
 
 catalog:
