@@ -73,13 +73,11 @@ export const useGlobeRenderer = ({
       countryPalette: refs.palette.current ?? undefined,
       dark: isDark ? 1 : 0,
       devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
-      diffuse: 1.2,
       glowColor: [
         ...(options.glowColor ??
           (isDark ? [0.08, 0.08, 0.15] : [0.85, 0.85, 0.9])),
       ] as [number, number, number],
       height: size,
-      mapBrightness: 6,
       mapSamples: 16_000,
       phi: refs.currentPhi.current,
       scale: 1.2,

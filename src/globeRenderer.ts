@@ -17,6 +17,10 @@
  */
 
 import { DOT_COUNT, DOT_TEXTURE_WIDTH } from './generated-country-data';
+import {
+  GLOBE_FRAGMENT_SHADER as MINIFIED_GLOBE_FRAGMENT_SHADER,
+  GLOBE_VERTEX_SHADER as MINIFIED_GLOBE_VERTEX_SHADER,
+} from './generated-globe-shaders';
 import { getDotCountryIds } from './worldGeoData';
 
 export interface GlobeOptions {
@@ -25,13 +29,10 @@ export interface GlobeOptions {
   phi: number;
   theta: number;
   mapSamples: number;
-  mapBrightness: number;
   baseColor: [number, number, number];
   glowColor: [number, number, number];
-  diffuse: number;
   devicePixelRatio: number;
   dark: number;
-  opacity?: number;
   offset?: [number, number];
   scale?: number;
   context?: WebGLContextAttributes;
@@ -70,174 +71,6 @@ const DOT_TEXTURE_HEIGHT = Math.ceil((DOT_COUNT + 1) / DOT_TEXTURE_WIDTH);
  * surface so they don't overlap the shaded land dots.
  */
 const PROJECTION_ELEVATION = 0.05;
-
-const GLOBE_VERTEX_SHADER = `
-attribute vec2 aPosition;
-
-void main() {
-  gl_Position = vec4(aPosition, 0.0, 1.0);
-}
-`;
-
-const GLOBE_FRAGMENT_SHADER = `
-precision highp float;
-
-uniform vec2 uResolution;
-uniform vec2 offset;
-uniform vec2 rotation;
-uniform float dots;
-uniform float scale;
-uniform vec3 baseColor;
-uniform vec3 glowColor;
-uniform vec4 renderParams;
-uniform sampler2D uCountryIds;
-uniform sampler2D uCountryPalette;
-
-const float sqrt5 = 2.236068;
-const float PI = 3.141593;
-const float kTau = 6.283185;
-const float kPhi = 1.618034;
-const float r = 0.8;
-
-float byDots;
-
-mat3 rotate(float theta, float phi) {
-  float cx = cos(theta);
-  float cy = cos(phi);
-  float sx = sin(theta);
-  float sy = sin(phi);
-  return mat3(
-    cy, sy * sx, -sy * cx,
-    0.0, cx, sx,
-    sy, cy * -sx, cy * cx
-  );
-}
-
-void nearestFibonacciLattice(vec3 p, out float m, out float nearestIdx) {
-  p = p.xzy;
-
-  float k = max(2.0, floor(log2(sqrt5 * dots * PI * (1.0 - p.z * p.z)) * 0.72021));
-
-  vec2 f = floor(pow(kPhi, k) / sqrt5 * vec2(1.0, kPhi) + 0.5);
-  vec2 br1 = fract((f + 1.0) * (kPhi - 1.0)) * kTau - 3.883222;
-  vec2 br2 = -2.0 * f;
-  vec2 sp = vec2(atan(p.y, p.x), p.z - 1.0);
-  vec2 c = floor(vec2(br2.y * sp.x - br1.y * (sp.y * dots + 1.0), -br2.x * sp.x + br1.x * (sp.y * dots + 1.0)) / (br1.x * br2.y - br2.x * br1.y));
-
-  float mindist = PI;
-  for (float s = 0.0; s < 4.0; s += 1.0) {
-    vec2 o = vec2(mod(s, 2.0), floor(s * 0.5));
-    float idx = dot(f, c + o);
-    if (idx > dots) continue;
-
-    float a = idx, b = 0.0;
-    if (a >= 16384.0) a -= 16384.0, b += 0.868872;
-    if (a >= 8192.0) a -= 8192.0, b += 0.934436;
-    if (a >= 4096.0) a -= 4096.0, b += 0.467218;
-    if (a >= 2048.0) a -= 2048.0, b += 0.733609;
-    if (a >= 1024.0) a -= 1024.0, b += 0.866804;
-    if (a >= 512.0) a -= 512.0, b += 0.433402;
-    if (a >= 256.0) a -= 256.0, b += 0.216701;
-    if (a >= 128.0) a -= 128.0, b += 0.108351;
-    if (a >= 64.0) a -= 64.0, b += 0.554175;
-    if (a >= 32.0) a -= 32.0, b += 0.777088;
-    if (a >= 16.0) a -= 16.0, b += 0.888544;
-    if (a >= 8.0) a -= 8.0, b += 0.944272;
-    if (a >= 4.0) a -= 4.0, b += 0.472136;
-    if (a >= 2.0) a -= 2.0, b += 0.236068;
-    if (a >= 1.0) a -= 1.0, b += 0.618034;
-
-    float theta = fract(b) * kTau;
-
-    float cosphi = 1.0 - 2.0 * idx * byDots;
-    float sinphi = sqrt(1.0 - cosphi * cosphi);
-    vec3 sample = vec3(cos(theta) * sinphi, sin(theta) * sinphi, cosphi);
-
-    float dist = length(p - sample);
-
-    if (dist < mindist) {
-      mindist = dist;
-      nearestIdx = idx;
-    }
-  }
-
-  m = mindist;
-}
-
-void main() {
-  byDots = 1.0 / dots;
-
-  vec2 invResolution = 1.0 / uResolution;
-
-  vec2 uv = ((gl_FragCoord.xy * invResolution) * 2.0 - 1.0) / scale - offset * vec2(1.0, -1.0) * invResolution;
-  uv.x *= uResolution.x * invResolution.y;
-
-  float l = dot(uv, uv);
-  float glowFactor = 0.0;
-
-  vec4 color = vec4(0.0);
-
-  if (l <= r*r) {
-    float dis;
-    vec4 layer = vec4(0.0);
-    vec3 p = normalize(vec3(uv, sqrt(r*r - l)));
-    mat3 rot = rotate(rotation.y, rotation.x);
-    float dotNL = p.z;
-
-    float dotIndex;
-    nearestFibonacciLattice(p * rot, dis, dotIndex);
-
-    vec2 countryIdCoord = vec2(
-      (mod(dotIndex, ${DOT_TEXTURE_WIDTH.toFixed(1)}) + 0.5) / ${DOT_TEXTURE_WIDTH.toFixed(1)},
-      (floor(dotIndex / ${DOT_TEXTURE_WIDTH.toFixed(1)}) + 0.5) / ${DOT_TEXTURE_HEIGHT.toFixed(1)}
-    );
-    float countryId = floor(
-      texture2D(uCountryIds, countryIdCoord).r * 255.0 + 0.5
-    );
-    vec4 countryColor = texture2D(
-      uCountryPalette,
-      vec2((countryId + 0.5) / 256.0, 0.5)
-    );
-
-    float dotMask = smoothstep(0.018, 0.0, dis);
-    float lighting = pow(dotNL, renderParams.y);
-
-    // Palette alpha is zero for ocean and the configured opacity for land.
-    // Both categorical textures use nearest-neighbor sampling so country IDs
-    // and colors never bleed across borders.
-    vec3 texColor = countryColor.rgb;
-    float isLand = countryColor.a;
-
-    // Smooth globe surface (no dots) — used for ocean and between dots.
-    float dark = renderParams.z;
-    float surfaceBright = mix(pow(dotNL, 0.4), 0.0, dark) + 0.1;
-    vec3 surface = baseColor * surfaceBright
-      + pow(1.0 - dotNL, 4.0) * glowColor;
-
-    // Land dots: choropleth-colored round dots.
-    vec3 landDotColor = mix(
-      texColor * 0.85,
-      texColor * lighting * 2.5,
-      dark
-    );
-
-    // Blend: surface everywhere, then overlay land-colored round dots.
-    // isLand * dotMask ensures color only appears within round dot shapes
-    // that fall on land.
-    vec3 result = mix(surface, landDotColor, isLand * dotMask);
-    layer += vec4(result, 1.0);
-
-    color += layer * (1.0 + renderParams.w) * 0.5;
-
-    glowFactor = (1.0 - l) * (1.0 - l) * smoothstep(0.0, 1.0, 0.2 / (l - r*r));
-  } else {
-    float outD = sqrt(0.2 / (l - r*r));
-    glowFactor = smoothstep(0.5, 1.0, outD / (outD + 1.0));
-  }
-
-  gl_FragColor = color + vec4(glowFactor * glowColor, glowFactor);
-}
-`;
 
 function compileShader(
   gl: WebGLRenderingContext,
@@ -289,10 +122,10 @@ function getGlobeUniformLocations(
 ) {
   return {
     baseColor: gl.getUniformLocation(program, 'baseColor'),
+    dark: gl.getUniformLocation(program, 'dark'),
     dots: gl.getUniformLocation(program, 'dots'),
     glowColor: gl.getUniformLocation(program, 'glowColor'),
     offset: gl.getUniformLocation(program, 'offset'),
-    renderParams: gl.getUniformLocation(program, 'renderParams'),
     rotation: gl.getUniformLocation(program, 'rotation'),
     scale: gl.getUniformLocation(program, 'scale'),
     uCountryIds: gl.getUniformLocation(program, 'uCountryIds'),
@@ -337,19 +170,16 @@ export default function createGlobe(
   let phi = opts.phi || 0;
   let theta = opts.theta || 0;
   let mapSamples = opts.mapSamples || 10_000;
-  let mapBrightness = opts.mapBrightness || 1;
   let baseColor: [number, number, number] = opts.baseColor || [1, 1, 1];
   let glowColor: [number, number, number] = opts.glowColor || [1, 1, 1];
-  let diffuse = opts.diffuse || 1;
   let dark = opts.dark || 0;
-  let opacity = opts.opacity ?? 1;
   let offset: [number, number] = opts.offset || [0, 0];
   let scale = opts.scale || 1;
 
   const globeProgram = createProgram(
     gl,
-    GLOBE_VERTEX_SHADER,
-    GLOBE_FRAGMENT_SHADER
+    MINIFIED_GLOBE_VERTEX_SHADER,
+    MINIFIED_GLOBE_FRAGMENT_SHADER
   );
   if (!globeProgram) {
     return NOOP_GLOBE;
@@ -437,23 +267,14 @@ export default function createGlobe(
     if (state.mapSamples !== undefined) {
       mapSamples = state.mapSamples;
     }
-    if (state.mapBrightness !== undefined) {
-      mapBrightness = state.mapBrightness;
-    }
     if (state.baseColor !== undefined) {
       baseColor = state.baseColor;
     }
     if (state.glowColor !== undefined) {
       glowColor = state.glowColor;
     }
-    if (state.diffuse !== undefined) {
-      diffuse = state.diffuse;
-    }
     if (state.dark !== undefined) {
       dark = state.dark;
-    }
-    if (state.opacity !== undefined) {
-      opacity = state.opacity;
     }
     if (state.offset !== undefined) {
       offset = state.offset;
@@ -483,13 +304,7 @@ export default function createGlobe(
     );
     gl.uniform3fv(globeUniforms.baseColor, baseColor);
     gl.uniform3fv(globeUniforms.glowColor, glowColor);
-    gl.uniform4f(
-      globeUniforms.renderParams,
-      mapBrightness,
-      diffuse,
-      dark,
-      opacity
-    );
+    gl.uniform1f(globeUniforms.dark, dark);
     gl.uniform1i(globeUniforms.uCountryIds, 0);
     gl.uniform1i(globeUniforms.uCountryPalette, 1);
     gl.activeTexture(gl.TEXTURE0);

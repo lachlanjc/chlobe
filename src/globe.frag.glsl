@@ -1,0 +1,140 @@
+precision highp float;
+
+uniform vec2 uResolution;
+uniform vec2 offset;
+uniform vec2 rotation;
+uniform float dots;
+uniform float scale;
+uniform float dark;
+uniform vec3 baseColor;
+uniform vec3 glowColor;
+uniform sampler2D uCountryIds;
+uniform sampler2D uCountryPalette;
+
+const float sqrt5 = 2.236068;
+const float PI = 3.141593;
+const float kTau = 6.283185;
+const float kPhi = 1.618034;
+const float r = 0.8;
+
+float byDots;
+
+mat3 rotate(float theta, float phi) {
+  float cx = cos(theta);
+  float cy = cos(phi);
+  float sx = sin(theta);
+  float sy = sin(phi);
+  return mat3(
+    cy, sy * sx, -sy * cx,
+    0.0, cx, sx,
+    sy, -cy * sx, cy * cx
+  );
+}
+
+void nearestFibonacciLattice(vec3 p, out float distance, out float nearestIdx) {
+  p = p.xzy;
+
+  float k = max(2.0, floor(log2(sqrt5 * dots * PI * (1.0 - p.z * p.z)) * 0.72021));
+  vec2 f = floor(pow(kPhi, k) / sqrt5 * vec2(1.0, kPhi) + 0.5);
+  vec2 br1 = fract((f + 1.0) * (kPhi - 1.0)) * kTau - 3.883222;
+  vec2 br2 = -2.0 * f;
+  vec2 sp = vec2(atan(p.y, p.x), p.z - 1.0);
+  vec2 c = floor(vec2(
+    br2.y * sp.x - br1.y * (sp.y * dots + 1.0),
+    -br2.x * sp.x + br1.x * (sp.y * dots + 1.0)
+  ) / (br1.x * br2.y - br2.x * br1.y));
+
+  float minDistance = PI;
+  for (float sampleOffset = 0.0; sampleOffset < 4.0; sampleOffset += 1.0) {
+    vec2 latticeOffset = vec2(mod(sampleOffset, 2.0), floor(sampleOffset * 0.5));
+    float idx = dot(f, c + latticeOffset);
+    if (idx > dots) continue;
+
+    float a = idx, b = 0.0;
+    if (a >= 16384.0) a -= 16384.0, b += 0.868872;
+    if (a >= 8192.0) a -= 8192.0, b += 0.934436;
+    if (a >= 4096.0) a -= 4096.0, b += 0.467218;
+    if (a >= 2048.0) a -= 2048.0, b += 0.733609;
+    if (a >= 1024.0) a -= 1024.0, b += 0.866804;
+    if (a >= 512.0) a -= 512.0, b += 0.433402;
+    if (a >= 256.0) a -= 256.0, b += 0.216701;
+    if (a >= 128.0) a -= 128.0, b += 0.108351;
+    if (a >= 64.0) a -= 64.0, b += 0.554175;
+    if (a >= 32.0) a -= 32.0, b += 0.777088;
+    if (a >= 16.0) a -= 16.0, b += 0.888544;
+    if (a >= 8.0) a -= 8.0, b += 0.944272;
+    if (a >= 4.0) a -= 4.0, b += 0.472136;
+    if (a >= 2.0) a -= 2.0, b += 0.236068;
+    if (a >= 1.0) a -= 1.0, b += 0.618034;
+
+    float theta = fract(b) * kTau;
+    float cosphi = 1.0 - 2.0 * idx * byDots;
+    float sinphi = sqrt(1.0 - cosphi * cosphi);
+    vec3 sample = vec3(cos(theta) * sinphi, sin(theta) * sinphi, cosphi);
+    float sampleDistance = length(p - sample);
+
+    if (sampleDistance < minDistance) {
+      minDistance = sampleDistance;
+      nearestIdx = idx;
+    }
+  }
+
+  distance = minDistance;
+}
+
+void main() {
+  byDots = 1.0 / dots;
+  vec2 invResolution = 1.0 / uResolution;
+  vec2 uv = ((gl_FragCoord.xy * invResolution) * 2.0 - 1.0) / scale
+    - offset * vec2(1.0, -1.0) * invResolution;
+  uv.x *= uResolution.x * invResolution.y;
+
+  float l = dot(uv, uv);
+  float glowFactor = 0.0;
+  vec4 color = vec4(0.0);
+
+  if (l <= r * r) {
+    float distance;
+    vec3 p = normalize(vec3(uv, sqrt(r * r - l)));
+    mat3 rotationMatrix = rotate(rotation.y, rotation.x);
+    float dotNL = p.z;
+    float dotIndex;
+    nearestFibonacciLattice(p * rotationMatrix, distance, dotIndex);
+
+    vec2 countryIdCoord = vec2(
+      (mod(dotIndex, __DOT_TEXTURE_WIDTH__) + 0.5) / __DOT_TEXTURE_WIDTH__,
+      (floor(dotIndex / __DOT_TEXTURE_WIDTH__) + 0.5) / __DOT_TEXTURE_HEIGHT__
+    );
+    float countryId = floor(
+      texture2D(uCountryIds, countryIdCoord).r * 255.0 + 0.5
+    );
+    vec4 countryColor = texture2D(
+      uCountryPalette,
+      vec2((countryId + 0.5) / 256.0, 0.5)
+    );
+
+    float dotMask = smoothstep(0.018, 0.0, distance);
+    float lighting = pow(dotNL, 1.2);
+    float surfaceBrightness = mix(pow(dotNL, 0.4), 0.0, dark) + 0.1;
+    vec3 surface = baseColor * surfaceBrightness
+      + pow(1.0 - dotNL, 4.0) * glowColor;
+    vec3 landDotColor = mix(
+      countryColor.rgb * 0.85,
+      countryColor.rgb * lighting * 2.5,
+      dark
+    );
+    vec3 result = mix(surface, landDotColor, countryColor.a * dotMask);
+    color += vec4(result, 1.0);
+    glowFactor = (1.0 - l) * (1.0 - l)
+      * smoothstep(0.0, 1.0, 0.2 / (l - r * r));
+  } else {
+    float outsideDistance = sqrt(0.2 / (l - r * r));
+    glowFactor = smoothstep(
+      0.5,
+      1.0,
+      outsideDistance / (outsideDistance + 1.0)
+    );
+  }
+
+  gl_FragColor = color + vec4(glowFactor * glowColor, glowFactor);
+}

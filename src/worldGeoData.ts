@@ -7,14 +7,15 @@ import {
   ALPHA2_BY_COUNTRY_ID,
   COUNTRY_CENTROIDS_BASE64,
   COUNTRY_COUNT,
-  DOT_COUNTRY_IDS_BASE64,
+  DOT_COUNT,
+  DOT_COUNTRY_CORRECTIONS_BASE64,
   HOVER_COUNTRY_RUNS_BASE64,
   HOVER_MAP_HEIGHT,
   HOVER_MAP_WIDTH,
 } from './generated-country-data';
 
 const UNMAPPED_ALPHA2 = '--';
-const CENTROID_SCALE = 100;
+const FIBONACCI_TURN = 0.618034;
 
 const decodeBase64 = (encoded: string): Uint8Array => {
   const binary = atob(encoded);
@@ -50,13 +51,6 @@ export const getCountryIdByAlpha2 = (): ReadonlyMap<string, number> => {
   return countryIds;
 };
 
-let dotCountryIds: Uint8Array | null = null;
-
-export const getDotCountryIds = (): Uint8Array => {
-  dotCountryIds ??= decodeBase64(DOT_COUNTRY_IDS_BASE64);
-  return dotCountryIds;
-};
-
 let hoverCountryIds: Uint8Array | null = null;
 
 const getHoverCountryIds = (): Uint8Array => {
@@ -76,11 +70,7 @@ const getHoverCountryIds = (): Uint8Array => {
   return countryIds;
 };
 
-/** Returns the ISO2 code at a longitude/latitude point, or null for ocean. */
-export const getCountryAtCoordinates = (
-  longitude: number,
-  latitude: number
-): string | null => {
+const getHoverCountryId = (longitude: number, latitude: number): number => {
   const normalizedLongitude = (((longitude + 180) % 360) + 360) % 360;
   const x = Math.min(
     HOVER_MAP_WIDTH - 1,
@@ -93,9 +83,49 @@ export const getCountryAtCoordinates = (
       Math.floor(((90 - latitude) / 180) * HOVER_MAP_HEIGHT)
     )
   );
-  const countryId = getHoverCountryIds()[y * HOVER_MAP_WIDTH + x];
-  return getAlpha2ForCountryId(countryId);
+  return getHoverCountryIds()[y * HOVER_MAP_WIDTH + x];
 };
+
+let dotCountryIds: Uint8Array | null = null;
+
+/** Reconstructs exact dot IDs from the hover raster plus sparse corrections. */
+export const getDotCountryIds = (): Uint8Array => {
+  if (dotCountryIds) {
+    return dotCountryIds;
+  }
+  const countryIds = new Uint8Array(DOT_COUNT + 1);
+  for (let index = 0; index <= DOT_COUNT; index += 1) {
+    const latitude = (Math.asin(1 - (2 * index) / DOT_COUNT) * 180) / Math.PI;
+    const longitude = -((index * FIBONACCI_TURN) % 1) * 360;
+    countryIds[index] = getHoverCountryId(longitude, latitude);
+  }
+
+  const corrections = decodeBase64(DOT_COUNTRY_CORRECTIONS_BASE64);
+  let correctionIndex = -1;
+  for (let offset = 0; offset < corrections.length;) {
+    let delta = 0;
+    let shift = 0;
+    let byte: number;
+    do {
+      byte = corrections[offset];
+      offset += 1;
+      delta += (byte % 128) * 2 ** shift;
+      shift += 7;
+    } while (byte >= 128);
+    correctionIndex += delta + 1;
+    countryIds[correctionIndex] = corrections[offset];
+    offset += 1;
+  }
+  dotCountryIds = countryIds;
+  return countryIds;
+};
+
+/** Returns the ISO2 code at a longitude/latitude point, or null for ocean. */
+export const getCountryAtCoordinates = (
+  longitude: number,
+  latitude: number
+): string | null =>
+  getAlpha2ForCountryId(getHoverCountryId(longitude, latitude));
 
 let countryCentroids: ReadonlyMap<string, [number, number]> | null = null;
 
@@ -108,7 +138,6 @@ export const getCountryCentroids = (): ReadonlyMap<
     return countryCentroids;
   }
   const bytes = decodeBase64(COUNTRY_CENTROIDS_BASE64);
-  const values = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const centroids = new Map<string, [number, number]>();
   for (let countryId = 1; countryId <= COUNTRY_COUNT; countryId += 1) {
     const alpha2 = getAlpha2ForCountryId(countryId);
@@ -116,8 +145,8 @@ export const getCountryCentroids = (): ReadonlyMap<
       continue;
     }
     centroids.set(alpha2, [
-      values.getInt16(countryId * 4, true) / CENTROID_SCALE,
-      values.getInt16(countryId * 4 + 2, true) / CENTROID_SCALE,
+      (bytes[countryId * 2] / 255) * 180 - 90,
+      (bytes[countryId * 2 + 1] / 255) * 360 - 180,
     ]);
   }
   countryCentroids = centroids;

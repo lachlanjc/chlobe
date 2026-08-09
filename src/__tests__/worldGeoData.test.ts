@@ -18,6 +18,21 @@ describe('generated country data', () => {
   it('includes one lookup for every shader-addressable dot', () => {
     expect(getDotCountryIds()).toHaveLength(16_001);
   });
+
+  it('reconstructs the exact generated dot ownership table', () => {
+    let sum = 0;
+    let weightedSum = 0;
+    const countryIds = getDotCountryIds();
+    for (let index = 0; index < countryIds.length; index += 1) {
+      sum += countryIds[index];
+      weightedSum =
+        (weightedSum + countryIds[index] * (index + 1)) % 1_000_000_007;
+    }
+    expect({ sum, weightedSum }).toStrictEqual({
+      sum: 319_814,
+      weightedSum: 429_075_111,
+    });
+  });
 });
 
 describe(getCountryCentroids, () => {

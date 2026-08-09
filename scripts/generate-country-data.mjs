@@ -6,12 +6,16 @@ import { iso31661NumericToAlpha2 } from 'iso-3166';
 import { feature } from 'topojson-client';
 import worldTopology from 'world-atlas/countries-110m.json' with { type: 'json' };
 
-const DOT_COUNT = 16_000;
-const DOT_TEXTURE_WIDTH = 128;
-const HOVER_MAP_WIDTH = 512;
-const HOVER_MAP_HEIGHT = 256;
+import {
+  DOT_COUNT,
+  DOT_TEXTURE_WIDTH,
+  HOVER_MAP_HEIGHT,
+  HOVER_MAP_WIDTH,
+} from './country-data-config.mjs';
+
 const KOSOVO_NUMERIC_ID = '-99';
 const UNMAPPED_ALPHA2 = '--';
+const FIBONACCI_TURN = 0.618034;
 
 const outputPath = fileURLToPath(
   new URL('../src/generated-country-data.ts', import.meta.url)
@@ -134,19 +138,60 @@ for (let offset = 0; offset < hoverCountryIds.length;) {
   offset += runLength;
 }
 
+const getRasterCountryIdForDot = (index) => {
+  const latitude = (Math.asin(1 - (2 * index) / DOT_COUNT) * 180) / Math.PI;
+  const turns = (index * FIBONACCI_TURN) % 1;
+  const longitude = -turns * 360;
+  const normalizedLongitude = (((longitude + 180) % 360) + 360) % 360;
+  const x = Math.min(
+    HOVER_MAP_WIDTH - 1,
+    Math.floor((normalizedLongitude / 360) * HOVER_MAP_WIDTH)
+  );
+  const y = Math.max(
+    0,
+    Math.min(
+      HOVER_MAP_HEIGHT - 1,
+      Math.floor(((90 - latitude) / 180) * HOVER_MAP_HEIGHT)
+    )
+  );
+  return hoverCountryIds[y * HOVER_MAP_WIDTH + x];
+};
+
+const writeVarint = (output, value) => {
+  let remaining = value;
+  while (remaining > 127) {
+    output.push((remaining % 128) + 128);
+    remaining = Math.floor(remaining / 128);
+  }
+  output.push(remaining);
+};
+
+const dotCountryCorrections = [];
+let previousCorrectionIndex = -1;
+for (let index = 0; index <= DOT_COUNT; index += 1) {
+  if (dotCountryIds[index] === getRasterCountryIdForDot(index)) {
+    continue;
+  }
+  writeVarint(dotCountryCorrections, index - previousCorrectionIndex - 1);
+  dotCountryCorrections.push(dotCountryIds[index]);
+  previousCorrectionIndex = index;
+}
+
 const alpha2ByCountryId = [
   UNMAPPED_ALPHA2,
   ...countries.map((country) => country.alpha2 ?? UNMAPPED_ALPHA2),
 ].join('');
 
-const centroidBytes = Buffer.alloc((countries.length + 1) * 4, 0xff);
+const centroidBytes = Buffer.alloc((countries.length + 1) * 2);
 for (const country of countries) {
   if (country.alpha2 === null) {
     continue;
   }
   const [longitude, latitude] = country.centroid;
-  centroidBytes.writeInt16LE(Math.round(latitude * 100), country.id * 4);
-  centroidBytes.writeInt16LE(Math.round(longitude * 100), country.id * 4 + 2);
+  centroidBytes[country.id * 2] = Math.round(((latitude + 90) / 180) * 255);
+  centroidBytes[country.id * 2 + 1] = Math.round(
+    ((longitude + 180) / 360) * 255
+  );
 }
 
 const generatedSource = `/**
@@ -155,7 +200,7 @@ const generatedSource = `/**
  */
 
 export const COUNTRY_COUNT = ${countries.length};
-export const DOT_COUNT = 16_000;
+export const DOT_COUNT = ${DOT_COUNT.toLocaleString('en-US').replace(',', '_')};
 export const DOT_TEXTURE_WIDTH = ${DOT_TEXTURE_WIDTH};
 export const HOVER_MAP_WIDTH = ${HOVER_MAP_WIDTH};
 export const HOVER_MAP_HEIGHT = ${HOVER_MAP_HEIGHT};
@@ -163,8 +208,8 @@ export const ALPHA2_BY_COUNTRY_ID =
   '${alpha2ByCountryId}';
 export const COUNTRY_CENTROIDS_BASE64 =
   '${centroidBytes.toString('base64')}';
-export const DOT_COUNTRY_IDS_BASE64 =
-  '${Buffer.from(dotCountryIds).toString('base64')}';
+export const DOT_COUNTRY_CORRECTIONS_BASE64 =
+  '${Buffer.from(dotCountryCorrections).toString('base64')}';
 export const HOVER_COUNTRY_RUNS_BASE64 =
   '${Buffer.from(hoverCountryRuns).toString('base64')}';
 `;
