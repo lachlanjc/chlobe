@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+// oxlint-disable vitest/prefer-importing-vitest-globals
 import { expect, test } from '@playwright/test';
 
 test('renders and supports legend, keyboard, and pointer interaction', async ({
@@ -10,7 +10,7 @@ test('renders and supports legend, keyboard, and pointer interaction', async ({
   await expect(canvas).toBeVisible();
   await expect(canvas).toHaveAttribute('role', 'application');
 
-  await page.getByRole('button', { name: /United States/ }).hover();
+  await page.getByRole('button', { name: /United States/u }).hover();
   await expect(page.getByTestId('globe-tooltip')).toContainText(
     'United States'
   );

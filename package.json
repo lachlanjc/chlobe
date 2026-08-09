@@ -34,6 +34,7 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "bundlemon": "bundlemon",
     "dev": "tsup src/index.ts --format cjs,esm --dts --clean --watch",
     "test": "vitest run",
     "test:browser": "pnpm build && pnpm --filter website build && playwright test",

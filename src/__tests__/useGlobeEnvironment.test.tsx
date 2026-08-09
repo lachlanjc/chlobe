@@ -61,7 +61,10 @@ afterEach(() => {
 describe('useGlobeEnvironment', () => {
   it('reacts to reduced-motion preference changes', () => {
     const { container } = render(<Environment />);
-    const element = container.firstElementChild!;
+    const element = container.firstElementChild;
+    if (!(element instanceof HTMLDivElement)) {
+      throw new Error('Expected environment element');
+    }
     expect(element.dataset.prefersReducedMotion).toBe('false');
 
     mediaQuery.matches = true;
@@ -71,7 +74,10 @@ describe('useGlobeEnvironment', () => {
 
   it('uses a ResizeObserver when no fixed size is supplied and cleans it up', () => {
     const { container, unmount } = render(<Environment />);
-    const element = container.firstElementChild!;
+    const element = container.firstElementChild;
+    if (!(element instanceof HTMLDivElement)) {
+      throw new Error('Expected environment element');
+    }
     responsiveWidth = 320;
     act(() =>
       ResizeObserverMock.instance?.callback([], ResizeObserverMock.instance)
@@ -85,7 +91,7 @@ describe('useGlobeEnvironment', () => {
 
   it('uses the fixed size without creating a ResizeObserver', () => {
     const { container } = render(<Environment fixedSize={256} />);
-    expect(container.firstElementChild?.dataset.size).toBe('256');
+    expect(container.firstElementChild?.getAttribute('data-size')).toBe('256');
     expect(ResizeObserverMock.instance).toBeUndefined();
   });
 });

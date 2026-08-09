@@ -4,5 +4,6 @@ dist/
 .pnpm-store/
 .next/
 coverage/
+test-results/
 *.tsbuildinfo
 .DS_Store

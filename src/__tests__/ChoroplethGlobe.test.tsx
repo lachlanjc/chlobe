@@ -107,7 +107,7 @@ afterEach(() => {
 });
 
 describe(ChoroplethGlobe, () => {
-  it('renders an accessible, non-interactive image and cleans up its renderer', async () => {
+  it('renders an accessible, non-interactive image and cleans up its renderer', () => {
     const { getByLabelText, unmount } = render(
       <ChoroplethGlobe
         ariaLabel="Country values"
@@ -127,7 +127,9 @@ describe(ChoroplethGlobe, () => {
     const destroyCount = globe.destroy.mock.calls.length;
     unmount();
     expect(globe.destroy).toHaveBeenCalledTimes(destroyCount + 1);
-    expect(window.cancelAnimationFrame).toHaveBeenCalledWith();
+    expect(window.cancelAnimationFrame).toHaveBeenCalledWith(
+      expect.any(Number)
+    );
   });
 
   it('provides entry identity to tooltip consumers and supports the imperative escape hatch', async () => {
@@ -212,8 +214,8 @@ describe(ChoroplethGlobe, () => {
   });
 
   it('cancels stale texture generation after data changes', async () => {
-    let resolveFirst: (canvas: HTMLCanvasElement) => void;
-    let resolveSecond: (canvas: HTMLCanvasElement) => void;
+    let resolveFirst: ((canvas: HTMLCanvasElement) => void) | undefined;
+    let resolveSecond: ((canvas: HTMLCanvasElement) => void) | undefined;
     mocks.generateTexture
       .mockImplementationOnce(
         () =>
@@ -241,10 +243,17 @@ describe(ChoroplethGlobe, () => {
     );
     await waitFor(() => expect(mocks.generateTexture).toHaveBeenCalledTimes(2));
 
-    await act(async () => resolveFirst!(document.createElement('canvas')));
+    if (!resolveFirst || !resolveSecond) {
+      throw new Error('Expected both texture requests to be pending');
+    }
+    const firstTextureRequest = resolveFirst;
+    const secondTextureRequest = resolveSecond;
+    await act(async () =>
+      firstTextureRequest(document.createElement('canvas'))
+    );
     expect(globe.updateTexture).not.toHaveBeenCalled();
 
-    resolveSecond!(document.createElement('canvas'));
+    secondTextureRequest(document.createElement('canvas'));
     await waitFor(() => expect(globe.updateTexture).toHaveBeenCalledOnce());
   });
 });

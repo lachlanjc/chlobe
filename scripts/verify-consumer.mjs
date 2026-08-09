@@ -1,24 +1,26 @@
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import path from 'node:path';
 
-const consumerDirectory = mkdtempSync(join(tmpdir(), 'react-cobe-countries-'));
-const modulesDirectory = join(consumerDirectory, 'node_modules');
+const consumerDirectory = mkdtempSync(
+  path.join(tmpdir(), 'react-cobe-countries-')
+);
+const modulesDirectory = path.join(consumerDirectory, 'node_modules');
 
 execFileSync('mkdir', ['-p', modulesDirectory]);
-symlinkSync(process.cwd(), join(modulesDirectory, 'react-cobe-countries'));
+symlinkSync(process.cwd(), path.join(modulesDirectory, 'react-cobe-countries'));
 writeFileSync(
-  join(consumerDirectory, 'consumer.cjs'),
+  path.join(consumerDirectory, 'consumer.cjs'),
   "const { ChoroplethGlobe } = require('react-cobe-countries');\nif (!ChoroplethGlobe) process.exit(1);\n"
 );
 writeFileSync(
-  join(consumerDirectory, 'consumer.mjs'),
+  path.join(consumerDirectory, 'consumer.mjs'),
   "import { ChoroplethGlobe } from 'react-cobe-countries';\nif (!ChoroplethGlobe) process.exit(1);\n"
 );
 
 for (const file of ['consumer.cjs', 'consumer.mjs']) {
-  execFileSync(process.execPath, [join(consumerDirectory, file)], {
+  execFileSync(process.execPath, [path.join(consumerDirectory, file)], {
     stdio: 'inherit',
   });
 }
