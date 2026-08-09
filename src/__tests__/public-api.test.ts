@@ -51,8 +51,11 @@ describe('public API', () => {
       activeEntryId: 'united-states',
       ariaLabel: 'Emissions by country',
       colors: {
-        filled: ['#0f172a', '#38bdf8'],
-        missing: '#e2e8f0',
+        filled: [
+          [15, 23, 42],
+          [56, 189, 248],
+        ],
+        missing: [226, 232, 240],
       },
       data,
       defaultActiveEntryId: null,
@@ -81,8 +84,11 @@ describe('public API', () => {
     const props = {
       ariaLabel: 'Country values',
       colors: {
-        filled: ['#0f172a', '#38bdf8'],
-        missing: '#e2e8f0',
+        filled: [
+          [15, 23, 42],
+          [56, 189, 248],
+        ],
+        missing: [226, 232, 240],
       },
       data,
       globe: { interactive: false },

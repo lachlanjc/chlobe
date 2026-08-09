@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 
-import { generateChoroplethTexture } from './choroplethTexture';
+import { generateChoroplethPalette } from './choropleth-palette';
 import type { Globe } from './globeRenderer';
 import type {
   ChoroplethGlobeData,
@@ -52,19 +52,15 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
       useState(defaultActiveEntryId);
     const activeEntryId = controlledActiveEntryId ?? uncontrolledActiveEntryId;
     const [tooltip, setTooltip] = useState<ChoroplethGlobeTooltip | null>(null);
-    const [centroids, setCentroids] = useState<ReadonlyMap<
-      string,
-      [number, number]
-    > | null>(null);
+    const centroids = getCountryCentroids();
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const globeRef = useRef<Globe | null>(null);
-    const textureRef = useRef<HTMLCanvasElement | null>(null);
+    const paletteRef = useRef<Uint8Array | null>(null);
     const currentPhiRef = useRef(globeOptions?.initialPhi ?? 0);
     const targetPhiRef = useRef<number | null>(null);
     const dragRef = useRef<{ startPhi: number; startX: number } | null>(null);
     const hoveringCanvasRef = useRef(false);
-    const countryLookupSeqRef = useRef(0);
     const lastLookupCoordsRef = useRef<[number, number] | null>(null);
     const dataRef = useRef(data);
     const centroidsRef = useRef(centroids);
@@ -76,7 +72,6 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
       onCountryHover,
       renderTooltip,
     });
-
     // The renderer has long-lived native event handlers and an animation
     // frame loop. Synchronizing its inputs after commit keeps render pure and
     // prevents those handlers from observing stale country data.
@@ -115,50 +110,19 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
     });
 
     useEffect(() => {
-      const textureInput: {
-        filledColorRange: [string, string];
+      const paletteInput: {
+        filledColorRange: [[number, number, number], [number, number, number]];
         missingAlpha?: number;
-        missingColor: string;
+        missingColor: [number, number, number];
         valuesByAlpha2: [string, number][];
       } = JSON.parse(textureKey);
-      let cancelled = false;
-      const createTexture = async () => {
-        try {
-          const texture = await generateChoroplethTexture({
-            ...textureInput,
-            valuesByAlpha2: new Map(textureInput.valuesByAlpha2),
-          });
-          if (!cancelled) {
-            textureRef.current = texture;
-            globeRef.current?.updateTexture(texture);
-          }
-        } catch {
-          // The WebGL globe still displays its neutral surface without a 2D context.
-        }
-      };
-      void createTexture();
-      return () => {
-        cancelled = true;
-      };
+      const palette = generateChoroplethPalette({
+        ...paletteInput,
+        valuesByAlpha2: new Map(paletteInput.valuesByAlpha2),
+      });
+      paletteRef.current = palette;
+      globeRef.current?.updatePalette(palette);
     }, [textureKey]);
-
-    useEffect(() => {
-      let cancelled = false;
-      const loadCentroids = async () => {
-        try {
-          const loadedCentroids = await getCountryCentroids();
-          if (!cancelled) {
-            setCentroids(loadedCentroids);
-          }
-        } catch {
-          // Navigation degrades gracefully when topology data cannot load.
-        }
-      };
-      void loadCentroids();
-      return () => {
-        cancelled = true;
-      };
-    }, []);
 
     useEffect(() => {
       const entry = findEntry(data, activeEntryId) ?? data[0] ?? null;
@@ -204,7 +168,6 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
         callbacks: callbacksRef,
         canvas: canvasRef,
         centroids: centroidsRef,
-        countryLookupSequence: countryLookupSeqRef,
         currentPhi: currentPhiRef,
         data: dataRef,
         drag: dragRef,
@@ -212,9 +175,9 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
         hoveringCanvas: hoveringCanvasRef,
         lastLookupCoordinates: lastLookupCoordsRef,
         options: optionsRef,
+        palette: paletteRef,
         prefersReducedMotion: reducedMotionRef,
         targetPhi: targetPhiRef,
-        texture: textureRef,
       },
       setTooltip,
       size,

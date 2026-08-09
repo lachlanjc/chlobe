@@ -5,5 +5,6 @@ export type {
   ChoroplethGlobeHandle,
   ChoroplethGlobeOptions,
   ChoroplethGlobeProps,
+  ChoroplethRgb,
   ChoroplethGlobeTooltip,
 } from './globeTypes';

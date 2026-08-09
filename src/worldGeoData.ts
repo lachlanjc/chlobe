@@ -1,183 +1,125 @@
 /**
- * Country polygon data for the world globe chart, derived from the
- * world-atlas (Natural Earth) 110m TopoJSON dataset. Provides GeoJSON
- * features joined to ISO 3166-1 alpha-2 codes, point-in-country hit testing,
- * and polygon-derived country centroids.
+ * Compact, generated country lookups used by the renderer, hover hit-testing,
+ * and navigation. The source geography is only needed by the build-time
+ * generator in scripts/generate-country-data.mjs.
  */
-import { geoBounds, geoCentroid, geoContains } from 'd3-geo';
-import type { Feature, Geometry } from 'geojson';
-import { iso31661Alpha2ToNumeric } from 'iso-3166';
-import { feature } from 'topojson-client';
+import {
+  ALPHA2_BY_COUNTRY_ID,
+  COUNTRY_CENTROIDS_BASE64,
+  COUNTRY_COUNT,
+  DOT_COUNTRY_IDS_BASE64,
+  HOVER_COUNTRY_RUNS_BASE64,
+  HOVER_MAP_HEIGHT,
+  HOVER_MAP_WIDTH,
+} from './generated-country-data';
 
-/** A single country polygon feature from the world-atlas dataset. */
-export type WorldCountryFeature = Feature<Geometry, { name: string }>;
+const UNMAPPED_ALPHA2 = '--';
+const CENTROID_SCALE = 100;
 
-/**
- * world-atlas omits feature ids for territories without an ISO 3166-1 numeric
- * code (Kosovo, Northern Cyprus, Somaliland). We assign Kosovo the Natural
- * Earth sentinel id "-99" so it joins to the XK alpha-2 code; the others stay
- * unmapped and are only drawn as background land.
- */
-const KOSOVO_NUMERIC_ID = '-99';
-
-function buildAlpha2ToNumericIdMap(): ReadonlyMap<string, string> {
-  // world-atlas feature ids use the ISO 3166-1 numeric code, zero-padded to
-  // three characters (e.g. Australia is "036").
-  const map = new Map(Object.entries(iso31661Alpha2ToNumeric));
-  map.set('XK', KOSOVO_NUMERIC_ID);
-  return map;
-}
-
-/**
- * ISO 3166-1 alpha-2 code -> the numeric string id used by world-atlas
- * country features (e.g. US -> "840", AU -> "036", XK -> "-99").
- */
-export const ALPHA2_TO_NUMERIC_COUNTRY_ID: ReadonlyMap<string, string> =
-  buildAlpha2ToNumericIdMap();
-
-const NUMERIC_COUNTRY_ID_TO_ALPHA2: ReadonlyMap<string, string> = new Map(
-  Array.from(ALPHA2_TO_NUMERIC_COUNTRY_ID, ([alpha2, numericId]) => [
-    numericId,
-    alpha2,
-  ])
-);
-
-/**
- * The numeric string id for a world-atlas country feature, normalized to
- * match `ALPHA2_TO_NUMERIC_COUNTRY_ID` values. Returns null for features
- * that have no id and no known special case.
- */
-export function getCountryFeatureNumericId(
-  countryFeature: WorldCountryFeature
-): string | null {
-  if (countryFeature.id != null) {
-    return String(countryFeature.id).padStart(3, '0');
+const decodeBase64 = (encoded: string): Uint8Array => {
+  const binary = atob(encoded);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.codePointAt(index) ?? 0;
   }
-  if (countryFeature.properties.name === 'Kosovo') {
-    return KOSOVO_NUMERIC_ID;
+  return bytes;
+};
+
+const getAlpha2ForCountryId = (countryId: number): string | null => {
+  if (countryId === 0 || countryId > COUNTRY_COUNT) {
+    return null;
   }
-  return null;
-}
+  const alpha2 = ALPHA2_BY_COUNTRY_ID.slice(countryId * 2, countryId * 2 + 2);
+  return alpha2 === UNMAPPED_ALPHA2 ? null : alpha2;
+};
 
-let allCountryFeaturesPromise: Promise<readonly WorldCountryFeature[]> | null =
-  null;
+let countryIdByAlpha2: ReadonlyMap<string, number> | null = null;
 
-/**
- * All country polygon features from the world-atlas dataset, including
- * features that have no alpha-2 mapping (still useful as background land).
- * The ~250KB TopoJSON is dynamically imported so it stays out of the main
- * bundle; the loaded features are memoized.
- */
-export function getAllCountryFeatures(): Promise<
-  readonly WorldCountryFeature[]
-> {
-  allCountryFeaturesPromise ??= import('world-atlas/countries-110m.json').then(
-    (module) => {
-      const topology = module.default;
-      return feature(topology, topology.objects.countries).features;
+export const getCountryIdByAlpha2 = (): ReadonlyMap<string, number> => {
+  if (countryIdByAlpha2) {
+    return countryIdByAlpha2;
+  }
+  const countryIds = new Map<string, number>();
+  for (let countryId = 1; countryId <= COUNTRY_COUNT; countryId += 1) {
+    const alpha2 = getAlpha2ForCountryId(countryId);
+    if (alpha2) {
+      countryIds.set(alpha2, countryId);
     }
+  }
+  countryIdByAlpha2 = countryIds;
+  return countryIds;
+};
+
+let dotCountryIds: Uint8Array | null = null;
+
+export const getDotCountryIds = (): Uint8Array => {
+  dotCountryIds ??= decodeBase64(DOT_COUNTRY_IDS_BASE64);
+  return dotCountryIds;
+};
+
+let hoverCountryIds: Uint8Array | null = null;
+
+const getHoverCountryIds = (): Uint8Array => {
+  if (hoverCountryIds) {
+    return hoverCountryIds;
+  }
+  const runs = decodeBase64(HOVER_COUNTRY_RUNS_BASE64);
+  const countryIds = new Uint8Array(HOVER_MAP_WIDTH * HOVER_MAP_HEIGHT);
+  let outputOffset = 0;
+  for (let index = 0; index < runs.length; index += 2) {
+    const runLength = runs[index];
+    const countryId = runs[index + 1];
+    countryIds.fill(countryId, outputOffset, outputOffset + runLength);
+    outputOffset += runLength;
+  }
+  hoverCountryIds = countryIds;
+  return countryIds;
+};
+
+/** Returns the ISO2 code at a longitude/latitude point, or null for ocean. */
+export const getCountryAtCoordinates = (
+  longitude: number,
+  latitude: number
+): string | null => {
+  const normalizedLongitude = (((longitude + 180) % 360) + 360) % 360;
+  const x = Math.min(
+    HOVER_MAP_WIDTH - 1,
+    Math.floor((normalizedLongitude / 360) * HOVER_MAP_WIDTH)
   );
-  return allCountryFeaturesPromise;
-}
+  const y = Math.max(
+    0,
+    Math.min(
+      HOVER_MAP_HEIGHT - 1,
+      Math.floor(((90 - latitude) / 180) * HOVER_MAP_HEIGHT)
+    )
+  );
+  const countryId = getHoverCountryIds()[y * HOVER_MAP_WIDTH + x];
+  return getAlpha2ForCountryId(countryId);
+};
 
-interface JoinedCountryFeature {
-  feature: WorldCountryFeature;
-  alpha2: string;
-  /**
-   * Bounding box from d3's geoBounds: [[minLng, minLat], [maxLng, maxLat]].
-   * For countries crossing the antimeridian (e.g. Fiji, Russia),
-   * minLng > maxLng.
-   */
-  bounds: [[number, number], [number, number]];
-}
+let countryCentroids: ReadonlyMap<string, [number, number]> | null = null;
 
-let countryFeaturesPromise: Promise<readonly JoinedCountryFeature[]> | null =
-  null;
-
-/**
- * Country polygon features joined to their ISO 3166-1 alpha-2 codes and
- * bounding boxes, memoized (hover hit-testing calls this repeatedly).
- * Features whose id has no alpha-2 mapping are excluded.
- */
-export function getCountryFeatures(): Promise<readonly JoinedCountryFeature[]> {
-  countryFeaturesPromise ??= getAllCountryFeatures().then((allFeatures) => {
-    const joined: JoinedCountryFeature[] = [];
-    for (const countryFeature of allFeatures) {
-      const numericId = getCountryFeatureNumericId(countryFeature);
-      const alpha2 =
-        numericId === null
-          ? undefined
-          : NUMERIC_COUNTRY_ID_TO_ALPHA2.get(numericId);
-      if (alpha2 !== undefined) {
-        joined.push({
-          alpha2,
-          bounds: geoBounds(countryFeature),
-          feature: countryFeature,
-        });
-      }
-    }
-    return joined;
-  });
-  return countryFeaturesPromise;
-}
-
-/** Whether a [lng, lat] point falls inside a geoBounds bounding box. */
-function boundsContain(
-  [[minLng, minLat], [maxLng, maxLat]]: [[number, number], [number, number]],
-  lng: number,
-  lat: number
-): boolean {
-  if (lat < minLat || lat > maxLat) {
-    return false;
+/** Returns precomputed ISO2 -> [latitude, longitude] country centroids. */
+export const getCountryCentroids = (): ReadonlyMap<
+  string,
+  [number, number]
+> => {
+  if (countryCentroids) {
+    return countryCentroids;
   }
-  // minLng > maxLng means the box crosses the antimeridian.
-  return minLng <= maxLng
-    ? lng >= minLng && lng <= maxLng
-    : lng >= minLng || lng <= maxLng;
-}
-
-/**
- * The ISO 3166-1 alpha-2 code of the country containing the given
- * [longitude, latitude] point, or null for points outside any country
- * polygon (e.g. oceans).
- */
-export async function getCountryAtCoordinates(
-  lng: number,
-  lat: number
-): Promise<string | null> {
-  const countryFeatures = await getCountryFeatures();
-  for (const { feature: countryFeature, alpha2, bounds } of countryFeatures) {
-    // The bounding-box check rejects most polygons before the much more
-    // expensive point-in-polygon test.
-    if (
-      boundsContain(bounds, lng, lat) &&
-      geoContains(countryFeature, [lng, lat])
-    ) {
-      return alpha2;
+  const bytes = decodeBase64(COUNTRY_CENTROIDS_BASE64);
+  const values = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const centroids = new Map<string, [number, number]>();
+  for (let countryId = 1; countryId <= COUNTRY_COUNT; countryId += 1) {
+    const alpha2 = getAlpha2ForCountryId(countryId);
+    if (!alpha2) {
+      continue;
     }
+    centroids.set(alpha2, [
+      values.getInt16(countryId * 4, true) / CENTROID_SCALE,
+      values.getInt16(countryId * 4 + 2, true) / CENTROID_SCALE,
+    ]);
   }
-  return null;
-}
-
-let countryCentroidsPromise: Promise<
-  ReadonlyMap<string, [number, number]>
-> | null = null;
-
-/**
- * ISO 3166-1 alpha-2 code -> [latitude, longitude] centroid computed from
- * each country's polygon. (d3's geoCentroid returns [longitude, latitude];
- * we flip to [latitude, longitude] to match the globe's `project()` input.)
- */
-export function getCountryCentroids(): Promise<
-  ReadonlyMap<string, [number, number]>
-> {
-  countryCentroidsPromise ??= getCountryFeatures().then((countryFeatures) => {
-    const centroids = new Map<string, [number, number]>();
-    for (const { feature: countryFeature, alpha2 } of countryFeatures) {
-      const [lng, lat] = geoCentroid(countryFeature);
-      centroids.set(alpha2, [lat, lng]);
-    }
-    return centroids;
-  });
-  return countryCentroidsPromise;
-}
+  countryCentroids = centroids;
+  return centroids;
+};

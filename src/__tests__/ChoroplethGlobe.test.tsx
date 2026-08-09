@@ -15,14 +15,14 @@ import type { ChoroplethGlobeHandle } from '../globeTypes';
 
 const mocks = vi.hoisted(() => ({
   createGlobe: vi.fn(),
-  generateTexture: vi.fn(),
+  generatePalette: vi.fn(),
   getCountryAtCoordinates: vi.fn(),
   getCountryCentroids: vi.fn(),
 }));
 
 vi.mock(import('../globeRenderer'), () => ({ default: mocks.createGlobe }));
-vi.mock(import('../choroplethTexture'), () => ({
-  generateChoroplethTexture: mocks.generateTexture,
+vi.mock(import('../choropleth-palette'), () => ({
+  generateChoroplethPalette: mocks.generatePalette,
 }));
 vi.mock(import('../worldGeoData'), () => ({
   getCountryAtCoordinates: mocks.getCountryAtCoordinates,
@@ -37,7 +37,13 @@ const data = [
     value: 42,
   },
 ];
-const colors = { filled: ['#000000', '#ffffff'] as const, missing: '#cccccc' };
+const colors = {
+  filled: [
+    [0, 0, 0],
+    [255, 255, 255],
+  ],
+  missing: [204, 204, 204],
+} as const;
 const formatValue = (value: number) => `${value} tCO₂e`;
 
 const globe = {
@@ -45,7 +51,7 @@ const globe = {
   project: vi.fn(() => ({ visible: true, x: 0.5, y: 0.5 })),
   unproject: vi.fn(() => [39, -98] as [number, number]),
   update: vi.fn(),
-  updateTexture: vi.fn(),
+  updatePalette: vi.fn(),
 };
 const animationFrames: FrameRequestCallback[] = [];
 
@@ -72,9 +78,9 @@ class ResizeObserverMock {
 beforeEach(() => {
   vi.resetAllMocks();
   mocks.createGlobe.mockReturnValue(globe);
-  mocks.generateTexture.mockResolvedValue(document.createElement('canvas'));
-  mocks.getCountryAtCoordinates.mockResolvedValue('US');
-  mocks.getCountryCentroids.mockResolvedValue(new Map([['US', [39, -98]]]));
+  mocks.generatePalette.mockReturnValue(new Uint8Array(1024));
+  mocks.getCountryAtCoordinates.mockReturnValue('US');
+  mocks.getCountryCentroids.mockReturnValue(new Map([['US', [39, -98]]]));
   Object.defineProperty(HTMLCanvasElement.prototype, 'clientHeight', {
     configurable: true,
     get: () => 200,
@@ -216,26 +222,11 @@ describe(ChoroplethGlobe, () => {
     expect(globe.update).toHaveBeenCalledWith({ phi: 0.25 });
   });
 
-  it('cancels stale texture generation after data changes', async () => {
-    let resolveFirst: ((canvas: HTMLCanvasElement) => void) | undefined;
-    let resolveSecond: ((canvas: HTMLCanvasElement) => void) | undefined;
-    mocks.generateTexture
-      .mockImplementationOnce(
-        () =>
-          new Promise<HTMLCanvasElement>((resolve) => {
-            resolveFirst = resolve;
-          })
-      )
-      .mockImplementationOnce(
-        () =>
-          new Promise<HTMLCanvasElement>((resolve) => {
-            resolveSecond = resolve;
-          })
-      );
+  it('uploads a new palette after data changes', () => {
     const { rerender } = render(
       <ChoroplethGlobe colors={colors} data={data} size={200} />
     );
-    await waitFor(() => expect(mocks.generateTexture).toHaveBeenCalledOnce());
+    expect(mocks.generatePalette).toHaveBeenCalledOnce();
 
     rerender(
       <ChoroplethGlobe
@@ -244,19 +235,7 @@ describe(ChoroplethGlobe, () => {
         size={200}
       />
     );
-    await waitFor(() => expect(mocks.generateTexture).toHaveBeenCalledTimes(2));
-
-    if (!resolveFirst || !resolveSecond) {
-      throw new Error('Expected both texture requests to be pending');
-    }
-    const firstTextureRequest = resolveFirst;
-    const secondTextureRequest = resolveSecond;
-    await act(async () =>
-      firstTextureRequest(document.createElement('canvas'))
-    );
-    expect(globe.updateTexture).not.toHaveBeenCalled();
-
-    secondTextureRequest(document.createElement('canvas'));
-    await waitFor(() => expect(globe.updateTexture).toHaveBeenCalledOnce());
+    expect(mocks.generatePalette).toHaveBeenCalledTimes(2);
+    expect(globe.updatePalette).toHaveBeenCalledOnce();
   });
 });

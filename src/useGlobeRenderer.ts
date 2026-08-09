@@ -25,7 +25,6 @@ interface GlobeRendererRefs {
   callbacks: MutableRefObject<GlobeCallbacks>;
   canvas: MutableRefObject<HTMLCanvasElement | null>;
   centroids: MutableRefObject<ReadonlyMap<string, [number, number]> | null>;
-  countryLookupSequence: MutableRefObject<number>;
   currentPhi: MutableRefObject<number>;
   data: MutableRefObject<readonly ChoroplethGlobeData[]>;
   drag: MutableRefObject<{ startPhi: number; startX: number } | null>;
@@ -33,9 +32,9 @@ interface GlobeRendererRefs {
   hoveringCanvas: MutableRefObject<boolean>;
   lastLookupCoordinates: MutableRefObject<[number, number] | null>;
   options: MutableRefObject<ChoroplethGlobeOptions | undefined>;
+  palette: MutableRefObject<Uint8Array | null>;
   prefersReducedMotion: MutableRefObject<boolean>;
   targetPhi: MutableRefObject<number | null>;
-  texture: MutableRefObject<HTMLCanvasElement | null>;
 }
 
 export interface GlobeRendererOptions {
@@ -71,6 +70,7 @@ export const useGlobeRenderer = ({
       baseColor: [
         ...(options.baseColor ?? (isDark ? [0.1, 0.1, 0.15] : [1, 1, 1])),
       ] as [number, number, number],
+      countryPalette: refs.palette.current ?? undefined,
       dark: isDark ? 1 : 0,
       devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       diffuse: 1.2,
@@ -87,9 +87,6 @@ export const useGlobeRenderer = ({
       width: size,
     });
     refs.globe.current = globe;
-    if (refs.texture.current) {
-      globe.updateTexture(refs.texture.current);
-    }
 
     let animationFrame: number | null = null;
     let shownTooltip: ChoroplethGlobeTooltip | null = null;
@@ -178,7 +175,6 @@ export const useGlobeRenderer = ({
         y / canvas.clientHeight
       );
       if (!coordinates) {
-        refs.countryLookupSequence.current += 1;
         refs.callbacks.current.onCountryHover?.(null);
         clearPointerTooltip();
         return;
@@ -193,41 +189,31 @@ export const useGlobeRenderer = ({
         return;
       }
       refs.lastLookupCoordinates.current = [latitude, longitude];
-      refs.countryLookupSequence.current += 1;
-      const sequence = refs.countryLookupSequence.current;
-      void getCountryAtCoordinates(longitude, latitude)
-        .then((alpha2) => {
-          if (sequence !== refs.countryLookupSequence.current) {
-            return;
-          }
-          refs.callbacks.current.onCountryHover?.(alpha2);
-          if (!alpha2 || !refs.callbacks.current.renderTooltip) {
-            clearPointerTooltip();
-            return;
-          }
-          const entry =
-            refs.data.current.find((item) => item.alpha2 === alpha2) ?? null;
-          setTooltip((current) =>
-            current?.source === 'entry'
-              ? current
-              : {
-                  alpha2,
-                  entry,
-                  entryId: entry?.id ?? null,
-                  formattedValue: entry
-                    ? (refs.callbacks.current.formatValue?.(
-                        entry.value,
-                        entry
-                      ) ?? null)
-                    : null,
-                  label: entry?.label ?? null,
-                  source: 'pointer',
-                  x,
-                  y,
-                }
-          );
-        })
-        .catch(() => clearPointerTooltip());
+      const alpha2 = getCountryAtCoordinates(longitude, latitude);
+      refs.callbacks.current.onCountryHover?.(alpha2);
+      if (!alpha2 || !refs.callbacks.current.renderTooltip) {
+        clearPointerTooltip();
+        return;
+      }
+      const entry =
+        refs.data.current.find((item) => item.alpha2 === alpha2) ?? null;
+      setTooltip((current) =>
+        current?.source === 'entry'
+          ? current
+          : {
+              alpha2,
+              entry,
+              entryId: entry?.id ?? null,
+              formattedValue: entry
+                ? (refs.callbacks.current.formatValue?.(entry.value, entry) ??
+                  null)
+                : null,
+              label: entry?.label ?? null,
+              source: 'pointer',
+              x,
+              y,
+            }
+      );
     };
 
     const onPointerDown = (event: PointerEvent) => {
@@ -265,7 +251,6 @@ export const useGlobeRenderer = ({
     };
     const onPointerLeave = () => {
       refs.hoveringCanvas.current = false;
-      refs.countryLookupSequence.current += 1;
       refs.lastLookupCoordinates.current = null;
       refs.callbacks.current.onCountryHover?.(null);
       clearPointerTooltip();
@@ -291,5 +276,24 @@ export const useGlobeRenderer = ({
       globe.destroy();
       refs.globe.current = null;
     };
-  }, [colorScheme, globeOptions, refs, setTooltip, size]);
+  }, [
+    colorScheme,
+    globeOptions,
+    refs.activeEntryId,
+    refs.callbacks,
+    refs.canvas,
+    refs.centroids,
+    refs.currentPhi,
+    refs.data,
+    refs.drag,
+    refs.globe,
+    refs.hoveringCanvas,
+    refs.lastLookupCoordinates,
+    refs.options,
+    refs.palette,
+    refs.prefersReducedMotion,
+    refs.targetPhi,
+    setTooltip,
+    size,
+  ]);
 };

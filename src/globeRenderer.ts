@@ -3,11 +3,8 @@
  * (MIT, https://github.com/shuding/cobe), reduced to the choropleth globe
  * this chart renders and extended with:
  *
- * - Choropleth texture support (the `mapTexture` option plus the
- *   `updateTexture` method): the globe samples an RGBA equirectangular
- *   land-mask texture and blends per-dot choropleth land colors over the
- *   base surface, instead of the stock single-channel dot-brightness
- *   texture.
+ * - Choropleth palette support: each fixed globe dot has a precomputed
+ *   country ID, and a tiny dynamic RGBA palette maps those IDs to colors.
  * - Screen projection (`project`): maps a [lat, lng] coordinate (degrees) to
  *   normalized [0, 1] canvas coordinates.
  * - Unprojection (`unproject`): maps normalized [0, 1] canvas coordinates
@@ -18,6 +15,9 @@
  * pipelines, the built-in dot-texture mode, and the CSS anchor-positioning
  * helper — the chart only needs the choropleth globe itself.
  */
+
+import { DOT_COUNT, DOT_TEXTURE_WIDTH } from './generated-country-data';
+import { getDotCountryIds } from './worldGeoData';
 
 export interface GlobeOptions {
   width: number;
@@ -35,18 +35,15 @@ export interface GlobeOptions {
   offset?: [number, number];
   scale?: number;
   context?: WebGLContextAttributes;
-  /**
-   * Initial RGBA choropleth texture (alpha = land mask). Without it the
-   * globe renders its base surface until `updateTexture` is called.
-   */
-  mapTexture?: TexImageSource;
+  /** Initial country-ID -> RGBA palette. */
+  countryPalette?: Uint8Array;
 }
 
 export interface Globe {
   update: (state: Partial<GlobeOptions>) => void;
   destroy: () => void;
-  /** Re-uploads the choropleth texture and re-renders. */
-  updateTexture: (image: TexImageSource) => void;
+  /** Re-uploads the country color palette and re-renders. */
+  updatePalette: (palette: Uint8Array) => void;
   /**
    * Projects a [lat, lng] coordinate (degrees) to normalized [0, 1] canvas
    * coordinates at the current phi/theta/scale/offset. `visible` is false
@@ -66,6 +63,7 @@ export interface Globe {
 }
 
 const GLOBE_RADIUS = 0.8;
+const DOT_TEXTURE_HEIGHT = Math.ceil((DOT_COUNT + 1) / DOT_TEXTURE_WIDTH);
 
 /**
  * Projected locations (tooltip anchors) sit slightly above the globe
@@ -92,7 +90,8 @@ uniform float scale;
 uniform vec3 baseColor;
 uniform vec3 glowColor;
 uniform vec4 renderParams;
-uniform sampler2D uTexture;
+uniform sampler2D uCountryIds;
+uniform sampler2D uCountryPalette;
 
 const float sqrt5 = 2.236068;
 const float PI = 3.141593;
@@ -114,7 +113,7 @@ mat3 rotate(float theta, float phi) {
   );
 }
 
-vec3 nearestFibonacciLattice(vec3 p, out float m) {
+void nearestFibonacciLattice(vec3 p, out float m, out float nearestIdx) {
   p = p.xzy;
 
   float k = max(2.0, floor(log2(sqrt5 * dots * PI * (1.0 - p.z * p.z)) * 0.72021));
@@ -126,7 +125,6 @@ vec3 nearestFibonacciLattice(vec3 p, out float m) {
   vec2 c = floor(vec2(br2.y * sp.x - br1.y * (sp.y * dots + 1.0), -br2.x * sp.x + br1.x * (sp.y * dots + 1.0)) / (br1.x * br2.y - br2.x * br1.y));
 
   float mindist = PI;
-  vec3 minip;
   for (float s = 0.0; s < 4.0; s += 1.0) {
     vec2 o = vec2(mod(s, 2.0), floor(s * 0.5));
     float idx = dot(f, c + o);
@@ -159,12 +157,11 @@ vec3 nearestFibonacciLattice(vec3 p, out float m) {
 
     if (dist < mindist) {
       mindist = dist;
-      minip = sample;
+      nearestIdx = idx;
     }
   }
 
   m = mindist;
-  return minip.xzy;
 }
 
 void main() {
@@ -187,34 +184,29 @@ void main() {
     mat3 rot = rotate(rotation.y, rotation.x);
     float dotNL = p.z;
 
-    vec3 gP = nearestFibonacciLattice(p * rot, dis);
+    float dotIndex;
+    nearestFibonacciLattice(p * rot, dis, dotIndex);
 
-    float gPhi = asin(gP.y);
-    float gTheta = acos(-gP.x / cos(gPhi));
-    if (gP.z < 0.0) gTheta = -gTheta;
-
-    // Choropleth texCoord — remapped to [0,1] for CLAMP_TO_EDGE.
-    // COBE shifts longitude by -PI (see latLonToVec3), so gTheta=0 in
-    // shader-space corresponds to geographic lon 180 (antimeridian).
-    // The d3-geo equirectangular texture has lon -180 at x=0, lon 0 at
-    // x=0.5, lon 180 at x=1. We need to shift by +0.5 and wrap.
-    // gTheta in [-PI, PI] -> geographic lon offset -> x in [0, 1]
-    // gPhi   in [-PI/2, PI/2] -> y in [0, 1]  (top = north pole)
-    vec2 texCoord = vec2(
-      fract(gTheta / kTau + 1.0),
-      0.5 - gPhi / PI
+    vec2 countryIdCoord = vec2(
+      (mod(dotIndex, ${DOT_TEXTURE_WIDTH.toFixed(1)}) + 0.5) / ${DOT_TEXTURE_WIDTH.toFixed(1)},
+      (floor(dotIndex / ${DOT_TEXTURE_WIDTH.toFixed(1)}) + 0.5) / ${DOT_TEXTURE_HEIGHT.toFixed(1)}
     );
-
-    vec4 texSample = texture2D(uTexture, texCoord);
+    float countryId = floor(
+      texture2D(uCountryIds, countryIdCoord).r * 255.0 + 0.5
+    );
+    vec4 countryColor = texture2D(
+      uCountryPalette,
+      vec2((countryId + 0.5) / 256.0, 0.5)
+    );
 
     float dotMask = smoothstep(0.018, 0.0, dis);
     float lighting = pow(dotNL, renderParams.y);
 
-    // Choropleth: texture RGBA — alpha=0 for ocean, alpha=1 for land.
-    // GL.LINEAR filtering at coastlines produces smooth alpha gradients
-    // instead of harsh edges.
-    vec3 texColor = texSample.rgb;
-    float isLand = texSample.a;
+    // Palette alpha is zero for ocean and the configured opacity for land.
+    // Both categorical textures use nearest-neighbor sampling so country IDs
+    // and colors never bleed across borders.
+    vec3 texColor = countryColor.rgb;
+    float isLand = countryColor.a;
 
     // Smooth globe surface (no dots) — used for ocean and between dots.
     float dark = renderParams.z;
@@ -303,8 +295,9 @@ function getGlobeUniformLocations(
     renderParams: gl.getUniformLocation(program, 'renderParams'),
     rotation: gl.getUniformLocation(program, 'rotation'),
     scale: gl.getUniformLocation(program, 'scale'),
+    uCountryIds: gl.getUniformLocation(program, 'uCountryIds'),
+    uCountryPalette: gl.getUniformLocation(program, 'uCountryPalette'),
     uResolution: gl.getUniformLocation(program, 'uResolution'),
-    uTexture: gl.getUniformLocation(program, 'uTexture'),
   };
 }
 
@@ -313,7 +306,7 @@ const NOOP_GLOBE: Globe = {
   project: () => ({ visible: false, x: 0, y: 0 }),
   unproject: () => null,
   update: () => {},
-  updateTexture: () => {},
+  updatePalette: () => {},
 };
 
 export default function createGlobe(
@@ -374,40 +367,61 @@ export default function createGlobe(
   const globeUniforms = getGlobeUniformLocations(gl, globeProgram);
   const globePositionLocation = gl.getAttribLocation(globeProgram, 'aPosition');
 
-  // Initialize with a 1x1 opaque placeholder until the real choropleth
-  // texture is uploaded via mapTexture or updateTexture.
-  const mapTexture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, mapTexture);
+  const countryIds = getDotCountryIds();
+  const countryIdPixels = new Uint8Array(
+    DOT_TEXTURE_WIDTH * DOT_TEXTURE_HEIGHT * 4
+  );
+  for (let index = 0; index < countryIds.length; index += 1) {
+    countryIdPixels[index * 4] = countryIds[index];
+    countryIdPixels[index * 4 + 3] = 255;
+  }
+
+  const countryIdTexture = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, countryIdTexture);
   gl.texImage2D(
     gl.TEXTURE_2D,
     0,
     gl.RGBA,
-    1,
-    1,
+    DOT_TEXTURE_WIDTH,
+    DOT_TEXTURE_HEIGHT,
     0,
     gl.RGBA,
     gl.UNSIGNED_BYTE,
-    new Uint8Array([0, 0, 0, 255])
+    countryIdPixels
   );
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-  function uploadTexture(image: TexImageSource): void {
-    gl.bindTexture(gl.TEXTURE_2D, mapTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  const countryPaletteTexture = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, countryPaletteTexture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+  function uploadPalette(palette: Uint8Array): void {
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, countryPaletteTexture);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      256,
+      1,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      palette
+    );
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, mapTexture);
   }
 
-  if (opts.mapTexture) {
-    uploadTexture(opts.mapTexture);
-  }
+  uploadPalette(opts.countryPalette ?? new Uint8Array(256 * 4));
 
   function render(state: Partial<GlobeOptions>): void {
     if (state.phi !== undefined) {
@@ -476,9 +490,12 @@ export default function createGlobe(
       dark,
       opacity
     );
-    gl.uniform1i(globeUniforms.uTexture, 0);
+    gl.uniform1i(globeUniforms.uCountryIds, 0);
+    gl.uniform1i(globeUniforms.uCountryPalette, 1);
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, mapTexture);
+    gl.bindTexture(gl.TEXTURE_2D, countryIdTexture);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, countryPaletteTexture);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
 
@@ -580,13 +597,14 @@ export default function createGlobe(
     destroy: () => {
       gl.deleteBuffer(quadBuffer);
       gl.deleteProgram(globeProgram);
-      gl.deleteTexture(mapTexture);
+      gl.deleteTexture(countryIdTexture);
+      gl.deleteTexture(countryPaletteTexture);
     },
     project,
     unproject,
     update: render,
-    updateTexture: (image: TexImageSource) => {
-      uploadTexture(image);
+    updatePalette: (palette: Uint8Array) => {
+      uploadPalette(palette);
       render({});
     },
   };

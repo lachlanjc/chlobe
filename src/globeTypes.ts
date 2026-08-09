@@ -12,12 +12,15 @@ export interface ChoroplethGlobeData {
   label?: string;
 }
 
+/** An RGB color with channels in the inclusive 0-255 range. */
+export type ChoroplethRgb = readonly [number, number, number];
+
 /** Color settings used to generate the country texture. */
 export interface ChoroplethGlobeColors {
   /** Fill color ramp from the smallest to largest absolute value. */
-  filled: readonly [string, string];
+  filled: readonly [ChoroplethRgb, ChoroplethRgb];
   /** Fill for countries absent from {@link ChoroplethGlobeProps.data}. */
-  missing: string;
+  missing: ChoroplethRgb;
   /** Opacity for countries absent from the data. Defaults to 0.25. */
   missingAlpha?: number;
 }
