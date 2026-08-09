@@ -1,4 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
+import React from 'react';
 
 import { ChoroplethGlobeDemo } from './ChoroplethGlobeDemo';
 

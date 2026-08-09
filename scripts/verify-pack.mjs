@@ -28,9 +28,9 @@ if (unexpectedFiles.length > 0) {
 
 for (const path of [
   'dist/index.js',
-  'dist/index.mjs',
+  'dist/index.cjs',
   'dist/index.d.ts',
-  'dist/index.d.mts',
+  'dist/index.d.cts',
 ]) {
   if (!files.some((file) => file.path === path)) {
     throw new Error(`npm pack is missing ${path}`);

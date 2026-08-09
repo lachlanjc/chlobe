@@ -1,36 +1,58 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 
-import { ChoroplethGlobe } from '../../dist/index.mjs';
+import { ChoroplethGlobe } from '../../dist/index.js';
 import type {
-  ChoroplethGlobeEntry,
+  ChoroplethGlobeData,
   ChoroplethGlobeHandle,
-} from '../../dist/index.mjs';
+} from '../../dist/index.js';
 
-const entries: ChoroplethGlobeEntry[] = [
+const data: ChoroplethGlobeData[] = [
   {
     alpha2: 'US',
     formattedValue: '43.2M tCO₂e',
     id: 'us',
     label: 'United States',
+    value: 43.2,
   },
-  { alpha2: 'CN', formattedValue: '31.0M tCO₂e', id: 'cn', label: 'China' },
-  { alpha2: 'BR', formattedValue: '15.8M tCO₂e', id: 'br', label: 'Brazil' },
-  { alpha2: 'IN', formattedValue: '12.4M tCO₂e', id: 'in', label: 'India' },
-  { alpha2: 'DE', formattedValue: '8.1M tCO₂e', id: 'de', label: 'Germany' },
-  { alpha2: 'AU', formattedValue: '5.7M tCO₂e', id: 'au', label: 'Australia' },
+  {
+    alpha2: 'CN',
+    formattedValue: '31.0M tCO₂e',
+    id: 'cn',
+    label: 'China',
+    value: 31,
+  },
+  {
+    alpha2: 'BR',
+    formattedValue: '15.8M tCO₂e',
+    id: 'br',
+    label: 'Brazil',
+    value: 15.8,
+  },
+  {
+    alpha2: 'IN',
+    formattedValue: '12.4M tCO₂e',
+    id: 'in',
+    label: 'India',
+    value: 12.4,
+  },
+  {
+    alpha2: 'DE',
+    formattedValue: '8.1M tCO₂e',
+    id: 'de',
+    label: 'Germany',
+    value: 8.1,
+  },
+  {
+    alpha2: 'AU',
+    formattedValue: '5.7M tCO₂e',
+    id: 'au',
+    label: 'Australia',
+    value: 5.7,
+  },
 ];
-
-const countryNames: Record<string, string> = {
-  AU: 'Australia',
-  BR: 'Brazil',
-  CN: 'China',
-  DE: 'Germany',
-  IN: 'India',
-  US: 'United States',
-};
 
 const styles = stylex.create({
   countryButton: {
@@ -118,18 +140,13 @@ const ChoroplethGlobeDemo = () => {
       <div {...stylex.props(styles.globePanel)}>
         <ChoroplethGlobe
           ref={globeRef}
-          choroplethInput={{
-            filledColorRange: ['#FFFBF3', '#FF6633'],
+          colors={{
+            filled: ['#FFFBF3', '#FF6633'],
             missingAlpha: 0.32,
-            missingColor: '#566ba8',
-            valuesByAlpha2: entries.map(({ alpha2 }, index) => [
-              alpha2,
-              entries.length - index,
-            ]),
+            missing: '#566ba8',
           }}
           colorScheme="light"
-          entries={entries}
-          getCountryLabel={(alpha2) => countryNames[alpha2] ?? alpha2}
+          data={data}
           renderTooltip={({ formattedValue, label, x, y }) => (
             <div {...stylex.props(styles.tooltip)} style={{ left: x, top: y }}>
               <strong>{label}</strong>
@@ -145,7 +162,7 @@ const ChoroplethGlobeDemo = () => {
           <h2 {...stylex.props(styles.legendTitle)}>Emissions by country</h2>
         </div>
         <ol {...stylex.props(styles.countryList)}>
-          {entries.map((entry) => (
+          {data.map((entry) => (
             <li key={entry.id}>
               <button
                 {...stylex.props(styles.countryButton)}

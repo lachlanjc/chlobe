@@ -7,7 +7,7 @@ import {
   getCountryFeatures,
 } from '../worldGeoData';
 
-describe(ALPHA2_TO_NUMERIC_COUNTRY_ID, () => {
+describe('country code mapping', () => {
   it('maps alpha-2 codes to zero-padded numeric ids', () => {
     expect(ALPHA2_TO_NUMERIC_COUNTRY_ID.get('US')).toBe('840');
     expect(ALPHA2_TO_NUMERIC_COUNTRY_ID.get('AU')).toBe('036');

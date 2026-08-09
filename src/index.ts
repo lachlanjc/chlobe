@@ -1,8 +1,9 @@
 export { default as ChoroplethGlobe } from './ChoroplethGlobe';
 export type {
-  ChoroplethGlobeEntry,
+  ChoroplethGlobeColors,
+  ChoroplethGlobeData,
   ChoroplethGlobeHandle,
-  ChoroplethGlobeInput,
+  ChoroplethGlobeOptions,
   ChoroplethGlobeProps,
   ChoroplethGlobeTooltip,
-} from './ChoroplethGlobe';
+} from './globeTypes';
