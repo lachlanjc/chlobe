@@ -1,7 +1,31 @@
+import localFont from "next/font/local";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import "@stylexswc/webpack-plugin/stylex.css";
 import "./globals.css";
+
+const booton = localFont({
+  display: "swap",
+  src: [
+    {
+      path: "./fonts/Booton-Regular.woff2",
+      style: "normal",
+      weight: "400",
+    },
+    {
+      path: "./fonts/Booton-Medium.woff2",
+      style: "normal",
+      weight: "500",
+    },
+    {
+      path: "./fonts/Booton-SemiBold.woff2",
+      style: "normal",
+      weight: "600",
+    },
+  ],
+  variable: "--font-booton",
+});
 
 export const metadata: Metadata = {
   description:
@@ -11,7 +35,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html className={booton.variable} lang="en">
       <body>{children}</body>
     </html>
   );
