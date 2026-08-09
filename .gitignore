@@ -1,3 +1,6 @@
 node_modules/
 dist/
-.npm-cache/
+.pnpm-store/
+.next
+*.tsbuildinfo
+.DS_Store
