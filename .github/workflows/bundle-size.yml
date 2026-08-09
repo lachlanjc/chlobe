@@ -23,6 +23,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - run: pnpm build:bundle-size
 
       - name: Compare bundle size
         uses: lironer/bundlemon-action@v1

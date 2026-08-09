@@ -34,6 +34,7 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "build:bundle-size": "tsup --config tsup.bundle-size.config.ts",
     "bundlemon": "bundlemon",
     "dev": "tsup src/index.ts --format cjs,esm --dts --clean --watch",
     "test": "vitest run",
