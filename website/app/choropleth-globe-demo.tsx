@@ -306,60 +306,54 @@ const getGlobeValue = (story: Story, value: number) => {
   return story === 'water' ? Math.sqrt(value) : value;
 };
 
-const GlobeLegend = ({ story }: { story: Story }) => {
-  if (story === 'forest') {
-    return (
-      <div aria-label="Forest area per person scale">
-        <div {...stylex.props(styles.legendStack)}>
-          {FOREST_LEGEND.map(([color], index) => (
-            <span
-              key={color}
-              {...stylex.props(
-                styles.legendSwatch,
-                FOREST_SWATCH_STYLES[index]
-              )}
-            />
-          ))}
-        </div>
-        <div {...stylex.props(styles.legendLabels)}>
-          {FOREST_LEGEND.slice(0, 4).map(([, label]) => (
-            <span key={label}>{label} ha</span>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (story === 'water') {
-    return (
-      <div aria-label="Freshwater withdrawals per person scale">
-        <div {...stylex.props(styles.legendGradient, styles.waterGradient)} />
-        <div {...stylex.props(styles.legendLabels)}>
-          {WATER_LEGEND.map((value) => (
-            <span key={value}>{value.toLocaleString()}</span>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (story === 'renewable') {
-    return (
-      <div aria-label="Renewable electricity share scale">
-        <div
-          {...stylex.props(styles.legendGradient, styles.renewableGradient)}
+const ForestLegend = () => (
+  <div aria-label="Forest area per person scale">
+    <div {...stylex.props(styles.legendStack)}>
+      {FOREST_LEGEND.map(([color], index) => (
+        <span
+          key={color}
+          {...stylex.props(styles.legendSwatch, FOREST_SWATCH_STYLES[index])}
         />
-        <div {...stylex.props(styles.legendLabels)}>
-          <span>0%</span>
-          <span>50%</span>
-          <span>100%</span>
-        </div>
-      </div>
-    );
-  }
+      ))}
+    </div>
+    <div {...stylex.props(styles.legendLabels)}>
+      {FOREST_LEGEND.slice(0, 4).map(([, label]) => (
+        <span key={label}>{label} ha</span>
+      ))}
+    </div>
+  </div>
+);
 
-  return null;
-};
+const WaterLegend = () => (
+  <div aria-label="Freshwater withdrawals per person scale">
+    <div {...stylex.props(styles.legendGradient, styles.waterGradient)} />
+    <div {...stylex.props(styles.legendLabels)}>
+      {WATER_LEGEND.map((value) => (
+        <span key={value}>{value.toLocaleString()}</span>
+      ))}
+    </div>
+  </div>
+);
+
+const RenewableLegend = () => (
+  <div aria-label="Renewable electricity share scale">
+    <div {...stylex.props(styles.legendGradient, styles.renewableGradient)} />
+    <div {...stylex.props(styles.legendLabels)}>
+      <span>0%</span>
+      <span>50%</span>
+      <span>100%</span>
+    </div>
+  </div>
+);
+
+const EmptyLegend = () => null;
+
+const LEGEND_REGISTRY = {
+  forest: ForestLegend,
+  oil: EmptyLegend,
+  renewable: RenewableLegend,
+  water: WaterLegend,
+} as const;
 
 const DatasetSection = ({
   dataset,
@@ -370,6 +364,7 @@ const DatasetSection = ({
 }) => {
   const details = STORY_DETAILS[story];
   const storyStyles = STORY_STYLES[story];
+  const Legend = LEGEND_REGISTRY[story];
   const globeRef = useRef<ChoroplethGlobeHandle>(null);
   const [activeEntryId, setActiveEntryId] = useState<string | null>(() =>
     story === 'oil'
@@ -426,7 +421,7 @@ const DatasetSection = ({
               </span>
             </div>
           ) : null}
-          <GlobeLegend story={story} />
+          <Legend />
           <p {...stylex.props(styles.source)}>
             {dataset.name} · {dataset.unit} · latest available:{' '}
             {formatYearRange(dataset.entries)} · {dataset.source}
@@ -435,7 +430,7 @@ const DatasetSection = ({
         <div {...stylex.props(styles.visual)}>
           <ChoroplethGlobe
             activeEntryId={activeEntryId}
-            ariaLabel={`${dataset.name} by country`}
+            aria-label={`${dataset.name} by country`}
             colorScheme={story === 'oil' ? 'dark' : 'light'}
             colors={details.colors}
             data={globeData}

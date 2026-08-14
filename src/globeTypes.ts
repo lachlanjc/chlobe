@@ -79,7 +79,7 @@ export interface ChoroplethGlobeProps {
   /** Optional caller-owned tooltip UI. No tooltip DOM is rendered by default. */
   renderTooltip?: (tooltip: ChoroplethGlobeTooltip) => ReactNode;
   /** Accessible name for the interactive globe, or its image alternative. */
-  ariaLabel?: string;
+  'aria-label'?: string;
   className?: string;
   style?: CSSProperties;
 }

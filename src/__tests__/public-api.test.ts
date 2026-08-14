@@ -49,7 +49,7 @@ describe('public API', () => {
   it('keeps hover and tooltip features opt-in while supporting accessible use', () => {
     const props = {
       activeEntryId: 'united-states',
-      ariaLabel: 'Emissions by country',
+      'aria-label': 'Emissions by country',
       colors: {
         filled: [
           [15, 23, 42],
@@ -77,12 +77,12 @@ describe('public API', () => {
       },
     } satisfies ChoroplethGlobeProps;
 
-    expect(props.ariaLabel).toBe('Emissions by country');
+    expect(props['aria-label']).toBe('Emissions by country');
   });
 
   it('does not require interaction or tooltip callbacks for a labelled static globe', () => {
     const props = {
-      ariaLabel: 'Country values',
+      'aria-label': 'Country values',
       colors: {
         filled: [
           [15, 23, 42],

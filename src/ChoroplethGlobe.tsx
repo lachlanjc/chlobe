@@ -30,7 +30,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
   (
     {
       activeEntryId: controlledActiveEntryId,
-      ariaLabel = 'Country choropleth globe',
+      'aria-label': ariaLabel = 'Country choropleth globe',
       className,
       colors,
       colorScheme = 'light',

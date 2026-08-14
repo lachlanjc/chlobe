@@ -116,7 +116,7 @@ describe(ChoroplethGlobe, () => {
   it('renders an accessible, non-interactive image and cleans up its renderer', () => {
     const { getByLabelText, unmount } = render(
       <ChoroplethGlobe
-        ariaLabel="Country values"
+        aria-label="Country values"
         colors={colors}
         data={data}
         globe={{ interactive: false }}
