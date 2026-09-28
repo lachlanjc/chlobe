@@ -1,5 +1,5 @@
 {
-  "name": "react-cobe-countries",
+  "name": "chlobe",
   "version": "0.0.1",
   "description": "Lightweight WebGL globe for rendering values of countries as shaded regions.",
   "keywords": [
@@ -10,13 +10,13 @@
     "react",
     "webgl"
   ],
-  "homepage": "https://github.com/lachlanjc/react-cobe-countries#readme",
-  "bugs": "https://github.com/lachlanjc/react-cobe-countries/issues",
+  "homepage": "https://github.com/lachlanjc/chlobe#readme",
+  "bugs": "https://github.com/lachlanjc/chlobe/issues",
   "license": "MIT",
   "author": "lachlanjc",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lachlanjc/react-cobe-countries.git"
+    "url": "https://github.com/lachlanjc/chlobe.git"
   },
   "files": [
     "dist"

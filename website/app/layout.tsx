@@ -31,7 +31,7 @@ const booton = localFont({
 export const metadata: Metadata = {
   description:
     'Lightweight WebGL globe for rendering values of countries as shaded regions.',
-  title: 'Cobe Countries',
+  title: 'Chlobe',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

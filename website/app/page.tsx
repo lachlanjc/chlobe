@@ -57,7 +57,7 @@ const styles = stylex.create({
 const Home = () => (
   <main {...stylex.props(styles.shell)}>
     <section {...stylex.props(styles.hero, styles.intro)}>
-      <p {...stylex.props(styles.eyebrow)}>Cobe Countries</p>
+      <p {...stylex.props(styles.eyebrow)}>Chlobe</p>
       <h1 {...stylex.props(styles.title)}>
         Visualize country data on a gl
         <span {...stylex.props(styles.titleGlobe)}></span>be.
