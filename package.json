@@ -16,7 +16,7 @@
   "author": "lachlanjc",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lachlanjc/chlobe.git"
+    "url": "git+https://github.com/lachlanjc/chlobe.git"
   },
   "files": [
     "dist"
