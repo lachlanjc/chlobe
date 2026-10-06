@@ -53,13 +53,16 @@ const globe = {
   update: vi.fn(),
   updatePalette: vi.fn(),
 };
-const animationFrames: FrameRequestCallback[] = [];
+const animationFrames = new Map<number, FrameRequestCallback>();
+let nextFrameId = 0;
 
 const runAnimationFrame = () => {
-  const callback = animationFrames.at(-1);
-  if (!callback) {
+  const frame = animationFrames.entries().next().value;
+  if (!frame) {
     throw new Error('No animation frame was requested');
   }
+  const [id, callback] = frame;
+  animationFrames.delete(id);
   act(() => callback(0));
 };
 
@@ -72,6 +75,18 @@ class ResizeObserverMock {
   constructor(callback: ResizeObserverCallback) {
     this.callback = callback;
     ResizeObserverMock.instances.push(this);
+  }
+}
+
+class IntersectionObserverMock {
+  static instances: IntersectionObserverMock[] = [];
+  callback: (entries: { isIntersecting: boolean }[]) => void;
+  disconnect = vi.fn<() => void>();
+  observe = vi.fn<(element: Element) => void>();
+
+  constructor(callback: (entries: { isIntersecting: boolean }[]) => void) {
+    this.callback = callback;
+    IntersectionObserverMock.instances.push(this);
   }
 }
 
@@ -90,26 +105,34 @@ beforeEach(() => {
     get: () => 200,
   });
   vi.stubGlobal('ResizeObserver', ResizeObserverMock);
+  vi.stubGlobal('IntersectionObserver', IntersectionObserverMock);
   vi.stubGlobal('matchMedia', () => ({
     addEventListener: vi.fn(),
     matches: false,
     removeEventListener: vi.fn(),
   }));
-  vi.stubGlobal('cancelAnimationFrame', vi.fn());
+  vi.stubGlobal(
+    'cancelAnimationFrame',
+    vi.fn((id: number) => animationFrames.delete(id))
+  );
   vi.stubGlobal(
     'requestAnimationFrame',
     vi.fn((callback: FrameRequestCallback) => {
-      animationFrames.push(callback);
-      return animationFrames.length;
+      nextFrameId += 1;
+      animationFrames.set(nextFrameId, callback);
+      return nextFrameId;
     })
   );
 });
 
 afterEach(() => {
   cleanup();
-  animationFrames.length = 0;
+  animationFrames.clear();
+  nextFrameId = 0;
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
   ResizeObserverMock.instances = [];
+  IntersectionObserverMock.instances = [];
 });
 
 describe(ChoroplethGlobe, () => {
@@ -279,6 +302,67 @@ describe(ChoroplethGlobe, () => {
     expect(globe.update).not.toHaveBeenCalled();
     unmount();
     expect(globe.destroy).toHaveBeenCalledOnce();
+  });
+
+  it('stops requesting idle frames and wakes for keyboard rotation', () => {
+    const { getByLabelText } = render(
+      <ChoroplethGlobe
+        colors={colors}
+        data={[]}
+        globe={{ autoRotate: false }}
+        size={200}
+      />
+    );
+    runAnimationFrame();
+    expect(animationFrames.size).toBe(0);
+    fireEvent.keyDown(getByLabelText('Country choropleth globe'), {
+      key: 'ArrowRight',
+    });
+    expect(animationFrames.size).toBe(1);
+    runAnimationFrame();
+    expect(globe.update).toHaveBeenLastCalledWith({ phi: 0.25 });
+    expect(animationFrames.size).toBe(0);
+  });
+
+  it('pauses offscreen rotation and resumes when the globe returns', () => {
+    render(<ChoroplethGlobe colors={colors} data={[]} size={200} />);
+    const observer = IntersectionObserverMock.instances[0];
+    act(() => observer.callback([{ isIntersecting: false }]));
+    expect(animationFrames.size).toBe(0);
+    act(() => observer.callback([{ isIntersecting: true }]));
+    runAnimationFrame();
+    expect(globe.update).toHaveBeenLastCalledWith({ phi: 0.0025 });
+    expect(animationFrames.size).toBe(1);
+  });
+
+  it('snaps navigation and stops idle scheduling for reduced motion', () => {
+    vi.stubGlobal('matchMedia', () => ({
+      addEventListener: vi.fn(),
+      matches: true,
+      removeEventListener: vi.fn(),
+    }));
+    const ref = createRef<ChoroplethGlobeHandle>();
+    render(
+      <ChoroplethGlobe colors={colors} data={data} ref={ref} size={200} />
+    );
+    runAnimationFrame();
+    expect(animationFrames.size).toBe(0);
+    globe.update.mockClear();
+    act(() => ref.current?.navigateToEntry('us'));
+    expect(animationFrames.size).toBe(1);
+    runAnimationFrame();
+    expect(animationFrames.size).toBe(0);
+  });
+
+  it('cancels frames in a hidden document and wakes when it becomes visible', () => {
+    render(<ChoroplethGlobe colors={colors} data={[]} size={200} />);
+    const hidden = vi.spyOn(document, 'hidden', 'get');
+    hidden.mockReturnValue(true);
+    fireEvent(document, new Event('visibilitychange'));
+    expect(animationFrames.size).toBe(0);
+    hidden.mockReturnValue(false);
+    fireEvent(document, new Event('visibilitychange'));
+    expect(animationFrames.size).toBe(1);
   });
 
   it('normalizes globe surface and glow colors from the public RGB contract', () => {

@@ -63,6 +63,7 @@ interface GlobeRendererRefs {
   options: MutableRefObject<ChoroplethGlobeOptions | undefined>;
   palette: MutableRefObject<Uint8Array | null>;
   prefersReducedMotion: MutableRefObject<boolean>;
+  requestRender: MutableRefObject<(() => void) | null>;
   targetPhi: MutableRefObject<number | null>;
 }
 
@@ -112,6 +113,7 @@ export const useGlobeRenderer = ({
     refs.globe.current = globe;
 
     let animationFrame: number | null = null;
+    let isVisible = true;
     let shownTooltip: ChoroplethGlobeTooltip | null = null;
     const setEntryTooltip = () => {
       const entry = findEntry(refs.data.current, refs.activeEntryId.current);
@@ -152,21 +154,38 @@ export const useGlobeRenderer = ({
     };
 
     let lastRenderedPhi = refs.currentPhi.current;
+    const shouldAutoRotate = () =>
+      refs.options.current?.autoRotate !== false &&
+      !refs.hoveringCanvas.current &&
+      refs.activeEntryId.current === null &&
+      !refs.prefersReducedMotion.current;
+    const cancelFrame = () => {
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+      }
+    };
+    const requestRender = () => {
+      if (animationFrame === null && isVisible && !document.hidden) {
+        animationFrame = window.requestAnimationFrame(render);
+      }
+    };
     const render = () => {
+      animationFrame = null;
+      if (!isVisible || document.hidden) {
+        return;
+      }
       let phi = refs.currentPhi.current;
       if (!refs.drag.current) {
         if (refs.targetPhi.current !== null) {
-          const step = stepPhiTowardTarget(phi, refs.targetPhi.current);
+          const step = refs.prefersReducedMotion.current
+            ? { done: true, phi: refs.targetPhi.current }
+            : stepPhiTowardTarget(phi, refs.targetPhi.current);
           phi = step.phi;
           if (step.done) {
             refs.targetPhi.current = null;
           }
-        } else if (
-          refs.options.current?.autoRotate !== false &&
-          !refs.hoveringCanvas.current &&
-          refs.activeEntryId.current === null &&
-          !refs.prefersReducedMotion.current
-        ) {
+        } else if (shouldAutoRotate()) {
           phi += AUTO_ROTATE_PHI_PER_FRAME;
         }
       }
@@ -180,9 +199,36 @@ export const useGlobeRenderer = ({
       } else {
         setEntryTooltip();
       }
-      animationFrame = window.requestAnimationFrame(render);
+      if (
+        !refs.drag.current &&
+        (refs.targetPhi.current !== null || shouldAutoRotate())
+      ) {
+        requestRender();
+      }
     };
-    animationFrame = window.requestAnimationFrame(render);
+    refs.requestRender.current = requestRender;
+    requestRender();
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        cancelFrame();
+      } else {
+        requestRender();
+      }
+    };
+    const observer =
+      typeof IntersectionObserver === 'function'
+        ? new IntersectionObserver(([entry]) => {
+            isVisible = entry.isIntersecting;
+            if (isVisible) {
+              requestRender();
+            } else {
+              cancelFrame();
+            }
+          })
+        : null;
+    observer?.observe(canvas);
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     const clearPointerTooltip = () =>
       setTooltip((current) => (current?.source === 'pointer' ? null : current));
@@ -249,6 +295,7 @@ export const useGlobeRenderer = ({
       };
       refs.targetPhi.current = null;
       canvas.setPointerCapture?.(event.pointerId);
+      requestRender();
     };
     const onPointerMove = (event: PointerEvent) => {
       if (refs.options.current?.interactive === false) {
@@ -258,12 +305,14 @@ export const useGlobeRenderer = ({
       if (drag) {
         refs.currentPhi.current =
           drag.startPhi + (event.clientX - drag.startX) / 100;
+        requestRender();
       } else {
         handleHover(event.offsetX, event.offsetY);
       }
     };
     const onPointerUp = () => {
       refs.drag.current = null;
+      requestRender();
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (refs.options.current?.interactive === false) {
@@ -276,30 +325,38 @@ export const useGlobeRenderer = ({
             ? -KEYBOARD_ROTATION_STEP
             : KEYBOARD_ROTATION_STEP;
         refs.targetPhi.current = null;
+        requestRender();
       }
     };
     const onPointerEnter = () => {
       refs.hoveringCanvas.current = refs.options.current?.interactive !== false;
+      requestRender();
     };
     const onPointerLeave = () => {
       refs.hoveringCanvas.current = false;
       refs.lastLookupCoordinates.current = null;
       refs.callbacks.current.onCountryHover?.(null);
       clearPointerTooltip();
+      requestRender();
     };
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('pointercancel', onPointerUp);
+    canvas.addEventListener('lostpointercapture', onPointerUp);
     canvas.addEventListener('pointerenter', onPointerEnter);
     canvas.addEventListener('pointerleave', onPointerLeave);
     canvas.addEventListener('keydown', onKeyDown);
     return () => {
-      if (animationFrame !== null) {
-        window.cancelAnimationFrame(animationFrame);
-      }
+      cancelFrame();
+      observer?.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      refs.requestRender.current = null;
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerUp);
+      canvas.removeEventListener('pointercancel', onPointerUp);
+      canvas.removeEventListener('lostpointercapture', onPointerUp);
       canvas.removeEventListener('pointerenter', onPointerEnter);
       canvas.removeEventListener('pointerleave', onPointerLeave);
       canvas.removeEventListener('keydown', onKeyDown);
@@ -320,6 +377,7 @@ export const useGlobeRenderer = ({
     refs.options,
     refs.palette,
     refs.prefersReducedMotion,
+    refs.requestRender,
     refs.targetPhi,
     setTooltip,
   ]);
@@ -338,12 +396,14 @@ export const useGlobeRenderer = ({
       refs.drag.current = null;
       refs.hoveringCanvas.current = false;
     }
+    refs.requestRender.current?.();
   }, [
     colorScheme,
     globeOptions,
     refs.globe,
     refs.drag,
     refs.hoveringCanvas,
+    refs.requestRender,
     size,
   ]);
 };

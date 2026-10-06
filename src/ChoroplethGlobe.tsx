@@ -56,6 +56,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const globeRef = useRef<Globe | null>(null);
+    const requestRenderRef = useRef<(() => void) | null>(null);
     const paletteRef = useRef<Uint8Array | null>(null);
     const currentPhiRef = useRef(globeOptions?.initialPhi ?? 0);
     const targetPhiRef = useRef<number | null>(null);
@@ -82,6 +83,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
       dataRef.current = data;
       optionsRef.current = globeOptions;
       reducedMotionRef.current = prefersReducedMotion;
+      requestRenderRef.current?.();
     }, [
       activeEntryId,
       centroids,
@@ -132,6 +134,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
           currentPhiRef.current,
           location[1]
         );
+        requestRenderRef.current?.();
       }
     }, [activeEntryId, centroids, data]);
 
@@ -154,6 +157,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
               currentPhiRef.current,
               location[1]
             );
+            requestRenderRef.current?.();
           }
         },
       }),
@@ -177,6 +181,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
         options: optionsRef,
         palette: paletteRef,
         prefersReducedMotion: reducedMotionRef,
+        requestRender: requestRenderRef,
         targetPhi: targetPhiRef,
       },
       setTooltip,
