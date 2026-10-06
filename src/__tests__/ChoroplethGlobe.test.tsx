@@ -11,7 +11,7 @@ import React, { createRef } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import ChoroplethGlobe from '../ChoroplethGlobe';
-import type { ChoroplethGlobeHandle } from '../globeTypes';
+import type { ChoroplethGlobeRef } from '../globeTypes';
 
 const mocks = vi.hoisted(() => ({
   createGlobe: vi.fn(),
@@ -173,7 +173,7 @@ describe(ChoroplethGlobe, () => {
   });
 
   it('provides entry identity to tooltip consumers and supports the imperative escape hatch', async () => {
-    const ref = createRef<ChoroplethGlobeHandle>();
+    const ref = createRef<ChoroplethGlobeRef>();
     const onActiveEntryChange = vi.fn();
     const renderTooltip = vi.fn(() => null);
     render(
@@ -210,7 +210,7 @@ describe(ChoroplethGlobe, () => {
 
   it('defaults omitted entry IDs to country codes for pointer and entry tooltips', async () => {
     const entry = { alpha2: 'US', value: 42 };
-    const ref = createRef<ChoroplethGlobeHandle>();
+    const ref = createRef<ChoroplethGlobeRef>();
     const onActiveEntryChange = vi.fn();
     const renderTooltip = vi.fn(() => null);
     const { getByLabelText } = render(
@@ -450,7 +450,7 @@ describe(ChoroplethGlobe, () => {
       matches: true,
       removeEventListener: vi.fn(),
     }));
-    const ref = createRef<ChoroplethGlobeHandle>();
+    const ref = createRef<ChoroplethGlobeRef>();
     render(
       <ChoroplethGlobe colors={colors} data={data} ref={ref} size={200} />
     );

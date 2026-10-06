@@ -1,7 +1,6 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { Code } from '@sugar-high/react';
 import React, { useRef, useState } from 'react';
 
 import 'react-flagpack/dist/style.css';
@@ -10,8 +9,9 @@ import Flag from 'react-flagpack';
 import { ChoroplethGlobe } from '../../dist/index.js';
 import type {
   ChoroplethGlobeData,
-  ChoroplethGlobeHandle,
+  ChoroplethGlobeRef,
 } from '../../dist/index.js';
+import { CodeBlock } from './code-block';
 
 interface DatasetEntry {
   alpha2: string;
@@ -319,7 +319,7 @@ const getExampleCode = (story: Story, entries: readonly DatasetEntry[]) => {
       } else if (story === 'water') {
         sampleValue = `Math.sqrt(${value})`;
       }
-      return `    { id: '${alpha2}', alpha2: '${alpha2}', value: ${sampleValue} },`;
+      return `    { alpha2: '${alpha2}', value: ${sampleValue} },`;
     })
     .join('\n');
 
@@ -399,7 +399,7 @@ const DatasetSection = ({
   const details = STORY_DETAILS[story];
   const storyStyles = STORY_STYLES[story];
   const Legend = LEGEND_REGISTRY[story];
-  const globeRef = useRef<ChoroplethGlobeHandle>(null);
+  const globeRef = useRef<ChoroplethGlobeRef>(null);
   const [activeEntryId, setActiveEntryId] = useState<string | null>(() =>
     story === 'oil'
       ? (getTopEntries(dataset.entries).at(0)?.alpha2 ?? null)
@@ -459,16 +459,15 @@ const DatasetSection = ({
             {dataset.name} · {dataset.unit} · latest available:{' '}
             {formatYearRange(dataset.entries)} · {dataset.source}
           </p>
-          <Code
+          <CodeBlock
             aria-label={`${details.heading} code example`}
             className={`sh-theme sh-theme--${story}`}
-            controls
             fontSize={12}
             lang="typescript"
             title={`${story}-globe.tsx`}
           >
             {getExampleCode(story, dataset.entries)}
-          </Code>
+          </CodeBlock>
         </div>
         <div {...stylex.props(styles.visual)}>
           <ChoroplethGlobe

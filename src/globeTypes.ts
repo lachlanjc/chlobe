@@ -52,7 +52,7 @@ export interface ChoroplethGlobeTooltip {
 }
 
 /** Imperative helpers for integrations that cannot use controlled props. */
-export interface ChoroplethGlobeHandle {
+export interface ChoroplethGlobeRef {
   hoverEntry: (id: string) => void;
   clearHoveredEntry: () => void;
   navigateToEntry: (id: string) => void;

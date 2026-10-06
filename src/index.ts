@@ -2,7 +2,7 @@ export { default as ChoroplethGlobe } from './ChoroplethGlobe';
 export type {
   ChoroplethGlobeColors,
   ChoroplethGlobeData,
-  ChoroplethGlobeHandle,
+  ChoroplethGlobeRef,
   ChoroplethGlobeOptions,
   ChoroplethGlobeProps,
   ChoroplethRgb,

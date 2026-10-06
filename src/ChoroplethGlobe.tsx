@@ -11,7 +11,7 @@ import { generateChoroplethPalette } from './choropleth-palette';
 import type { Globe } from './globeRenderer';
 import type {
   ChoroplethGlobeData,
-  ChoroplethGlobeHandle,
+  ChoroplethGlobeRef,
   ChoroplethGlobeProps,
   ChoroplethGlobeTooltip,
 } from './globeTypes';
@@ -28,7 +28,7 @@ const findEntry = (
     ? null
     : (data.find((entry) => (entry.id ?? entry.alpha2) === id) ?? null);
 
-const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
+const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
   (
     {
       activeEntryId: controlledActiveEntryId,

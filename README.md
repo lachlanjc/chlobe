@@ -18,9 +18,9 @@ pnpm add chlobe
 import { ChoroplethGlobe } from 'chlobe';
 
 const emissions = [
-  { id: 'us', alpha2: 'US', label: 'United States', value: 6 },
-  { id: 'br', alpha2: 'BR', label: 'Brazil', value: 1.3 },
-  { id: 'in', alpha2: 'IN', label: 'India', value: 4.1 },
+  { alpha2: 'US', label: 'United States', value: 6 },
+  { alpha2: 'BR', label: 'Brazil', value: 1.3 },
+  { alpha2: 'IN', label: 'India', value: 4.1 },
 ];
 
 export const EmissionsGlobe = () => (
