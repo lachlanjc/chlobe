@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
+import { ChoroplethDefinition } from './choropleth-definition';
 import { CopyButton } from './ui/copy-button';
 
 const styles = stylex.create({
@@ -53,7 +54,7 @@ const styles = stylex.create({
     margin: 0,
     maxWidth: '100%',
     overflowX: 'auto',
-    padding: '10px 90px 10px 16px',
+    padding: '10px 120px 10px 16px',
   },
   link: {
     color: '#ABF1D0',
@@ -82,14 +83,8 @@ const Hero = () => (
         <span {...stylex.props(styles.link)}></span>be.
       </h1>
       <p {...stylex.props(styles.description)}>
-        <strong>chlobe:</strong> a 15KB React{' '}
-        <a
-          href="https://en.wikipedia.org/wiki/Choropleth_map"
-          {...stylex.props(styles.link)}
-        >
-          chloropleth
-        </a>{' '}
-        version of the brilliant{' '}
+        <strong>chlobe:</strong> a 15KB React <ChoroplethDefinition /> version
+        of the brilliant{' '}
         <a href="https://cobe.vercel.app/" {...stylex.props(styles.link)}>
           cobe
         </a>
@@ -104,7 +99,12 @@ const Hero = () => (
             <span aria-hidden="true">$ </span>pnpm add chlobe
           </code>
         </pre>
-        <CopyButton code="pnpm add chlobe" label="install command" overlay />
+        <CopyButton
+          code="Install cobe to visualize country data per https://raw.githubusercontent.com/lachlanjc/chlobe/refs/heads/main/README.md"
+          copyLabel="Copy prompt"
+          label="install prompt"
+          overlay
+        />
       </div>
     </div>
   </section>

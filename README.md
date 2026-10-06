@@ -41,9 +41,9 @@ export const EmissionsGlobe = () => (
 );
 ```
 
-Each entry needs an ISO 3166-1 alpha-2 `alpha2` country code and a numeric `value`. The optional stable `id` defaults to `alpha2` for active-entry controls, imperative methods, and tooltip `entryId`. `label` is optional metadata for your UI. RGB colors use channels from `0` through `255`.
+Each entry needs an ISO 3166-1 alpha-2 `alpha2` country code and a numeric `value`. Optionally provide a stable `id` (defaults to `alpha2`) for active-entry controls, imperative methods, and tooltip `entryId`. `label` is optional metadata for your UI.
 
-(Why RGB tuples? They’re more efficient for shaders. [Here’s a converter](https://retool.com/utilities/hex-to-rgb).)
+RGB colors use channels from `0` through `255`. Why RGB tuples? They’re more efficient for shaders. [Here’s a converter](https://retool.com/utilities/hex-to-rgb).
 
 With no `size`, the globe fills the width of its container and keeps a square aspect ratio. Pass `size={360}` for a fixed CSS-pixel square.
 
@@ -142,21 +142,19 @@ const globe = useRef<ChoroplethGlobeRef>(null);
 const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 // Attach ref={globe} to your ChoroplethGlobe, then render:
-{
-  emissions.map(({ alpha2, value }) => (
-    <button
-      key={alpha2}
-      type="button"
-      onMouseEnter={() => globe.current?.hoverEntry(alpha2)}
-      onMouseLeave={() => globe.current?.clearHoveredEntry()}
-      onFocus={() => globe.current?.hoverEntry(alpha2)}
-      onBlur={() => globe.current?.clearHoveredEntry()}
-      onClick={() => globe.current?.navigateToEntry(alpha2)}
-    >
-      {countryNames.of(alpha2) ?? alpha2} · {value}B metric tons CO₂e
-    </button>
-  ));
-}
+{emissions.map(({ alpha2, value }) => (
+  <button
+    key={alpha2}
+    type="button"
+    onMouseEnter={() => globe.current?.hoverEntry(alpha2)}
+    onMouseLeave={() => globe.current?.clearHoveredEntry()}
+    onFocus={() => globe.current?.hoverEntry(alpha2)}
+    onBlur={() => globe.current?.clearHoveredEntry()}
+    onClick={() => globe.current?.navigateToEntry(alpha2)}
+  >
+    {countryNames.of(alpha2) ?? alpha2} · {value}B metric tons CO₂e
+  </button>
+))}
 ```
 
 ## Options
@@ -190,11 +188,11 @@ All prop, data, tooltip, ref, and RGB types are exported. `className` and `style
 
 ## Accessibility
 
-Always provide a meaningful `aria-label`. Interactive globes expose a focusable canvas with arrow-key rotation. A non-interactive globe uses an image role and does not enter the tab order. Respectful motion is built in: rotation stops when the user prefers reduced motion. Provide an accompanying text summary or accessible data table for the values; a canvas label alone does not expose the dataset to screen readers.
+Always provide a meaningful `aria-label`. Interactive globes expose a focusable canvas with arrow-key rotation. A non-interactive globe uses an image role and does not enter the tab order. Rotation stops when the user prefers reduced motion. Provide an accompanying text summary or accessible data table for the values; a canvas label alone does not expose the dataset to screen readers.
 
 ## Geographic coverage
 
-The built-in geography comes from Natural Earth 110m: 177 country and territory features, including Kosovo (`XK`). It does not include every ISO2 country. Dots use a fixed 16,000-point lattice; pointer hit-testing uses a 512 × 256 country raster. Small countries and islands can be absent from the source or too small to receive a dot or hover cell. Puerto Rico has source geometry and a navigation anchor, but no hover cell at this resolution.
+The built-in geography comes from Natural Earth 110m: 177 country and territory features. It does not include every ISO2 country. Dots use a fixed 16,000-point lattice; pointer hit-testing uses a 512 × 256 country raster. Small countries and islands can be absent from the source or too small to receive a dot or hover cell. Puerto Rico has source geometry and a navigation anchor, but no hover cell at this resolution.
 
 Navigation and entry tooltips use precomputed land anchors near each country's geographic centroid. Anchors are checked against source polygons during generation and stored as three-byte cell locations on a finer grid, so decoding does not round them across borders. Countries with hover coverage use anchors inside their own hover region.
 
