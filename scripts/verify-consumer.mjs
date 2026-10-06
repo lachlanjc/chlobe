@@ -4,17 +4,21 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 const consumerDirectory = mkdtempSync(path.join(tmpdir(), 'chlobe-'));
-const modulesDirectory = path.join(consumerDirectory, 'node_modules');
+const scopeDirectory = path.join(
+  consumerDirectory,
+  'node_modules',
+  '@lachlanjc'
+);
 
-execFileSync('mkdir', ['-p', modulesDirectory]);
-symlinkSync(process.cwd(), path.join(modulesDirectory, 'chlobe'));
+execFileSync('mkdir', ['-p', scopeDirectory]);
+symlinkSync(process.cwd(), path.join(scopeDirectory, 'chlobe'));
 writeFileSync(
   path.join(consumerDirectory, 'consumer.cjs'),
-  "const { ChoroplethGlobe } = require('chlobe');\nif (!ChoroplethGlobe) process.exit(1);\n"
+  "const { ChoroplethGlobe } = require('@lachlanjc/chlobe');\nif (!ChoroplethGlobe) process.exit(1);\n"
 );
 writeFileSync(
   path.join(consumerDirectory, 'consumer.mjs'),
-  "import { ChoroplethGlobe } from 'chlobe';\nif (!ChoroplethGlobe) process.exit(1);\n"
+  "import { ChoroplethGlobe } from '@lachlanjc/chlobe';\nif (!ChoroplethGlobe) process.exit(1);\n"
 );
 
 for (const file of ['consumer.cjs', 'consumer.mjs']) {

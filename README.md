@@ -7,7 +7,7 @@ This library is a superfast superset (15kb total) for visualizing country-level 
 ## Install
 
 ```sh
-pnpm add chlobe
+pnpm add @lachlanjc/chlobe
 ```
 
 `react` 18 or later is a peer dependency. The component needs a browser with WebGL support. Use it inside a Client Component (`'use client'`).
@@ -17,7 +17,7 @@ pnpm add chlobe
 ```tsx
 'use client';
 
-import { ChoroplethGlobe } from 'chlobe';
+import { ChoroplethGlobe } from '@lachlanjc/chlobe';
 
 const emissions = [
   { alpha2: 'US', value: 6 },
@@ -63,7 +63,7 @@ The package deliberately renders no tooltip DOM. Supply `renderTooltip` to rende
 'use client';
 
 import { useState } from 'react';
-import { ChoroplethGlobe } from 'chlobe';
+import { ChoroplethGlobe } from '@lachlanjc/chlobe';
 
 // Illustrative annual emissions, in billions of metric tons CO₂e.
 const emissions = [
@@ -135,7 +135,7 @@ Reuse the quick-start `emissions` data. Inside your component, attach a ref and 
 
 ```tsx
 import { useRef } from 'react';
-import type { ChoroplethGlobeRef } from 'chlobe';
+import type { ChoroplethGlobeRef } from '@lachlanjc/chlobe';
 
 // Inside your Client Component:
 const globe = useRef<ChoroplethGlobeRef>(null);

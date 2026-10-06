@@ -36,7 +36,7 @@ const ProjectBar = ({ as }: { as: 'header' | 'footer' }) => {
           {...stylex.props(styles.links)}
         >
           <a
-            href="https://www.npmjs.com/package/chlobe"
+            href="https://www.npmjs.com/package/@lachlanjc/chlobe"
             {...stylex.props(styles.link)}
           >
             npm

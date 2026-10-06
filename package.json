@@ -1,5 +1,5 @@
 {
-  "name": "chlobe",
+  "name": "@lachlanjc/chlobe",
   "version": "0.0.1",
   "description": "Lightweight WebGL globe for rendering values of countries as shaded regions.",
   "keywords": [
@@ -31,6 +31,9 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",

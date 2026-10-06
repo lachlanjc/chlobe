@@ -19,7 +19,7 @@ const UsageGuide = () => (
           Requires React 18+ and WebGL:
         </p>
         <CodeBlock aria-label="Install chlobe" fontSize={14} lang="shell">
-          pnpm add chlobe
+          pnpm add @lachlanjc/chlobe
         </CodeBlock>
         <p {...stylex.props(contentStyles.paragraph)}>
           Render a globe with an RGB color ramp (it’s more efficient for

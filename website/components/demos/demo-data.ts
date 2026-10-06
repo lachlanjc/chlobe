@@ -141,7 +141,7 @@ const getExampleCode = (story: Story, entries: readonly DatasetEntry[]) => {
 
   return `'use client';
 
-import { ChoroplethGlobe } from 'chlobe';
+import { ChoroplethGlobe } from '@lachlanjc/chlobe';
 
 export const Globe = () => (
   <ChoroplethGlobe

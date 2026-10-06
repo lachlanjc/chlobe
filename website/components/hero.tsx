@@ -96,7 +96,7 @@ const Hero = () => (
           {...stylex.props(styles.installCommand)}
         >
           <code>
-            <span aria-hidden="true">$ </span>pnpm add chlobe
+            <span aria-hidden="true">$ </span>pnpm add @lachlanjc/chlobe
           </code>
         </pre>
         <CopyButton
