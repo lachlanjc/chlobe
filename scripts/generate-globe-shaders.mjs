@@ -9,14 +9,40 @@ const outputPath = fileURLToPath(
 );
 const dotTextureHeight = Math.ceil((DOT_COUNT + 1) / DOT_TEXTURE_WIDTH);
 
+// Keep the GLSL/TypeScript interface stable; only shader-local symbols shrink.
+const minifyIdentifiers = (source) => {
+  const interfaceNames = new Set([
+    'main',
+    ...Array.from(
+      source.matchAll(/\b(?:uniform|attribute)\s+\w+\s+(?<name>\w+)/gu),
+      (match) => match.groups.name
+    ),
+  ]);
+  const names = new Map();
+  for (const match of source.matchAll(
+    /\b(?:float|vec2|vec3|vec4|mat3|void)\s+(?<name>\w+)/gu
+  )) {
+    const { name } = match.groups;
+    if (!interfaceNames.has(name) && !names.has(name)) {
+      names.set(name, `q${names.size.toString(36)}`);
+    }
+  }
+  return source.replaceAll(
+    /(?<!\.)\b[a-zA-Z_]\w*\b/gu,
+    (name) => names.get(name) ?? name
+  );
+};
+
 const minifyShader = (source) =>
-  source
-    .replaceAll('__DOT_TEXTURE_WIDTH__', `${DOT_TEXTURE_WIDTH}.0`)
-    .replaceAll('__DOT_TEXTURE_HEIGHT__', `${dotTextureHeight}.0`)
-    .replaceAll(/\/\/.*$/gmu, '')
-    .replaceAll(/\s+/gu, ' ')
-    .replaceAll(/\s*(?<token>[{}()[\],;=+*/<>-])\s*/gu, '$<token>')
-    .trim();
+  minifyIdentifiers(
+    source
+      .replaceAll('__DOT_TEXTURE_WIDTH__', `${DOT_TEXTURE_WIDTH}.0`)
+      .replaceAll('__DOT_TEXTURE_HEIGHT__', `${dotTextureHeight}.0`)
+      .replaceAll(/\/\/.*$/gmu, '')
+      .replaceAll(/\s+/gu, ' ')
+      .replaceAll(/\s*(?<token>[{}()[\],;=+*/<>-])\s*/gu, '$<token>')
+      .trim()
+  );
 
 const vertexSource = minifyShader(
   await readFile(new URL('globe.vert.glsl', sourceDirectory), 'utf-8')
