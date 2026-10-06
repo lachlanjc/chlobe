@@ -1,23 +1,11 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { useState } from 'react';
 
-import { ChoroplethGlobe } from '../../../dist/index.js';
-import type {
-  ChoroplethGlobeColors,
-  ChoroplethGlobeTooltip,
-} from '../../../dist/index.js';
-import { CodeBlock } from '../ui/code-block';
+import type { ChoroplethGlobeTooltip } from '../../../dist/index.js';
 import { getTooltipCode } from './example-code';
-import {
-  countryNames,
-  data,
-  initialAppearance,
-  initialColors,
-} from './example-data';
-import { exampleStyles } from './example-styles';
-import { GlobeControls } from './globe-controls';
+import { countryNames } from './example-data';
+import { GlobeExample } from './globe-example';
 
 const styles = stylex.create({
   tooltip: {
@@ -63,48 +51,17 @@ const renderCountryTooltip = ({
   </div>
 );
 
-const TooltipGlobeExample = () => {
-  const [appearance, setAppearance] = useState(initialAppearance);
-  const [colors, setColors] = useState<ChoroplethGlobeColors>(initialColors);
-  const [autoRotate, setAutoRotate] = useState(true);
-  const [interactive, setInteractive] = useState(true);
-
-  return (
-    <div {...stylex.props(exampleStyles.example)}>
-      <CodeBlock
-        aria-label="Country tooltip example"
-        fontSize={14}
-        lang="typescript"
-        title="globe-tooltip.tsx"
-      >
-        {getTooltipCode(colors, autoRotate, interactive, appearance)}
-      </CodeBlock>
-      <div {...stylex.props(exampleStyles.preview)}>
-        <div {...stylex.props(exampleStyles.previewLayout)}>
-          <div {...stylex.props(exampleStyles.globe)}>
-            <ChoroplethGlobe
-              aria-label="Country tooltip globe preview"
-              colors={colors}
-              data={data}
-              formatValue={formatRenewableValue}
-              globe={{ autoRotate, interactive, ...appearance }}
-              renderTooltip={renderCountryTooltip}
-            />
-          </div>
-          <GlobeControls
-            appearance={appearance}
-            onAppearanceChange={setAppearance}
-            autoRotate={autoRotate}
-            colors={colors}
-            interactive={interactive}
-            onAutoRotateChange={setAutoRotate}
-            onColorsChange={setColors}
-            onInteractiveChange={setInteractive}
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
+const TooltipGlobeExample = () => (
+  <GlobeExample
+    getCode={getTooltipCode}
+    globeProps={{
+      'aria-label': 'Country tooltip globe preview',
+      formatValue: formatRenewableValue,
+      renderTooltip: renderCountryTooltip,
+    }}
+    label="Country tooltip example"
+    title="globe-tooltip.tsx"
+  />
+);
 
 export { TooltipGlobeExample };

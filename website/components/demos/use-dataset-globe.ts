@@ -12,18 +12,17 @@ const useDatasetGlobe = (dataset: Dataset, story: Story) => {
   const [activeEntryId, setActiveEntryId] = useState<string | null>(
     story === 'oil' ? 'US' : null
   );
-  const prepared = {
-    data: dataset.entries.map((entry) => ({
-      alpha2: entry.alpha2,
-      label: entry.label,
-      value: getGlobeValue(story, entry.value),
-    })),
-    featured: getFeaturedEntries(story, dataset.entries),
-    sourceById: new Map(dataset.entries.map((entry) => [entry.alpha2, entry])),
-  };
+  const data = dataset.entries.map((entry) => ({
+    alpha2: entry.alpha2,
+    label: entry.label,
+    value: getGlobeValue(story, entry.value),
+  }));
+  const sourceById = new Map(
+    dataset.entries.map((entry) => [entry.alpha2, entry])
+  );
 
   const formatTooltipValue = (_value: number, entry: ChoroplethGlobeData) => {
-    const source = prepared.sourceById.get(entry.alpha2);
+    const source = sourceById.get(entry.alpha2);
     return source ? `${formatValue(story, source.value)} · ${source.year}` : '';
   };
   const entryProps = (entry: DatasetEntry) => ({
@@ -37,9 +36,9 @@ const useDatasetGlobe = (dataset: Dataset, story: Story) => {
 
   return {
     activeEntryId,
-    data: prepared.data,
+    data,
     entryProps,
-    featured: prepared.featured,
+    featured: getFeaturedEntries(story, dataset.entries),
     formatTooltipValue,
     globeRef,
     handleActiveEntryChange: setActiveEntryId,

@@ -22,7 +22,8 @@ const UsageGuide = () => (
           pnpm add chlobe
         </CodeBlock>
         <p {...stylex.props(contentStyles.paragraph)}>
-          Render a globe with an RGB color ramp (it’s more efficient for shaders):
+          Render a globe with an RGB color ramp (it’s more efficient for
+          shaders):
         </p>
         <BasicGlobeExample />
       </div>

@@ -4,11 +4,10 @@ import * as stylex from '@stylexjs/stylex';
 
 import { siteStyles } from '../site-styles';
 import { DatasetGlobe } from './dataset-globe';
-import { DemoCopyButton } from './demo-copy-button';
 import { formatValue, getFillColor } from './demo-data';
 import type { Dataset } from './demo-data';
+import { DemoFooter } from './demo-footer';
 import { demoStyles } from './demo-styles';
-import { SourceNote } from './source-note';
 import { useDatasetGlobe } from './use-dataset-globe';
 
 const styles = stylex.create({
@@ -121,10 +120,7 @@ const ForestDemo = ({ dataset }: { dataset: Dataset }) => {
             </div>
           </div>
         </div>
-        <footer {...stylex.props(demoStyles.footer)}>
-          <SourceNote dataset={dataset} story="forest" />
-          <DemoCopyButton dataset={dataset} story="forest" />
-        </footer>
+        <DemoFooter dataset={dataset} story="forest" />
       </div>
     </section>
   );

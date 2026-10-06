@@ -5,11 +5,10 @@ import Flag from 'react-flagpack';
 
 import { siteStyles } from '../site-styles';
 import { DatasetGlobe } from './dataset-globe';
-import { DemoCopyButton } from './demo-copy-button';
 import { formatValue } from './demo-data';
 import type { Dataset } from './demo-data';
+import { DemoFooter } from './demo-footer';
 import { demoStyles } from './demo-styles';
-import { SourceNote } from './source-note';
 import { useDatasetGlobe } from './use-dataset-globe';
 
 const styles = stylex.create({
@@ -153,10 +152,7 @@ const OilDemo = ({ dataset }: { dataset: Dataset }) => {
             </ul>
           </div>
         </div>
-        <footer {...stylex.props(demoStyles.footer)}>
-          <SourceNote dataset={dataset} story="oil" />
-          <DemoCopyButton dataset={dataset} story="oil" />
-        </footer>
+        <DemoFooter dataset={dataset} story="oil" />
       </div>
     </section>
   );

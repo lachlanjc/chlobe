@@ -1,23 +1,12 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
-import { ChoroplethGlobe } from '../../../dist/index.js';
-import type {
-  ChoroplethGlobeColors,
-  ChoroplethGlobeRef,
-} from '../../../dist/index.js';
-import { CodeBlock } from '../ui/code-block';
+import type { ChoroplethGlobeRef } from '../../../dist/index.js';
 import { getLegendCode } from './example-code';
-import {
-  countryNames,
-  data,
-  initialAppearance,
-  initialColors,
-} from './example-data';
-import { exampleStyles } from './example-styles';
-import { GlobeControls } from './globe-controls';
+import { countryNames, data } from './example-data';
+import { GlobeExample } from './globe-example';
 
 const styles = stylex.create({
   legend: {
@@ -43,62 +32,32 @@ const styles = stylex.create({
 });
 
 const LegendGlobeExample = () => {
-  const [appearance, setAppearance] = useState(initialAppearance);
-  const [colors, setColors] = useState<ChoroplethGlobeColors>(initialColors);
   const globe = useRef<ChoroplethGlobeRef>(null);
-  const [autoRotate, setAutoRotate] = useState(true);
-  const [interactive, setInteractive] = useState(true);
 
   return (
-    <div {...stylex.props(exampleStyles.example)}>
-      <CodeBlock
-        aria-label="Custom legend example"
-        fontSize={14}
-        lang="typescript"
-        title="globe-legend.tsx"
-      >
-        {getLegendCode(colors, autoRotate, interactive, appearance)}
-      </CodeBlock>
-      <div {...stylex.props(exampleStyles.preview)}>
-        <div {...stylex.props(exampleStyles.previewLayout)}>
-          <div {...stylex.props(exampleStyles.globe)}>
-            <ChoroplethGlobe
-              aria-label="Custom legend globe preview"
-              colors={colors}
-              data={data}
-              globe={{ autoRotate, interactive, ...appearance }}
-              ref={globe}
-            />
-            <div {...stylex.props(styles.legend)}>
-              {data.map(({ alpha2, value }) => (
-                <button
-                  key={alpha2}
-                  {...stylex.props(styles.legendButton)}
-                  onBlur={() => globe.current?.clearHoveredEntry()}
-                  onClick={() => globe.current?.navigateToEntry(alpha2)}
-                  onFocus={() => globe.current?.hoverEntry(alpha2)}
-                  onMouseEnter={() => globe.current?.hoverEntry(alpha2)}
-                  onMouseLeave={() => globe.current?.clearHoveredEntry()}
-                  type="button"
-                >
-                  {countryNames.of(alpha2) ?? alpha2} · {value}%
-                </button>
-              ))}
-            </div>
-          </div>
-          <GlobeControls
-            appearance={appearance}
-            onAppearanceChange={setAppearance}
-            autoRotate={autoRotate}
-            colors={colors}
-            interactive={interactive}
-            onAutoRotateChange={setAutoRotate}
-            onColorsChange={setColors}
-            onInteractiveChange={setInteractive}
-          />
-        </div>
+    <GlobeExample
+      getCode={getLegendCode}
+      globeProps={{ 'aria-label': 'Custom legend globe preview', ref: globe }}
+      label="Custom legend example"
+      title="globe-legend.tsx"
+    >
+      <div {...stylex.props(styles.legend)}>
+        {data.map(({ alpha2, value }) => (
+          <button
+            key={alpha2}
+            {...stylex.props(styles.legendButton)}
+            onBlur={() => globe.current?.clearHoveredEntry()}
+            onClick={() => globe.current?.navigateToEntry(alpha2)}
+            onFocus={() => globe.current?.hoverEntry(alpha2)}
+            onMouseEnter={() => globe.current?.hoverEntry(alpha2)}
+            onMouseLeave={() => globe.current?.clearHoveredEntry()}
+            type="button"
+          >
+            {countryNames.of(alpha2) ?? alpha2} · {value}%
+          </button>
+        ))}
       </div>
-    </div>
+    </GlobeExample>
   );
 };
 

@@ -30,30 +30,3 @@
     line-height: 1.25;
   }
 }
-
-:root {
-  --txt-heading-xxs: 600 0.75rem/1rem var(--font-booton), sans-serif;
-  --txt-heading-xs: 600 0.875rem/1.25rem var(--font-booton), sans-serif;
-  --txt-heading-s: 600 1rem/1.25rem var(--font-booton), sans-serif;
-  --txt-heading-m: 600 1.125rem/1.25rem var(--font-booton), sans-serif;
-  --txt-heading-l: 600 1.375rem/1.75rem var(--font-booton), sans-serif;
-  --txt-heading-xl: 600 1.75rem/2rem var(--font-booton), sans-serif;
-  --txt-heading-xxl: 600 2rem/2.25rem var(--font-booton), sans-serif;
-
-  --txt-body-s-regular: 400 0.75rem/1rem var(--font-booton), sans-serif;
-  --txt-body-s-medium: 468 0.75rem/1rem var(--font-booton), sans-serif;
-  --txt-body-s-semibold: 600 0.75rem/1rem var(--font-booton), sans-serif;
-
-  --txt-body-m-regular: 400 0.875rem/1.25rem var(--font-booton), sans-serif;
-  --txt-body-m-medium: 468 0.875rem/1.25rem var(--font-booton), sans-serif;
-  --txt-body-m-semibold: 600 0.875rem/1.25rem var(--font-booton), sans-serif;
-
-  --txt-body-l-regular: 400 1rem/1.5rem var(--font-booton), sans-serif;
-  --txt-body-l-medium: 468 1rem/1.5rem var(--font-booton), sans-serif;
-  --txt-body-l-semibold: 600 1rem/1.5rem var(--font-booton), sans-serif;
-
-  --color-amber: #ff9d00;
-  --color-purple: #665ac7;
-  --color-mauve: #884f7d;
-  --color-green: #26745b;
-}

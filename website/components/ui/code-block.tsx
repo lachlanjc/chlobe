@@ -12,7 +12,7 @@ const styles = stylex.create({
     '--sh-class': '#8d85ff',
     '--sh-comment': 'var(--theme-muted)',
     '--sh-control-color': 'var(--theme-muted)',
-    '--sh-entity': 'var(--color-purple)',
+    '--sh-entity': '#665ac7',
     '--sh-identifier': '#354150',
     '--sh-jsxliterals': '#bf7db6',
     '--sh-keyword': '#f47067',
@@ -27,18 +27,6 @@ const styles = stylex.create({
     color: 'var(--sh-identifier)',
     colorScheme: 'light',
   },
-  forest: {
-    '--sh-class': '#66558e',
-    '--sh-entity': 'var(--sh-class)',
-    '--sh-identifier': '#15522f',
-    '--sh-jsxliterals': 'var(--color-mauve)',
-    '--sh-keyword': '#8a3b32',
-    '--sh-property': '#346ba0',
-    '--sh-sign': 'var(--theme-muted)',
-    '--sh-string': 'var(--color-green)',
-    '--theme-muted': '#627a62',
-    '--theme-surface': '#e0eddd',
-  },
   header: {
     fontFamily: 'ui-monospace, monospace',
     fontSize: 14,
@@ -46,63 +34,12 @@ const styles = stylex.create({
     padding: '4px 90px 4px 16px',
     textAlign: 'center',
   },
-  oil: {
-    '--sh-class': '#c4b5fd',
-    '--sh-entity': 'var(--sh-class)',
-    '--sh-identifier': '#f1f5ff',
-    '--sh-jsxliterals': '#f0abdc',
-    '--sh-keyword': '#fda4af',
-    '--sh-property': '#93c5fd',
-    '--sh-sign': 'var(--theme-muted)',
-    '--sh-string': '#7dd3c0',
-    '--theme-muted': '#9aabc5',
-    '--theme-surface': '#102342',
-    colorScheme: 'dark',
-  },
-  renewable: {
-    '--sh-class': '#6451a1',
-    '--sh-entity': 'var(--sh-class)',
-    '--sh-identifier': '#062f25',
-    '--sh-jsxliterals': 'var(--color-mauve)',
-    '--sh-keyword': '#ae3d18',
-    '--sh-property': '#9e5b13',
-    '--sh-sign': 'var(--theme-muted)',
-    '--sh-string': 'var(--color-green)',
-    '--theme-muted': '#80715d',
-    '--theme-surface': '#fffbf3',
-  },
-  water: {
-    '--sh-class': 'var(--color-purple)',
-    '--sh-entity': 'var(--sh-class)',
-    '--sh-identifier': '#0b2471',
-    '--sh-jsxliterals': 'var(--color-mauve)',
-    '--sh-keyword': '#a34142',
-    '--sh-property': '#245bb4',
-    '--sh-sign': 'var(--theme-muted)',
-    '--sh-string': '#067565',
-    '--theme-muted': '#60798e',
-    '--theme-surface': '#eaf6fc',
-  },
 });
 
-const colorThemes = {
-  forest: styles.forest,
-  oil: styles.oil,
-  renewable: styles.renewable,
-  water: styles.water,
-};
-
-const CodeBlock = ({
-  children,
-  className,
-  colorTheme,
-  title,
-  ...props
-}: CodeProps & { colorTheme?: keyof typeof colorThemes }) => {
+const CodeBlock = ({ children, className, title, ...props }: CodeProps) => {
   const { className: blockClassName } = stylex.props(
     styles.block,
-    styles.defaultTheme,
-    colorTheme && colorThemes[colorTheme]
+    styles.defaultTheme
   );
 
   return (
