@@ -10,11 +10,23 @@ test('renders and supports the environmental globe sections', async ({
       WebGLRenderingContext.prototype,
       WebGL2RenderingContext.prototype,
     ]) {
+      const { createProgram } = prototype;
+      prototype.createProgram = function trackProgramCreation() {
+        const canvas = this.canvas as HTMLCanvasElement;
+        canvas.dataset.programCount = String(
+          Number(canvas.dataset.programCount ?? 0) + 1
+        );
+        return createProgram.call(this);
+      };
       const draw = prototype.drawArrays;
       prototype.drawArrays = function drawArrays(...args) {
         draw.apply(this, args);
         const canvas = this.canvas as HTMLCanvasElement;
-        if (canvas.dataset.renderedPixels) {
+        if (
+          canvas.width < 32 ||
+          canvas.height < 32 ||
+          canvas.dataset.renderedPixels === '1024'
+        ) {
           return;
         }
         const pixels = new Uint8Array(32 * 32 * 4);
@@ -64,6 +76,20 @@ test('renders and supports the environmental globe sections', async ({
 
   const oilSection = page.locator('section[aria-labelledby="oil-heading"]');
   await expect(oilSection.getByRole('button')).toHaveCount(5);
+  const programCount =
+    (await oilGlobe.getAttribute('data-program-count')) ?? '';
+  await oilSection
+    .getByRole('button', { name: 'Saudi Arabia 6,232 TWh' })
+    .click();
+  await expect(oilGlobe).toHaveAttribute('data-program-count', programCount);
+  const originalWidth = await oilGlobe.evaluate(
+    (canvas: HTMLCanvasElement) => canvas.width
+  );
+  await page.setViewportSize({ height: 800, width: 820 });
+  await expect
+    .poll(() => oilGlobe.evaluate((canvas: HTMLCanvasElement) => canvas.width))
+    .not.toBe(originalWidth);
+  await expect(oilGlobe).toHaveAttribute('data-program-count', programCount);
 
   await oilGlobe.focus();
   await page.keyboard.press('ArrowLeft');

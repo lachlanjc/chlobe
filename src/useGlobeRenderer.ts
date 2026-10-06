@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 
 import createGlobe from './globeRenderer';
-import type { Globe } from './globeRenderer';
+import type { Globe, GlobeOptions } from './globeRenderer';
 import type {
   ChoroplethRgb,
   ChoroplethGlobeData,
@@ -20,6 +20,28 @@ const normalizeRgb = (color: ChoroplethRgb): [number, number, number] => [
   color[1] / 255,
   color[2] / 255,
 ];
+
+const getAppearance = (
+  colorScheme: 'light' | 'dark',
+  options: ChoroplethGlobeOptions | undefined
+): Pick<GlobeOptions, 'baseColor' | 'glowColor' | 'dark'> => {
+  const isDark = colorScheme === 'dark';
+  const defaultBaseColor: [number, number, number] = isDark
+    ? [0.1, 0.1, 0.15]
+    : [1, 1, 1];
+  const defaultGlowColor: [number, number, number] = isDark
+    ? [0.08, 0.08, 0.15]
+    : [0.85, 0.85, 0.9];
+  return {
+    baseColor: options?.baseColor
+      ? normalizeRgb(options.baseColor)
+      : defaultBaseColor,
+    dark: isDark ? 1 : 0,
+    glowColor: options?.glowColor
+      ? normalizeRgb(options.glowColor)
+      : defaultGlowColor,
+  };
+};
 
 interface GlobeCallbacks {
   formatValue?: (value: number, entry: ChoroplethGlobeData) => string;
@@ -65,38 +87,27 @@ export const useGlobeRenderer = ({
   setTooltip,
   size,
 }: GlobeRendererOptions): void => {
+  const initialConfiguration = useRef({ colorScheme, globeOptions, size });
   useEffect(() => {
     const canvas = refs.canvas.current;
-    if (!canvas || size <= 0) {
+    if (!canvas) {
       return;
     }
-    const isDark = colorScheme === 'dark';
-    const options = globeOptions ?? {};
-    const interactive = options.interactive ?? true;
-    const defaultBaseColor: [number, number, number] = isDark
-      ? [0.1, 0.1, 0.15]
-      : [1, 1, 1];
-    const defaultGlowColor: [number, number, number] = isDark
-      ? [0.08, 0.08, 0.15]
-      : [0.85, 0.85, 0.9];
-    const baseColor = options.baseColor
-      ? normalizeRgb(options.baseColor)
-      : defaultBaseColor;
-    const glowColor = options.glowColor
-      ? normalizeRgb(options.glowColor)
-      : defaultGlowColor;
+    const {
+      colorScheme: initialScheme,
+      globeOptions: initialOptions,
+      size: initialSize,
+    } = initialConfiguration.current;
     const globe = createGlobe(canvas, {
-      baseColor,
+      ...getAppearance(initialScheme, initialOptions),
       countryPalette: refs.palette.current ?? undefined,
-      dark: isDark ? 1 : 0,
       devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
-      glowColor,
-      height: size,
+      height: Math.max(initialSize, 1),
       mapSamples: 16_000,
       phi: refs.currentPhi.current,
       scale: 1.2,
       theta: 0.2,
-      width: size,
+      width: Math.max(initialSize, 1),
     });
     refs.globe.current = globe;
 
@@ -229,6 +240,9 @@ export const useGlobeRenderer = ({
     };
 
     const onPointerDown = (event: PointerEvent) => {
+      if (refs.options.current?.interactive === false) {
+        return;
+      }
       refs.drag.current = {
         startPhi: refs.currentPhi.current,
         startX: event.clientX,
@@ -237,6 +251,9 @@ export const useGlobeRenderer = ({
       canvas.setPointerCapture?.(event.pointerId);
     };
     const onPointerMove = (event: PointerEvent) => {
+      if (refs.options.current?.interactive === false) {
+        return;
+      }
       const drag = refs.drag.current;
       if (drag) {
         refs.currentPhi.current =
@@ -249,6 +266,9 @@ export const useGlobeRenderer = ({
       refs.drag.current = null;
     };
     const onKeyDown = (event: KeyboardEvent) => {
+      if (refs.options.current?.interactive === false) {
+        return;
+      }
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
         event.preventDefault();
         refs.currentPhi.current +=
@@ -259,7 +279,7 @@ export const useGlobeRenderer = ({
       }
     };
     const onPointerEnter = () => {
-      refs.hoveringCanvas.current = true;
+      refs.hoveringCanvas.current = refs.options.current?.interactive !== false;
     };
     const onPointerLeave = () => {
       refs.hoveringCanvas.current = false;
@@ -267,14 +287,12 @@ export const useGlobeRenderer = ({
       refs.callbacks.current.onCountryHover?.(null);
       clearPointerTooltip();
     };
-    if (interactive) {
-      canvas.addEventListener('pointerdown', onPointerDown);
-      canvas.addEventListener('pointermove', onPointerMove);
-      canvas.addEventListener('pointerup', onPointerUp);
-      canvas.addEventListener('pointerenter', onPointerEnter);
-      canvas.addEventListener('pointerleave', onPointerLeave);
-      canvas.addEventListener('keydown', onKeyDown);
-    }
+    canvas.addEventListener('pointerdown', onPointerDown);
+    canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('pointerenter', onPointerEnter);
+    canvas.addEventListener('pointerleave', onPointerLeave);
+    canvas.addEventListener('keydown', onKeyDown);
     return () => {
       if (animationFrame !== null) {
         window.cancelAnimationFrame(animationFrame);
@@ -289,8 +307,6 @@ export const useGlobeRenderer = ({
       refs.globe.current = null;
     };
   }, [
-    colorScheme,
-    globeOptions,
     refs.activeEntryId,
     refs.callbacks,
     refs.canvas,
@@ -306,6 +322,28 @@ export const useGlobeRenderer = ({
     refs.prefersReducedMotion,
     refs.targetPhi,
     setTooltip,
+  ]);
+
+  useEffect(() => {
+    if (size <= 0) {
+      return;
+    }
+    const options = globeOptions ?? {};
+    refs.globe.current?.update({
+      ...getAppearance(colorScheme, options),
+      height: size,
+      width: size,
+    });
+    if (options.interactive === false) {
+      refs.drag.current = null;
+      refs.hoveringCanvas.current = false;
+    }
+  }, [
+    colorScheme,
+    globeOptions,
+    refs.globe,
+    refs.drag,
+    refs.hoveringCanvas,
     size,
   ]);
 };

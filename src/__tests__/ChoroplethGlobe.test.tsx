@@ -127,6 +127,7 @@ describe(ChoroplethGlobe, () => {
     const canvas = getByLabelText('Country values');
     expect(canvas.getAttribute('role')).toBe('img');
     expect(canvas.getAttribute('tabindex')).toBeNull();
+    globe.update.mockClear();
     fireEvent.keyDown(canvas, { key: 'ArrowLeft' });
     expect(globe.update).not.toHaveBeenCalled();
 
@@ -237,6 +238,47 @@ describe(ChoroplethGlobe, () => {
     );
     expect(mocks.generatePalette).toHaveBeenCalledTimes(2);
     expect(globe.updatePalette).toHaveBeenCalledOnce();
+  });
+
+  it('reuses the renderer across resize, theme, and fresh options objects', () => {
+    const { rerender, getByLabelText, unmount } = render(
+      <ChoroplethGlobe
+        colors={colors}
+        data={data}
+        globe={{ autoRotate: false }}
+        size={200}
+      />
+    );
+    rerender(
+      <ChoroplethGlobe
+        colors={colors}
+        data={data}
+        colorScheme="dark"
+        globe={{
+          autoRotate: false,
+          interactive: false,
+          baseColor: [10, 20, 30],
+        }}
+        size={300}
+      />
+    );
+    expect(mocks.createGlobe).toHaveBeenCalledOnce();
+    expect(globe.destroy).not.toHaveBeenCalled();
+    expect(globe.update).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        width: 300,
+        height: 300,
+        dark: 1,
+        baseColor: [10 / 255, 20 / 255, 30 / 255],
+      })
+    );
+    globe.update.mockClear();
+    fireEvent.keyDown(getByLabelText('Country choropleth globe'), {
+      key: 'ArrowRight',
+    });
+    expect(globe.update).not.toHaveBeenCalled();
+    unmount();
+    expect(globe.destroy).toHaveBeenCalledOnce();
   });
 
   it('normalizes globe surface and glow colors from the public RGB contract', () => {

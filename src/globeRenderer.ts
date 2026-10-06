@@ -261,8 +261,12 @@ export default function createGlobe(
       theta = state.theta;
     }
     if (state.width && state.height) {
-      canvas.width = state.width * devicePixelRatio;
-      canvas.height = state.height * devicePixelRatio;
+      const width = state.width * devicePixelRatio;
+      const height = state.height * devicePixelRatio;
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+      }
     }
     if (state.mapSamples !== undefined) {
       mapSamples = state.mapSamples;
