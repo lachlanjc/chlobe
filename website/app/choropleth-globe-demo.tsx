@@ -2,7 +2,6 @@
 
 import * as stylex from '@stylexjs/stylex';
 import { Code } from '@sugar-high/react';
-import { vercel } from '@sugar-high/react/themes';
 import React, { useRef, useState } from 'react';
 
 import 'react-flagpack/dist/style.css';
@@ -462,11 +461,10 @@ const DatasetSection = ({
           </p>
           <Code
             aria-label={`${details.heading} code example`}
+            className={`sh-theme sh-theme--${story}`}
             controls
             fontSize={12}
             lang="typescript"
-            style={{ colorScheme: story === 'oil' ? 'dark' : 'light' }}
-            theme={vercel}
             title={`${story}-globe.tsx`}
           >
             {getExampleCode(story, dataset.entries)}
