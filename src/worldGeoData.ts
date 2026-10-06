@@ -59,10 +59,11 @@ const getHoverCountryIds = (): Uint8Array => {
   }
   const runs = decodeBase64(HOVER_COUNTRY_RUNS_BASE64);
   const countryIds = new Uint8Array(HOVER_MAP_WIDTH * HOVER_MAP_HEIGHT);
+  const runCount = runs.length / 2;
   let outputOffset = 0;
-  for (let index = 0; index < runs.length; index += 2) {
+  for (let index = 0; index < runCount; index += 1) {
     const runLength = runs[index];
-    const countryId = runs[index + 1];
+    const countryId = runs[index + runCount];
     countryIds.fill(countryId, outputOffset, outputOffset + runLength);
     outputOffset += runLength;
   }

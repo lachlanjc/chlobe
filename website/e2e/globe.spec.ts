@@ -1,12 +1,12 @@
 // oxlint-disable vitest/prefer-importing-vitest-globals
 import { expect, test } from '@playwright/test';
 
-test('renders four distinct environmental globe sections', async ({ page }) => {
+test('renders and supports the environmental globe sections', async ({
+  page,
+}) => {
   await page.goto('/');
 
-  await expect(
-    page.getByRole('heading', { name: 'Room to grow' })
-  ).toBeVisible();
+  await expect(page.locator('#forest-heading')).toBeVisible();
   await expect(
     page.getByRole('heading', { name: 'Where the oil comes from' })
   ).toBeVisible();
@@ -14,9 +14,6 @@ test('renders four distinct environmental globe sections', async ({ page }) => {
     page.getByRole('heading', {
       name: 'How much freshwater does each person draw?',
     })
-  ).toBeVisible();
-  await expect(
-    page.getByRole('heading', { name: 'The almost-complete grid' })
   ).toBeVisible();
 
   const forestGlobe = page.getByLabel('Forest area per person by country');

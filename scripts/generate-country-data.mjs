@@ -123,7 +123,8 @@ for (let y = 0; y < HOVER_MAP_HEIGHT; y += 1) {
   }
 }
 
-const hoverCountryRuns = [];
+const hoverRunLengths = [];
+const hoverRunCountryIds = [];
 for (let offset = 0; offset < hoverCountryIds.length;) {
   const countryId = hoverCountryIds[offset];
   let runLength = 1;
@@ -134,7 +135,8 @@ for (let offset = 0; offset < hoverCountryIds.length;) {
   ) {
     runLength += 1;
   }
-  hoverCountryRuns.push(runLength, countryId);
+  hoverRunLengths.push(runLength);
+  hoverRunCountryIds.push(countryId);
   offset += runLength;
 }
 
@@ -211,7 +213,7 @@ export const COUNTRY_CENTROIDS_BASE64 =
 export const DOT_COUNTRY_CORRECTIONS_BASE64 =
   '${Buffer.from(dotCountryCorrections).toString('base64')}';
 export const HOVER_COUNTRY_RUNS_BASE64 =
-  '${Buffer.from(hoverCountryRuns).toString('base64')}';
+  '${Buffer.from([...hoverRunLengths, ...hoverRunCountryIds]).toString('base64')}';
 `;
 
 await writeFile(outputPath, generatedSource);

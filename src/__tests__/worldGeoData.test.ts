@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -17,6 +19,23 @@ describe('generated country data', () => {
 
   it('includes one lookup for every shader-addressable dot', () => {
     expect(getDotCountryIds()).toHaveLength(16_001);
+  });
+
+  it('preserves country ownership across every hover raster cell', () => {
+    const countryIds = getCountryIdByAlpha2();
+    const raster = new Uint8Array(512 * 256);
+    for (let y = 0; y < 256; y += 1) {
+      for (let x = 0; x < 512; x += 1) {
+        const alpha2 = getCountryAtCoordinates(
+          ((x + 0.5) / 512) * 360 - 180,
+          90 - ((y + 0.5) / 256) * 180
+        );
+        raster[y * 512 + x] = alpha2 ? (countryIds.get(alpha2) ?? 0) : 0;
+      }
+    }
+    expect(createHash('sha256').update(raster).digest('hex')).toBe(
+      'e0343f37e33e359e6c3f4de0b3cda08b17fad5e706ffd75dd7914fad49e2382a'
+    );
   });
 
   it('reconstructs the exact generated dot ownership table', () => {
