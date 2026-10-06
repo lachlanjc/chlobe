@@ -91,7 +91,9 @@ describe('useGlobeEnvironment', () => {
 
   it('uses the fixed size without creating a ResizeObserver', () => {
     const { container } = render(<Environment fixedSize={256} />);
-    expect(container.firstElementChild?.dataset.size).toBe('256');
+    expect(container.querySelector<HTMLDivElement>('div')?.dataset.size).toBe(
+      '256'
+    );
     expect(ResizeObserverMock.instance).toBeUndefined();
   });
 });

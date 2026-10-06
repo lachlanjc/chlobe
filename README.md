@@ -119,6 +119,8 @@ Use the `globe` prop to adjust behavior and surface colors:
 - `baseColor` and `glowColor` use the same 0–255 RGB convention as `colors`.
 - `colorScheme` accepts `'light'` (default) or `'dark'`.
 
+Provide `onError={(error) => ...}` to handle unavailable WebGL, shader compilation or linking errors, and context loss. Initialization failures leave an inert canvas; the callback receives the diagnostic. When a WebGL context is lost, animation and interaction pause until the browser restores it. The library then recreates its GPU resources and reapplies the current palette, appearance, and rotation.
+
 ## Accessibility
 
 Always provide a meaningful `aria-label`. Interactive globes expose a focusable canvas with arrow-key rotation. A non-interactive globe uses an image role and does not enter the tab order. Respectful motion is built in: rotation stops when the user prefers reduced motion.

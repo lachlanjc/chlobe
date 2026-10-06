@@ -74,6 +74,8 @@ export interface ChoroplethGlobeProps {
   onActiveEntryChange?: (id: string | null) => void;
   /** Called when pointer hit-testing enters or leaves a country. */
   onCountryHover?: (alpha2: string | null) => void;
+  /** Reports WebGL initialization failures and recoverable context loss. */
+  onError?: (error: Error) => void;
   /** Formats a numeric entry value for the tooltip. */
   formatValue?: (value: number, entry: ChoroplethGlobeData) => string;
   /** Optional caller-owned tooltip UI. No tooltip DOM is rendered by default. */

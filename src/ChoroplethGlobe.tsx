@@ -40,6 +40,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
       globe: globeOptions,
       onActiveEntryChange,
       onCountryHover,
+      onError,
       renderTooltip,
       size: fixedSize,
       style,
@@ -73,6 +74,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
     const callbacksRef = useRef({
       formatValue,
       onCountryHover,
+      onError,
       renderTooltip,
     });
     // The renderer has long-lived native event handlers and an animation
@@ -80,7 +82,12 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
     // prevents those handlers from observing stale country data.
     useEffect(() => {
       activeEntryIdRef.current = activeEntryId;
-      callbacksRef.current = { formatValue, onCountryHover, renderTooltip };
+      callbacksRef.current = {
+        formatValue,
+        onCountryHover,
+        onError,
+        renderTooltip,
+      };
       anchorsRef.current = anchors;
       dataRef.current = data;
       optionsRef.current = globeOptions;
@@ -93,6 +100,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
       formatValue,
       globeOptions,
       onCountryHover,
+      onError,
       prefersReducedMotion,
       renderTooltip,
     ]);

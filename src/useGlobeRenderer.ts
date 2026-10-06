@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 
 import createGlobe from './globeRenderer';
@@ -45,6 +45,7 @@ const getAppearance = (
 interface GlobeCallbacks {
   formatValue?: (value: number, entry: ChoroplethGlobeData) => string;
   onCountryHover?: (alpha2: string | null) => void;
+  onError?: (error: Error) => void;
   renderTooltip?: (tooltip: ChoroplethGlobeTooltip) => unknown;
 }
 
@@ -87,7 +88,13 @@ export const useGlobeRenderer = ({
   size,
 }: GlobeRendererOptions): void => {
   const initialConfiguration = useRef({ colorScheme, globeOptions, size });
-  const { globe: globeRef, requestRender: requestRenderRef } = refs;
+  const [contextVersion, setContextVersion] = useState(0);
+  const {
+    drag: dragRef,
+    globe: globeRef,
+    hoveringCanvas: hoveringCanvasRef,
+    requestRender: requestRenderRef,
+  } = refs;
   useEffect(() => {
     const canvas = refs.canvas.current;
     if (!canvas) {
@@ -98,12 +105,17 @@ export const useGlobeRenderer = ({
       globeOptions: initialOptions,
       size: initialSize,
     } = initialConfiguration.current;
+    let rendererFailed = false;
     const globe = createGlobe(canvas, {
       ...getAppearance(initialScheme, initialOptions),
       countryPalette: refs.palette.current ?? undefined,
       devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       height: Math.max(initialSize, 1),
       mapSamples: 16_000,
+      onError: (error) => {
+        rendererFailed = true;
+        refs.callbacks.current.onError?.(error);
+      },
       phi: refs.currentPhi.current,
       scale: 1.2,
       theta: 0.2,
@@ -113,6 +125,7 @@ export const useGlobeRenderer = ({
 
     let animationFrame: number | null = null;
     let isVisible = true;
+    let contextLost = rendererFailed;
     let shownTooltip: ChoroplethGlobeTooltip | null = null;
     const clearEntryTooltip = () => {
       if (shownTooltip) {
@@ -157,7 +170,7 @@ export const useGlobeRenderer = ({
     let lastRenderedPhi = refs.currentPhi.current;
     const shouldAutoRotate = () =>
       refs.options.current?.autoRotate !== false &&
-      !refs.hoveringCanvas.current &&
+      !hoveringCanvasRef.current &&
       refs.activeEntryId.current === null &&
       !refs.prefersReducedMotion.current;
     const cancelFrame = () => {
@@ -168,11 +181,11 @@ export const useGlobeRenderer = ({
     };
     const render = () => {
       animationFrame = null;
-      if (!isVisible || document.hidden) {
+      if (contextLost || !isVisible || document.hidden) {
         return;
       }
       let phi = refs.currentPhi.current;
-      if (!refs.drag.current) {
+      if (!dragRef.current) {
         if (refs.targetPhi.current !== null) {
           const step = refs.prefersReducedMotion.current
             ? { done: true, phi: refs.targetPhi.current }
@@ -197,14 +210,19 @@ export const useGlobeRenderer = ({
         setEntryTooltip();
       }
       if (
-        !refs.drag.current &&
+        !dragRef.current &&
         (refs.targetPhi.current !== null || shouldAutoRotate())
       ) {
         animationFrame = window.requestAnimationFrame(render);
       }
     };
     const requestRender = () => {
-      if (animationFrame === null && isVisible && !document.hidden) {
+      if (
+        animationFrame === null &&
+        !contextLost &&
+        isVisible &&
+        !document.hidden
+      ) {
         animationFrame = window.requestAnimationFrame(render);
       }
     };
@@ -303,10 +321,10 @@ export const useGlobeRenderer = ({
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      if (refs.options.current?.interactive === false) {
+      if (contextLost || refs.options.current?.interactive === false) {
         return;
       }
-      refs.drag.current = {
+      dragRef.current = {
         startPhi: refs.currentPhi.current,
         startX: event.clientX,
       };
@@ -318,10 +336,10 @@ export const useGlobeRenderer = ({
       requestRender();
     };
     const onPointerMove = (event: PointerEvent) => {
-      if (refs.options.current?.interactive === false) {
+      if (contextLost || refs.options.current?.interactive === false) {
         return;
       }
-      const drag = refs.drag.current;
+      const drag = dragRef.current;
       if (drag) {
         refs.currentPhi.current =
           drag.startPhi + (event.clientX - drag.startX) / 100;
@@ -331,11 +349,11 @@ export const useGlobeRenderer = ({
       }
     };
     const onPointerUp = () => {
-      refs.drag.current = null;
+      dragRef.current = null;
       requestRender();
     };
     const onKeyDown = (event: KeyboardEvent) => {
-      if (refs.options.current?.interactive === false) {
+      if (contextLost || refs.options.current?.interactive === false) {
         return;
       }
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
@@ -349,16 +367,33 @@ export const useGlobeRenderer = ({
       }
     };
     const onPointerEnter = () => {
-      refs.hoveringCanvas.current = refs.options.current?.interactive !== false;
+      hoveringCanvasRef.current = refs.options.current?.interactive !== false;
       requestRender();
     };
     const onPointerLeave = () => {
-      refs.hoveringCanvas.current = false;
+      hoveringCanvasRef.current = false;
       lastCell = null;
       emitCountryHover(null);
       clearPointerTooltip();
       requestRender();
     };
+    const onContextLost = (event: Event) => {
+      event.preventDefault();
+      contextLost = true;
+      cancelFrame();
+      globeRef.current = null;
+      dragRef.current = null;
+      lastCell = null;
+      emitCountryHover(null);
+      clearEntryTooltip();
+      clearPointerTooltip();
+      refs.callbacks.current.onError?.(
+        new Error('WebGL context lost; waiting for restoration')
+      );
+    };
+    const onContextRestored = () => setContextVersion((version) => version + 1);
+    canvas.addEventListener('webglcontextlost', onContextLost);
+    canvas.addEventListener('webglcontextrestored', onContextRestored);
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerup', onPointerUp);
@@ -371,6 +406,8 @@ export const useGlobeRenderer = ({
       cancelFrame();
       observer?.disconnect();
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      canvas.removeEventListener('webglcontextlost', onContextLost);
+      canvas.removeEventListener('webglcontextrestored', onContextRestored);
       requestRenderRef.current = null;
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
@@ -384,15 +421,16 @@ export const useGlobeRenderer = ({
       globeRef.current = null;
     };
   }, [
+    contextVersion,
     refs.activeEntryId,
     refs.callbacks,
     refs.canvas,
     refs.anchors,
     refs.currentPhi,
     refs.data,
-    refs.drag,
+    dragRef,
     globeRef,
-    refs.hoveringCanvas,
+    hoveringCanvasRef,
     refs.options,
     refs.palette,
     refs.prefersReducedMotion,
@@ -412,16 +450,17 @@ export const useGlobeRenderer = ({
       width: size,
     });
     if (options.interactive === false) {
-      refs.drag.current = null;
-      refs.hoveringCanvas.current = false;
+      dragRef.current = null;
+      hoveringCanvasRef.current = false;
     }
     requestRenderRef.current?.();
   }, [
     colorScheme,
+    contextVersion,
     globeOptions,
     globeRef,
-    refs.drag,
-    refs.hoveringCanvas,
+    dragRef,
+    hoveringCanvasRef,
     requestRenderRef,
     size,
   ]);

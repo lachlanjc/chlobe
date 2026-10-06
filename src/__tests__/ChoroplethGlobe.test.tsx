@@ -16,8 +16,8 @@ import type { ChoroplethGlobeHandle } from '../globeTypes';
 const mocks = vi.hoisted(() => ({
   createGlobe: vi.fn(),
   generatePalette: vi.fn(),
-  getCountryAtCell: vi.fn<(cell: number) => string | null>(),
   getCountryAnchors: vi.fn(),
+  getCountryAtCell: vi.fn<(cell: number) => string | null>(),
   getHoverCell: vi.fn<(longitude: number, latitude: number) => number>(),
 }));
 
@@ -26,8 +26,8 @@ vi.mock(import('../choropleth-palette'), () => ({
   generateChoroplethPalette: mocks.generatePalette,
 }));
 vi.mock(import('../worldGeoData'), () => ({
-  getCountryAtCell: mocks.getCountryAtCell,
   getCountryAnchors: mocks.getCountryAnchors,
+  getCountryAtCell: mocks.getCountryAtCell,
   getHoverCell: mocks.getHoverCell,
 }));
 
@@ -440,6 +440,47 @@ describe(ChoroplethGlobe, () => {
     hidden.mockReturnValue(false);
     fireEvent(document, new Event('visibilitychange'));
     expect(animationFrames.size).toBe(1);
+  });
+
+  it('recovers context loss with the current appearance and palette', () => {
+    const onError = vi.fn<(error: Error) => void>();
+    const { getByLabelText, rerender } = render(
+      <ChoroplethGlobe colors={colors} data={[]} onError={onError} size={200} />
+    );
+    const canvas = getByLabelText('Country choropleth globe');
+    runAnimationFrame();
+    const lost = new Event('webglcontextlost', { cancelable: true });
+    fireEvent(canvas, lost);
+    expect({
+      pendingFrames: animationFrames.size,
+      prevented: lost.defaultPrevented,
+    }).toStrictEqual({ pendingFrames: 0, prevented: true });
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining('context lost'),
+      })
+    );
+    const restoredPalette = new Uint8Array(1024).fill(123);
+    mocks.generatePalette.mockReturnValue(restoredPalette);
+    rerender(
+      <ChoroplethGlobe
+        colors={colors}
+        data={data}
+        colorScheme="dark"
+        onError={onError}
+        globe={{ autoRotate: false }}
+        size={300}
+      />
+    );
+    fireEvent(canvas, new Event('webglcontextrestored'));
+    expect(mocks.createGlobe).toHaveBeenCalledTimes(2);
+    expect(mocks.createGlobe).toHaveBeenLastCalledWith(
+      expect.any(HTMLCanvasElement),
+      expect.objectContaining({ countryPalette: restoredPalette, phi: 0.0025 })
+    );
+    expect(globe.update).toHaveBeenLastCalledWith(
+      expect.objectContaining({ dark: 1, height: 300, width: 300 })
+    );
   });
 
   it('normalizes globe surface and glow colors from the public RGB contract', () => {

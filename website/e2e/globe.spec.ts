@@ -10,18 +10,21 @@ test('renders and supports the environmental globe sections', async ({
       WebGLRenderingContext.prototype,
       WebGL2RenderingContext.prototype,
     ]) {
-      const { createProgram } = prototype;
-      prototype.createProgram = function trackProgramCreation() {
+      const { createProgram: originalCreateProgram } = prototype;
+      prototype.createProgram = function createProgram() {
         const canvas = this.canvas as HTMLCanvasElement;
         canvas.dataset.programCount = String(
           Number(canvas.dataset.programCount ?? 0) + 1
         );
-        return createProgram.call(this);
+        return originalCreateProgram.call(this);
       };
       const draw = prototype.drawArrays;
       prototype.drawArrays = function drawArrays(...args) {
         draw.apply(this, args);
         const canvas = this.canvas as HTMLCanvasElement;
+        canvas.dataset.drawCount = String(
+          Number(canvas.dataset.drawCount ?? 0) + 1
+        );
         if (
           canvas.width < 32 ||
           canvas.height < 32 ||
@@ -52,14 +55,8 @@ test('renders and supports the environmental globe sections', async ({
   await page.goto('/');
 
   await expect(page.locator('#forest-heading')).toBeVisible();
-  await expect(
-    page.getByRole('heading', { name: 'Where the oil comes from' })
-  ).toBeVisible();
-  await expect(
-    page.getByRole('heading', {
-      name: 'How much freshwater does each person draw?',
-    })
-  ).toBeVisible();
+  await expect(page.locator('#oil-heading')).toBeVisible();
+  await expect(page.locator('#water-heading')).toBeVisible();
 
   const forestGlobe = page.getByLabel('Forest area per person by country');
   await expect(forestGlobe).toHaveAttribute('role', 'img');
@@ -108,4 +105,40 @@ test('renders and supports the environmental globe sections', async ({
     bounds.y + bounds.height / 2
   );
   await page.mouse.up();
+
+  const programsBeforeLoss = Number(
+    await oilGlobe.getAttribute('data-program-count')
+  );
+  const drawsBeforeLoss = Number(
+    await oilGlobe.getAttribute('data-draw-count')
+  );
+  const canLoseContext = await oilGlobe.evaluate(
+    (canvas: HTMLCanvasElement) => {
+      const context = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
+      const extension = context?.getExtension('WEBGL_lose_context');
+      if (!extension) {
+        return false;
+      }
+      canvas.addEventListener(
+        'webglcontextlost',
+        (event) => {
+          canvas.dataset.lossPrevented = String(event.defaultPrevented);
+          window.setTimeout(() => extension.restoreContext(), 100);
+        },
+        { once: true }
+      );
+      extension.loseContext();
+      return true;
+    }
+  );
+  expect(canLoseContext).toBe(true);
+  await expect(oilGlobe).toHaveAttribute('data-loss-prevented', 'true');
+  await expect(oilGlobe).toHaveAttribute(
+    'data-program-count',
+    String(programsBeforeLoss + 1)
+  );
+  await expect
+    .poll(async () => Number(await oilGlobe.getAttribute('data-draw-count')))
+    .toBeGreaterThan(drawsBeforeLoss);
+  await page.screenshot({ path: 'test-results/globe-demo.png' });
 });

@@ -38,6 +38,7 @@ export interface GlobeOptions {
   context?: WebGLContextAttributes;
   /** Initial country-ID -> RGBA palette. */
   countryPalette?: Uint8Array;
+  onError?: (error: Error) => void;
 }
 
 export interface Globe {
@@ -76,16 +77,19 @@ function compileShader(
   gl: WebGLRenderingContext,
   type: number,
   source: string
-): WebGLShader | null {
+): WebGLShader {
   const shader = gl.createShader(type);
   if (!shader) {
-    return null;
+    throw new Error('Unable to create WebGL shader');
   }
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    const details = gl.getShaderInfoLog(shader);
     gl.deleteShader(shader);
-    return null;
+    throw new Error(
+      `WebGL shader compilation failed: ${details ?? 'no diagnostic available'}`
+    );
   }
   return shader;
 }
@@ -94,26 +98,32 @@ function createProgram(
   gl: WebGLRenderingContext,
   vertexSource: string,
   fragmentSource: string
-): WebGLProgram | null {
+): WebGLProgram {
   const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexSource);
-  const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
-  if (!vertexShader || !fragmentShader) {
-    return null;
+  let fragmentShader: WebGLShader | null = null;
+  try {
+    fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
+    const program = gl.createProgram();
+    if (!program) {
+      throw new Error('Unable to create WebGL program');
+    }
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      const details = gl.getProgramInfoLog(program);
+      gl.deleteProgram(program);
+      throw new Error(
+        `WebGL program linking failed: ${details ?? 'no diagnostic available'}`
+      );
+    }
+    return program;
+  } finally {
+    gl.deleteShader(vertexShader);
+    if (fragmentShader) {
+      gl.deleteShader(fragmentShader);
+    }
   }
-  const program = gl.createProgram();
-  if (!program) {
-    return null;
-  }
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    gl.deleteProgram(program);
-    return null;
-  }
-  gl.deleteShader(vertexShader);
-  gl.deleteShader(fragmentShader);
-  return program;
 }
 
 function getGlobeUniformLocations(
@@ -158,6 +168,7 @@ export default function createGlobe(
     canvas.getContext('webgl2', contextAttributes) ??
     canvas.getContext('webgl', contextAttributes);
   if (!glContext) {
+    opts.onError?.(new Error('WebGL is unavailable'));
     return NOOP_GLOBE;
   }
   // Rebind after the null check so closures below see a non-null context.
@@ -176,12 +187,15 @@ export default function createGlobe(
   let offset: [number, number] = opts.offset || [0, 0];
   let scale = opts.scale || 1;
 
-  const globeProgram = createProgram(
-    gl,
-    MINIFIED_GLOBE_VERTEX_SHADER,
-    MINIFIED_GLOBE_FRAGMENT_SHADER
-  );
-  if (!globeProgram) {
+  let globeProgram: WebGLProgram;
+  try {
+    globeProgram = createProgram(
+      gl,
+      MINIFIED_GLOBE_VERTEX_SHADER,
+      MINIFIED_GLOBE_FRAGMENT_SHADER
+    );
+  } catch (error) {
+    opts.onError?.(error instanceof Error ? error : new Error(String(error)));
     return NOOP_GLOBE;
   }
 
