@@ -1,7 +1,7 @@
 import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
-import { geoBounds, geoCentroid, geoContains } from 'd3-geo';
+import { geoBounds, geoCentroid, geoContains, geoDistance } from 'd3-geo';
 import { iso31661NumericToAlpha2 } from 'iso-3166';
 import { feature } from 'topojson-client';
 import worldTopology from 'world-atlas/countries-110m.json' with { type: 'json' };
@@ -11,6 +11,8 @@ import {
   DOT_TEXTURE_WIDTH,
   HOVER_MAP_HEIGHT,
   HOVER_MAP_WIDTH,
+  ANCHOR_MAP_WIDTH,
+  ANCHOR_MAP_HEIGHT,
 } from './country-data-config.mjs';
 
 const KOSOVO_NUMERIC_ID = '-99';
@@ -184,16 +186,80 @@ const alpha2ByCountryId = [
   ...countries.map((country) => country.alpha2 ?? UNMAPPED_ALPHA2),
 ].join('');
 
-const centroidBytes = Buffer.alloc((countries.length + 1) * 2);
+// Anchors are cell centers on a finer grid, so decoding never rounds them
+// across a coast. Prefer interior hover cells, then proximity to the centroid.
+const anchors = new Map();
+const considerAnchor = (country, x, y, interior) => {
+  const longitude = ((x + 0.5) / ANCHOR_MAP_WIDTH) * 360 - 180;
+  const latitude = 90 - ((y + 0.5) / ANCHOR_MAP_HEIGHT) * 180;
+  const previous = anchors.get(country.id);
+  if (previous?.interior && !interior) {
+    return;
+  }
+  const distance = geoDistance(country.centroid, [longitude, latitude]);
+  if (
+    previous &&
+    previous.interior === interior &&
+    previous.distance <= distance
+  ) {
+    return;
+  }
+  if (geoContains(country.countryFeature, [longitude, latitude])) {
+    anchors.set(country.id, {
+      cell: y * ANCHOR_MAP_WIDTH + x,
+      distance,
+      interior,
+    });
+  }
+};
+
+for (let y = 0; y < ANCHOR_MAP_HEIGHT; y += 1) {
+  const hoverY = Math.floor((y / ANCHOR_MAP_HEIGHT) * HOVER_MAP_HEIGHT);
+  for (let x = 0; x < ANCHOR_MAP_WIDTH; x += 1) {
+    const hoverX = Math.floor((x / ANCHOR_MAP_WIDTH) * HOVER_MAP_WIDTH);
+    const cell = hoverY * HOVER_MAP_WIDTH + hoverX;
+    const countryId = hoverCountryIds[cell];
+    if (countryId === 0) {
+      continue;
+    }
+    const interior =
+      hoverX > 0 &&
+      hoverX < HOVER_MAP_WIDTH - 1 &&
+      hoverY > 0 &&
+      hoverY < HOVER_MAP_HEIGHT - 1 &&
+      [
+        cell - 1,
+        cell + 1,
+        cell - HOVER_MAP_WIDTH,
+        cell + HOVER_MAP_WIDTH,
+      ].every((neighbor) => hoverCountryIds[neighbor] === countryId);
+    considerAnchor(countries[countryId - 1], x, y, interior);
+  }
+}
+
+const anchorBytes = Buffer.alloc((countries.length + 1) * 3);
 for (const country of countries) {
   if (country.alpha2 === null) {
     continue;
   }
-  const [longitude, latitude] = country.centroid;
-  centroidBytes[country.id * 2] = Math.round(((latitude + 90) / 180) * 255);
-  centroidBytes[country.id * 2 + 1] = Math.round(
-    ((longitude + 180) / 360) * 255
-  );
+  // Tiny source features may have no hover cell (currently Puerto Rico).
+  // Preserve their navigation using a finer-grid point inside the geometry.
+  if (!anchors.has(country.id)) {
+    for (let y = 0; y < ANCHOR_MAP_HEIGHT; y += 1) {
+      const latitude = 90 - ((y + 0.5) / ANCHOR_MAP_HEIGHT) * 180;
+      for (let x = 0; x < ANCHOR_MAP_WIDTH; x += 1) {
+        const longitude = ((x + 0.5) / ANCHOR_MAP_WIDTH) * 360 - 180;
+        if (boundsContain(country.bounds, longitude, latitude)) {
+          considerAnchor(country, x, y, false);
+        }
+      }
+    }
+  }
+  const anchor = anchors.get(country.id);
+  if (!anchor) {
+    throw new Error(`No land anchor for ${country.alpha2}`);
+  }
+  anchorBytes.writeUIntLE(anchor.cell, country.id * 3, 3);
 }
 
 const generatedSource = `/**
@@ -206,10 +272,12 @@ export const DOT_COUNT = ${DOT_COUNT.toLocaleString('en-US').replace(',', '_')};
 export const DOT_TEXTURE_WIDTH = ${DOT_TEXTURE_WIDTH};
 export const HOVER_MAP_WIDTH = ${HOVER_MAP_WIDTH};
 export const HOVER_MAP_HEIGHT = ${HOVER_MAP_HEIGHT};
+export const ANCHOR_MAP_WIDTH = ${ANCHOR_MAP_WIDTH};
+export const ANCHOR_MAP_HEIGHT = ${ANCHOR_MAP_HEIGHT};
 export const ALPHA2_BY_COUNTRY_ID =
   '${alpha2ByCountryId}';
-export const COUNTRY_CENTROIDS_BASE64 =
-  '${centroidBytes.toString('base64')}';
+export const COUNTRY_ANCHORS_BASE64 =
+  '${anchorBytes.toString('base64')}';
 export const DOT_COUNTRY_CORRECTIONS_BASE64 =
   '${Buffer.from(dotCountryCorrections).toString('base64')}';
 export const HOVER_COUNTRY_RUNS_BASE64 =

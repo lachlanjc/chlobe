@@ -5,7 +5,9 @@
  */
 import {
   ALPHA2_BY_COUNTRY_ID,
-  COUNTRY_CENTROIDS_BASE64,
+  COUNTRY_ANCHORS_BASE64,
+  ANCHOR_MAP_WIDTH,
+  ANCHOR_MAP_HEIGHT,
   COUNTRY_COUNT,
   DOT_COUNT,
   DOT_COUNTRY_CORRECTIONS_BASE64,
@@ -133,28 +135,29 @@ export const getCountryAtCoordinates = (
   latitude: number
 ): string | null => getCountryAtCell(getHoverCell(longitude, latitude));
 
-let countryCentroids: ReadonlyMap<string, [number, number]> | null = null;
+let countryAnchors: ReadonlyMap<string, [number, number]> | null = null;
 
-/** Returns precomputed ISO2 -> [latitude, longitude] country centroids. */
-export const getCountryCentroids = (): ReadonlyMap<
-  string,
-  [number, number]
-> => {
-  if (countryCentroids) {
-    return countryCentroids;
+/** Returns precomputed ISO2 -> [latitude, longitude] interior land anchors. */
+export const getCountryAnchors = (): ReadonlyMap<string, [number, number]> => {
+  if (countryAnchors) {
+    return countryAnchors;
   }
-  const bytes = decodeBase64(COUNTRY_CENTROIDS_BASE64);
-  const centroids = new Map<string, [number, number]>();
+  const bytes = decodeBase64(COUNTRY_ANCHORS_BASE64);
+  const anchors = new Map<string, [number, number]>();
   for (let countryId = 1; countryId <= COUNTRY_COUNT; countryId += 1) {
     const alpha2 = getAlpha2ForCountryId(countryId);
     if (!alpha2) {
       continue;
     }
-    centroids.set(alpha2, [
-      (bytes[countryId * 2] / 255) * 180 - 90,
-      (bytes[countryId * 2 + 1] / 255) * 360 - 180,
+    const offset = countryId * 3;
+    const cell =
+      bytes[offset] + bytes[offset + 1] * 256 + bytes[offset + 2] * 65_536;
+    anchors.set(alpha2, [
+      90 -
+        ((Math.floor(cell / ANCHOR_MAP_WIDTH) + 0.5) / ANCHOR_MAP_HEIGHT) * 180,
+      (((cell % ANCHOR_MAP_WIDTH) + 0.5) / ANCHOR_MAP_WIDTH) * 360 - 180,
     ]);
   }
-  countryCentroids = centroids;
-  return centroids;
+  countryAnchors = anchors;
+  return anchors;
 };

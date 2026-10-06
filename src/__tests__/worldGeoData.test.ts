@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   getCountryAtCoordinates,
-  getCountryCentroids,
+  getCountryAnchors,
   getCountryIdByAlpha2,
   getDotCountryIds,
   getHoverCell,
@@ -55,15 +55,26 @@ describe('generated country data', () => {
   });
 });
 
-describe(getCountryCentroids, () => {
-  it('returns a plausible [lat, lng] centroid for the US', () => {
-    const us = getCountryCentroids().get('US');
+describe(getCountryAnchors, () => {
+  it('returns a plausible [lat, lng] land anchor for the US', () => {
+    const us = getCountryAnchors().get('US');
     expect(us).toBeDefined();
     const [lat, lng] = us ?? [0, 0];
     expect(lat).toBeGreaterThan(30);
     expect(lat).toBeLessThan(50);
     expect(lng).toBeGreaterThan(-130);
     expect(lng).toBeLessThan(-60);
+  });
+
+  it('keeps every raster-supported country anchor in its own hover region', () => {
+    const anchors = getCountryAnchors();
+    const withoutHoverCell = [...anchors].flatMap(
+      ([alpha2, [latitude, longitude]]) =>
+        getCountryAtCoordinates(longitude, latitude) === alpha2 ? [] : [alpha2]
+    );
+    // Puerto Rico exists in the source geometry but has no cell at hover resolution.
+    expect(withoutHoverCell).toStrictEqual(['PR']);
+    expect(anchors.size).toBe(getCountryIdByAlpha2().size);
   });
 });
 

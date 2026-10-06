@@ -18,7 +18,7 @@ import type {
 import { targetPhiForLongitude } from './rotation';
 import { usePrefersReducedMotion, useSquareSize } from './useGlobeEnvironment';
 import { useGlobeRenderer } from './useGlobeRenderer';
-import { getCountryCentroids } from './worldGeoData';
+import { getCountryAnchors } from './worldGeoData';
 
 const findEntry = (
   data: readonly ChoroplethGlobeData[],
@@ -55,7 +55,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
         ? uncontrolledActiveEntryId
         : controlledActiveEntryId;
     const [tooltip, setTooltip] = useState<ChoroplethGlobeTooltip | null>(null);
-    const centroids = getCountryCentroids();
+    const anchors = getCountryAnchors();
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const globeRef = useRef<Globe | null>(null);
@@ -66,7 +66,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
     const dragRef = useRef<{ startPhi: number; startX: number } | null>(null);
     const hoveringCanvasRef = useRef(false);
     const dataRef = useRef(data);
-    const centroidsRef = useRef(centroids);
+    const anchorsRef = useRef(anchors);
     const activeEntryIdRef = useRef(activeEntryId);
     const optionsRef = useRef(globeOptions);
     const reducedMotionRef = useRef(prefersReducedMotion);
@@ -81,14 +81,14 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
     useEffect(() => {
       activeEntryIdRef.current = activeEntryId;
       callbacksRef.current = { formatValue, onCountryHover, renderTooltip };
-      centroidsRef.current = centroids;
+      anchorsRef.current = anchors;
       dataRef.current = data;
       optionsRef.current = globeOptions;
       reducedMotionRef.current = prefersReducedMotion;
       requestRenderRef.current?.();
     }, [
       activeEntryId,
-      centroids,
+      anchors,
       data,
       formatValue,
       globeOptions,
@@ -130,7 +130,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
 
     useEffect(() => {
       const entry = findEntry(data, activeEntryId) ?? data[0] ?? null;
-      const location = entry ? centroids?.get(entry.alpha2) : null;
+      const location = entry ? anchors?.get(entry.alpha2) : null;
       if (location) {
         targetPhiRef.current = targetPhiForLongitude(
           currentPhiRef.current,
@@ -138,7 +138,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
         );
         requestRenderRef.current?.();
       }
-    }, [activeEntryId, centroids, data]);
+    }, [activeEntryId, anchors, data]);
 
     useImperativeHandle(
       ref,
@@ -151,9 +151,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
         },
         navigateToEntry: (id) => {
           const entry = findEntry(dataRef.current, id);
-          const location = entry
-            ? centroidsRef.current?.get(entry.alpha2)
-            : null;
+          const location = entry ? anchorsRef.current?.get(entry.alpha2) : null;
           if (location) {
             targetPhiRef.current = targetPhiForLongitude(
               currentPhiRef.current,
@@ -171,9 +169,9 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
       globeOptions,
       refs: {
         activeEntryId: activeEntryIdRef,
+        anchors: anchorsRef,
         callbacks: callbacksRef,
         canvas: canvasRef,
-        centroids: centroidsRef,
         currentPhi: currentPhiRef,
         data: dataRef,
         drag: dragRef,

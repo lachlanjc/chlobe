@@ -123,6 +123,12 @@ Use the `globe` prop to adjust behavior and surface colors:
 
 Always provide a meaningful `aria-label`. Interactive globes expose a focusable canvas with arrow-key rotation. A non-interactive globe uses an image role and does not enter the tab order. Respectful motion is built in: rotation stops when the user prefers reduced motion.
 
+## Geographic coverage
+
+The built-in geography comes from Natural Earth 110m: 177 country and territory features, including Kosovo (`XK`). It does not include every ISO2 country. Dots use a fixed 16,000-point lattice; pointer hit-testing uses a 512 × 256 country raster. Small countries and islands can be absent from the source or too small to receive a dot or hover cell. Puerto Rico has source geometry and a navigation anchor, but no hover cell at this resolution.
+
+Navigation and entry tooltips use precomputed land anchors near each country's geographic centroid. Anchors are checked against source polygons during generation and stored as three-byte cell locations on a finer grid, so decoding does not round them across borders. Countries with hover coverage use anchors inside their own hover region.
+
 ## Development
 
 ```sh

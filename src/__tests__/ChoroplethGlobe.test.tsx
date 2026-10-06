@@ -17,7 +17,7 @@ const mocks = vi.hoisted(() => ({
   createGlobe: vi.fn(),
   generatePalette: vi.fn(),
   getCountryAtCell: vi.fn<(cell: number) => string | null>(),
-  getCountryCentroids: vi.fn(),
+  getCountryAnchors: vi.fn(),
   getHoverCell: vi.fn<(longitude: number, latitude: number) => number>(),
 }));
 
@@ -27,7 +27,7 @@ vi.mock(import('../choropleth-palette'), () => ({
 }));
 vi.mock(import('../worldGeoData'), () => ({
   getCountryAtCell: mocks.getCountryAtCell,
-  getCountryCentroids: mocks.getCountryCentroids,
+  getCountryAnchors: mocks.getCountryAnchors,
   getHoverCell: mocks.getHoverCell,
 }));
 
@@ -105,7 +105,7 @@ beforeEach(() => {
   mocks.generatePalette.mockReturnValue(new Uint8Array(1024));
   mocks.getCountryAtCell.mockReturnValue('US');
   mocks.getHoverCell.mockReturnValue(1);
-  mocks.getCountryCentroids.mockReturnValue(new Map([['US', [39, -98]]]));
+  mocks.getCountryAnchors.mockReturnValue(new Map([['US', [39, -98]]]));
   Object.defineProperty(HTMLCanvasElement.prototype, 'clientHeight', {
     configurable: true,
     get: () => 200,

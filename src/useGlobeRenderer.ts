@@ -52,7 +52,7 @@ interface GlobeRendererRefs {
   activeEntryId: MutableRefObject<string | null>;
   callbacks: MutableRefObject<GlobeCallbacks>;
   canvas: MutableRefObject<HTMLCanvasElement | null>;
-  centroids: MutableRefObject<ReadonlyMap<string, [number, number]> | null>;
+  anchors: MutableRefObject<ReadonlyMap<string, [number, number]> | null>;
   currentPhi: MutableRefObject<number>;
   data: MutableRefObject<readonly ChoroplethGlobeData[]>;
   drag: MutableRefObject<{ startPhi: number; startX: number } | null>;
@@ -87,8 +87,8 @@ export const useGlobeRenderer = ({
   size,
 }: GlobeRendererOptions): void => {
   const initialConfiguration = useRef({ colorScheme, globeOptions, size });
+  const { globe: globeRef, requestRender: requestRenderRef } = refs;
   useEffect(() => {
-    const { globe: globeRef, requestRender: requestRenderRef } = refs;
     const canvas = refs.canvas.current;
     if (!canvas) {
       return;
@@ -122,7 +122,7 @@ export const useGlobeRenderer = ({
     };
     const setEntryTooltip = () => {
       const entry = findEntry(refs.data.current, refs.activeEntryId.current);
-      const location = entry ? refs.centroids.current?.get(entry.alpha2) : null;
+      const location = entry ? refs.anchors.current?.get(entry.alpha2) : null;
       if (!entry || !location || !refs.callbacks.current.renderTooltip) {
         clearEntryTooltip();
         return;
@@ -387,16 +387,16 @@ export const useGlobeRenderer = ({
     refs.activeEntryId,
     refs.callbacks,
     refs.canvas,
-    refs.centroids,
+    refs.anchors,
     refs.currentPhi,
     refs.data,
     refs.drag,
-    refs.globe,
+    globeRef,
     refs.hoveringCanvas,
     refs.options,
     refs.palette,
     refs.prefersReducedMotion,
-    refs.requestRender,
+    requestRenderRef,
     refs.targetPhi,
     setTooltip,
   ]);
@@ -406,7 +406,7 @@ export const useGlobeRenderer = ({
       return;
     }
     const options = globeOptions ?? {};
-    refs.globe.current?.update({
+    globeRef.current?.update({
       ...getAppearance(colorScheme, options),
       height: size,
       width: size,
@@ -415,14 +415,14 @@ export const useGlobeRenderer = ({
       refs.drag.current = null;
       refs.hoveringCanvas.current = false;
     }
-    refs.requestRender.current?.();
+    requestRenderRef.current?.();
   }, [
     colorScheme,
     globeOptions,
-    refs.globe,
+    globeRef,
     refs.drag,
     refs.hoveringCanvas,
-    refs.requestRender,
+    requestRenderRef,
     size,
   ]);
 };
