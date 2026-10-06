@@ -72,7 +72,7 @@ test('renders and supports the environmental globe sections', async ({
   }
 
   const oilSection = page.locator('section[aria-labelledby="oil-heading"]');
-  await expect(oilSection.getByRole('button')).toHaveCount(5);
+  await expect(oilSection.locator('ul button')).toHaveCount(6);
   const programCount =
     (await oilGlobe.getAttribute('data-program-count')) ?? '';
   await oilSection

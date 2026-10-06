@@ -13,6 +13,7 @@
     "@sugar-high/react": "^2.4.1",
     "next": "^16.3.0",
     "react": "catalog:",
+    "react-aria-components": "^1.21.1",
     "react-dom": "catalog:",
     "react-flagpack": "^2.0.5"
   },

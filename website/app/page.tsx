@@ -6,6 +6,13 @@ import oil from '../public/data/oil-production.json';
 import renewable from '../public/data/renewable-electricity-share.json';
 import water from '../public/data/water-withdrawals-per-person.json';
 import { ChoroplethGlobeDemo } from './choropleth-globe-demo';
+import { CodeBlock } from './code-block';
+import { CopyButton } from './copy-button';
+import {
+  BasicGlobeExample,
+  LegendGlobeExample,
+  TooltipGlobeExample,
+} from './tech-globe-previews';
 
 const styles = stylex.create({
   description: {
@@ -14,13 +21,6 @@ const styles = stylex.create({
     lineHeight: 1.5,
     margin: 0,
     maxWidth: 560,
-  },
-  eyebrow: {
-    color: '#b8c9ff',
-    fontSize: 14,
-    fontWeight: 700,
-    letterSpacing: '0.08em',
-    margin: 0,
   },
   hero: {
     alignItems: 'center',
@@ -33,18 +33,32 @@ const styles = stylex.create({
     padding: 'clamp(30px, 8vh, 60px) clamp(24px, 6vw, 88px)',
     textAlign: 'center',
   },
+  install: { minWidth: 0, position: 'relative' },
+  installCommand: {
+    backgroundColor: 'rgb(255 255 255 / 0.06)',
+    border: '1px solid rgb(184 201 255 / 0.25)',
+    borderRadius: 2,
+    color: '#b8c9ff',
+    fontFamily: 'ui-monospace, monospace',
+    fontSize: 14,
+    lineHeight: 1.5,
+    margin: 0,
+    maxWidth: '100%',
+    overflowX: 'auto',
+    padding: '10px 90px 10px 16px',
+  },
   intro: {
     display: 'flex',
     flexDirection: 'column',
     gap: 16,
   },
   tech: {
+    columnGap: 64,
     display: 'grid',
-    gap: 32,
-    gridTemplateColumns: 'repeat(2, 1fr)',
     marginInline: 'auto',
-    maxWidth: 1200,
+    maxWidth: 1260,
     padding: 'clamp(30px, 8vh, 60px) clamp(24px, 6vw, 88px)',
+    rowGap: 32,
   },
   techHead: {
     fontSize: 24,
@@ -57,8 +71,11 @@ const styles = stylex.create({
     fontSize: 18,
     lineHeight: 1.5,
     marginBlock: 12,
-    maxWidth: 560,
     textWrap: 'pretty',
+  },
+  techUl: {
+    listStyle: 'none',
+    padding: 0,
   },
   title: {
     fontSize: 'clamp(38px, 7vw, 72px)',
@@ -77,7 +94,6 @@ const styles = stylex.create({
 const Home = () => (
   <>
     <header {...stylex.props(styles.hero, styles.intro)}>
-      <p {...stylex.props(styles.eyebrow)}>`bun add chlobe`</p>
       <h1 {...stylex.props(styles.title)}>
         Visualize country data on a gl
         <span {...stylex.props(styles.titleGlobe)}></span>be.
@@ -96,7 +112,24 @@ const Home = () => (
         </a>
         .
       </p>
+      <div {...stylex.props(styles.install)}>
+        <pre
+          aria-label="Install chlobe"
+          {...stylex.props(styles.installCommand)}
+        >
+          <code>
+            <span aria-hidden="true">$ </span>bun add chlobe
+          </code>
+        </pre>
+        <CopyButton code="bun add chlobe" label="install command" overlay />
+      </div>
     </header>
+    <ChoroplethGlobeDemo
+      forest={forest}
+      oil={oil}
+      renewable={renewable}
+      water={water}
+    />
     <section {...stylex.props(styles.tech)}>
       <div>
         <h2 {...stylex.props(styles.techHead)}>The story</h2>
@@ -122,29 +155,59 @@ const Home = () => (
       </div>
       <div>
         <h2 {...stylex.props(styles.techHead)}>Behavior</h2>
-        <ul {...stylex.props(styles.techP)}>
-          <li>
-            <strong>Auto-rotate:</strong> spins the globe slowly by default, but
-            stops when you interact with it.
+        <ul {...stylex.props(styles.techUl)}>
+          <li {...stylex.props(styles.techP)}>
+            <strong>Auto-rotate prop:</strong> spins the globe slowly by
+            default, but stops when you interact with it.
           </li>
-          <li>
-            <strong>Interactive:</strong> rotate it with your mouse or touch
-            gestures. Hovering over a country will highlight it and show its
-            name and value in a tooltip.
+          <li {...stylex.props(styles.techP)}>
+            <strong>Interactive prop:</strong> rotate it with your mouse or
+            touch gestures. Hovering over a country will highlight it and show
+            its name and value in a tooltip.
           </li>
-          <li>
-            <strong>Remote control:</strong> quickly rotate to a country when
-            you hover its legend entry
+          <li {...stylex.props(styles.techP)}>
+            <strong>refs for legend control:</strong> quickly rotate to a
+            country when you hover its legend entry.
           </li>
         </ul>
       </div>
+      <div>
+        <h2 {...stylex.props(styles.techHead)}>Install &amp; use</h2>
+        <p {...stylex.props(styles.techP)}>
+          Install <strong>chlobe</strong> and its React peer dependency:
+        </p>
+        <CodeBlock
+          aria-label="Install chlobe and React"
+          fontSize={14}
+          lang="shell"
+          title="Terminal"
+        >
+          pnpm add chlobe react
+        </CodeBlock>
+        <p {...stylex.props(styles.techP)}>
+          Then render a globe with 2021 renewable electricity shares and an RGB
+          color ramp:
+        </p>
+        <BasicGlobeExample />
+      </div>
+      <div>
+        <h2 {...stylex.props(styles.techHead)}>Custom legend</h2>
+        <p {...stylex.props(styles.techP)}>
+          Hover or focus a legend button to highlight its country. Click it to
+          rotate the globe there.
+        </p>
+        <LegendGlobeExample />
+      </div>
+      <div>
+        <h2 {...stylex.props(styles.techHead)}>Custom tooltip</h2>
+        <p {...stylex.props(styles.techP)}>
+          Hover a country to see its name and renewable electricity share.
+          Brazil is selected initially; countries outside the dataset show “No
+          data”.
+        </p>
+        <TooltipGlobeExample />
+      </div>
     </section>
-    <ChoroplethGlobeDemo
-      forest={forest}
-      oil={oil}
-      renewable={renewable}
-      water={water}
-    />
   </>
 );
 

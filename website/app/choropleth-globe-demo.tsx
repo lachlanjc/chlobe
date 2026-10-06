@@ -11,7 +11,7 @@ import type {
   ChoroplethGlobeData,
   ChoroplethGlobeRef,
 } from '../../dist/index.js';
-import { CodeBlock } from './code-block';
+import { CopyButton } from './copy-button';
 
 interface DatasetEntry {
   alpha2: string;
@@ -35,16 +35,18 @@ const STORY_DETAILS = {
     background: '#eff7ed',
     colors: {
       filled: [
-        [224, 237, 221],
+        [153, 194, 143],
         [21, 82, 47],
       ],
       missing: [200, 232, 190],
       missingAlpha: 0.58,
     },
+    countries: ['CA', 'RU', 'BR', 'CD', 'CN', 'IN'],
     glow: [224, 237, 221],
     heading: 'Forest area per person',
     initialPhi: 0.8,
-    summary: 'Forest area divided by population.',
+    summary:
+      'From Canada’s vast forests to India’s densely populated landscape.',
     surface: '#eff7ed',
   },
   oil: {
@@ -52,16 +54,18 @@ const STORY_DETAILS = {
     background: '#041330',
     colors: {
       filled: [
-        [79, 89, 110],
-        [209, 216, 229],
+        [60, 94, 148],
+        [190, 220, 255],
       ],
       missing: [79, 89, 110],
       missingAlpha: 0.18,
     },
+    countries: ['US', 'SA', 'RU', 'BR', 'NO', 'AU'],
     glow: [79, 89, 110],
     heading: 'Where oil comes from',
     initialPhi: 2.4,
-    summary: 'The barrel room: the largest latest-reported producers.',
+    summary:
+      'Oil production across the Americas, the Middle East, Europe, and Australia.',
     surface: '#102342',
   },
   renewable: {
@@ -69,16 +73,18 @@ const STORY_DETAILS = {
     background: '#ff9d00',
     colors: {
       filled: [
-        [255, 232, 163],
-        [255, 102, 51],
+        [255, 219, 128],
+        [187, 62, 24],
       ],
       missing: [255, 235, 188],
       missingAlpha: 0.34,
     },
+    countries: ['NO', 'BR', 'DE', 'CN', 'IN', 'SA'],
     glow: [255, 251, 243],
-    heading: 'The almost-complete grid',
+    heading: 'Different paths to a renewable grid',
     initialPhi: -1.1,
-    summary: 'The leading renewable electricity shares, latest reported year.',
+    summary:
+      'From Norway’s almost-complete renewable grid to Saudi Arabia’s 0.1% share.',
     surface: 'rgb(255 251 243)',
   },
   water: {
@@ -86,43 +92,26 @@ const STORY_DETAILS = {
     background: 'rgb(196, 231, 244)',
     colors: {
       filled: [
-        [196, 231, 244],
-        [101, 141, 253],
+        [130, 188, 226],
+        [18, 70, 224],
       ],
       missing: [3, 44, 165],
       missingAlpha: 0.01,
     },
+    countries: ['TM', 'US', 'IN', 'BR', 'ET', 'CD'],
     glow: [11, 36, 113],
     heading: 'How much freshwater does each person draw?',
     initialPhi: -2.2,
-    summary: 'Annual withdrawals per person.',
+    summary:
+      'Annual withdrawals per person, from Turkmenistan to the Democratic Republic of Congo.',
     surface: '#ffffff',
   },
 } as const;
-
-const FOREST_LEGEND = [
-  ['#eff7ed', '0.1'],
-  ['#e0eddd', '1'],
-  ['#c8e8be', '5'],
-  ['#afd9a5', '10+'],
-  ['#8ab280', ''],
-  ['#4a7d40', ''],
-  ['#15522f', ''],
-] as const;
-
-const WATER_LEGEND = [0, 500, 1000, 2000, 3500] as const;
 
 const styles = stylex.create({
   content: { display: 'flex', flexDirection: 'column', gap: 22, minWidth: 0 },
   forest: { backgroundColor: '#eff7ed', color: '#15522f' },
   forestHighlight: { borderLeft: '4px solid #15522f' },
-  forestSwatch0: { backgroundColor: '#eff7ed' },
-  forestSwatch1: { backgroundColor: '#e0eddd' },
-  forestSwatch2: { backgroundColor: '#c8e8be' },
-  forestSwatch3: { backgroundColor: '#afd9a5' },
-  forestSwatch4: { backgroundColor: '#8ab280' },
-  forestSwatch5: { backgroundColor: '#4a7d40' },
-  forestSwatch6: { backgroundColor: '#15522f' },
   heading: {
     fontSize: 'clamp(38px, 5vw, 70px)',
     letterSpacing: '-0.055em',
@@ -140,15 +129,13 @@ const styles = stylex.create({
     justifyContent: 'space-between',
     marginTop: 8,
   },
-  legendStack: { display: 'flex', height: 12, overflow: 'hidden' },
-  legendSwatch: { flex: 1 },
   oil: { backgroundColor: '#041330', color: '#f1f5ff' },
   rankButton: {
     alignItems: 'center',
     cursor: 'pointer',
     display: 'grid',
     gap: 10,
-    gridTemplateColumns: '28px 1fr auto',
+    gridTemplateColumns: '1fr auto',
     padding: '9px 12px',
     textAlign: 'left',
     width: '100%',
@@ -160,7 +147,7 @@ const styles = stylex.create({
     color: '#062f25',
   },
   rankButtonWater: { backgroundColor: '#ffffff', color: 'rgb(18, 70, 224)' },
-  rankButtonWithFlag: { gridTemplateColumns: '30px 28px 1fr auto' },
+  rankButtonWithFlag: { gridTemplateColumns: '28px 1fr auto' },
   rankList: {
     display: 'grid',
     gap: 2,
@@ -168,12 +155,7 @@ const styles = stylex.create({
     margin: 0,
     padding: 0,
   },
-  rankNumber: { fontVariantNumeric: 'tabular-nums', opacity: 0.65 },
   renewable: { backgroundColor: '#ff9d00', color: '#062f25' },
-  renewableGradient: {
-    backgroundImage:
-      'linear-gradient(90deg, rgb(255, 232, 163), rgb(255, 102, 51))',
-  },
   section: {
     containIntrinsicSize: '760px',
     contentVisibility: 'auto',
@@ -224,21 +206,7 @@ const styles = stylex.create({
     gap: 20,
   },
   water: { backgroundColor: 'rgb(196, 231, 244)', color: 'rgb(18, 70, 224)' },
-  waterGradient: {
-    backgroundImage:
-      'linear-gradient(90deg, rgb(196, 231, 244), rgb(18, 70, 224))',
-  },
 });
-
-const FOREST_SWATCH_STYLES = [
-  styles.forestSwatch0,
-  styles.forestSwatch1,
-  styles.forestSwatch2,
-  styles.forestSwatch3,
-  styles.forestSwatch4,
-  styles.forestSwatch5,
-  styles.forestSwatch6,
-] as const;
 
 const STORY_STYLES = {
   forest: {
@@ -263,23 +231,11 @@ const STORY_STYLES = {
   },
 } as const;
 
-const getTopEntries = (entries: readonly DatasetEntry[]) => {
-  const topEntries: DatasetEntry[] = [];
-  for (const entry of entries) {
-    const insertionIndex = topEntries.findIndex(
-      (topEntry) => entry.value > topEntry.value
-    );
-    if (insertionIndex === -1) {
-      topEntries.push(entry);
-    } else {
-      topEntries.splice(insertionIndex, 0, entry);
-    }
-    if (topEntries.length > 5) {
-      topEntries.pop();
-    }
-  }
-  return topEntries;
-};
+const getFeaturedEntries = (story: Story, entries: readonly DatasetEntry[]) =>
+  STORY_DETAILS[story].countries.flatMap((alpha2) => {
+    const entry = entries.find((candidate) => candidate.alpha2 === alpha2);
+    return entry ? [entry] : [];
+  });
 
 const formatYearRange = (entries: readonly DatasetEntry[]) => {
   const years = entries.map((entry) => entry.year);
@@ -302,7 +258,7 @@ const formatValue = (story: Story, value: number) => {
 };
 
 const getGlobeValue = (story: Story, value: number) => {
-  if (story === 'oil') {
+  if (story === 'oil' || story === 'forest') {
     return Math.log1p(value);
   }
   return story === 'water' ? Math.sqrt(value) : value;
@@ -310,14 +266,14 @@ const getGlobeValue = (story: Story, value: number) => {
 
 const getExampleCode = (story: Story, entries: readonly DatasetEntry[]) => {
   const { colors } = STORY_DETAILS[story];
-  const sampleData = getTopEntries(entries)
-    .slice(0, 2)
+  const sampleData = getFeaturedEntries(story, entries)
     .map(({ alpha2, value }) => {
-      let sampleValue = `${value}`;
-      if (story === 'oil') {
-        sampleValue = `Math.log1p(${value})`;
+      const roundedValue = Number(value.toFixed(story === 'forest' ? 2 : 1));
+      let sampleValue = `${roundedValue}`;
+      if (story === 'oil' || story === 'forest') {
+        sampleValue = `Math.log1p(${roundedValue})`;
       } else if (story === 'water') {
-        sampleValue = `Math.sqrt(${value})`;
+        sampleValue = `Math.sqrt(${roundedValue})`;
       }
       return `    { alpha2: '${alpha2}', value: ${sampleValue} },`;
     })
@@ -340,54 +296,37 @@ ${sampleData}
 );`;
 };
 
-const ForestLegend = () => (
-  <div aria-label="Forest area per person scale">
-    <div {...stylex.props(styles.legendStack)}>
-      {FOREST_LEGEND.map(([color], index) => (
-        <span
-          key={color}
-          {...stylex.props(styles.legendSwatch, FOREST_SWATCH_STYLES[index])}
-        />
-      ))}
-    </div>
-    <div {...stylex.props(styles.legendLabels)}>
-      {FOREST_LEGEND.slice(0, 4).map(([, label]) => (
-        <span key={label}>{label} ha</span>
-      ))}
-    </div>
-  </div>
-);
+const DatasetLegend = ({
+  dataset,
+  story,
+}: {
+  dataset: Dataset;
+  story: Story;
+}) => {
+  const { colors } = STORY_DETAILS[story];
+  const values = dataset.entries.map(({ value }) => value);
+  const scale = story === 'water' ? 'Square-root' : 'Logarithmic';
 
-const WaterLegend = () => (
-  <div aria-label="Freshwater withdrawals per person scale">
-    <div {...stylex.props(styles.legendGradient, styles.waterGradient)} />
-    <div {...stylex.props(styles.legendLabels)}>
-      {WATER_LEGEND.map((value) => (
-        <span key={value}>{value.toLocaleString()}</span>
-      ))}
+  return (
+    <div aria-label={`${dataset.name} scale`}>
+      <div
+        {...stylex.props(styles.legendGradient)}
+        style={{
+          backgroundImage: `linear-gradient(90deg, rgb(${colors.filled[0].join(', ')}), rgb(${colors.filled[1].join(', ')}))`,
+        }}
+      />
+      <div {...stylex.props(styles.legendLabels)}>
+        <span>{formatValue(story, Math.min(...values))}</span>
+        <span>{formatValue(story, Math.max(...values))}</span>
+      </div>
+      {story === 'renewable' ? null : (
+        <p {...stylex.props(styles.source)}>
+          {scale} color scale · values shown in original units
+        </p>
+      )}
     </div>
-  </div>
-);
-
-const RenewableLegend = () => (
-  <div aria-label="Renewable electricity share scale">
-    <div {...stylex.props(styles.legendGradient, styles.renewableGradient)} />
-    <div {...stylex.props(styles.legendLabels)}>
-      <span>0%</span>
-      <span>50%</span>
-      <span>100%</span>
-    </div>
-  </div>
-);
-
-const EmptyLegend = () => null;
-
-const LEGEND_REGISTRY = {
-  forest: ForestLegend,
-  oil: EmptyLegend,
-  renewable: RenewableLegend,
-  water: WaterLegend,
-} as const;
+  );
+};
 
 const DatasetSection = ({
   dataset,
@@ -398,11 +337,10 @@ const DatasetSection = ({
 }) => {
   const details = STORY_DETAILS[story];
   const storyStyles = STORY_STYLES[story];
-  const Legend = LEGEND_REGISTRY[story];
   const globeRef = useRef<ChoroplethGlobeRef>(null);
   const [activeEntryId, setActiveEntryId] = useState<string | null>(() =>
     story === 'oil'
-      ? (getTopEntries(dataset.entries).at(0)?.alpha2 ?? null)
+      ? (getFeaturedEntries(story, dataset.entries).at(0)?.alpha2 ?? null)
       : null
   );
   const sourceById = new Map(
@@ -410,17 +348,14 @@ const DatasetSection = ({
   );
   const globeData: ChoroplethGlobeData[] = [];
   for (const entry of dataset.entries) {
-    if (story === 'oil' && entry.value === 0) {
-      continue;
-    }
     globeData.push({
       alpha2: entry.alpha2,
       label: entry.label,
       value: getGlobeValue(story, entry.value),
     });
   }
-  const topEntries = getTopEntries(dataset.entries);
-  const highlightedEntry = topEntries.at(0);
+  const featuredEntries = getFeaturedEntries(story, dataset.entries);
+  const highlightedEntry = featuredEntries.at(0);
   const formattedTooltipValue = (
     _value: number,
     entry: ChoroplethGlobeData
@@ -454,20 +389,16 @@ const DatasetSection = ({
               </span>
             </div>
           ) : null}
-          <Legend />
+          <DatasetLegend dataset={dataset} story={story} />
           <p {...stylex.props(styles.source)}>
-            {dataset.name} · {dataset.unit} · latest available:{' '}
-            {formatYearRange(dataset.entries)} · {dataset.source}
+            {dataset.name} · {dataset.entries.length} countries · {dataset.unit}{' '}
+            · latest available: {formatYearRange(dataset.entries)} ·{' '}
+            {dataset.source}
           </p>
-          <CodeBlock
-            aria-label={`${details.heading} code example`}
-            className={`sh-theme sh-theme--${story}`}
-            fontSize={12}
-            lang="typescript"
-            title={`${story}-globe.tsx`}
-          >
-            {getExampleCode(story, dataset.entries)}
-          </CodeBlock>
+          <CopyButton
+            code={getExampleCode(story, dataset.entries)}
+            label={`${details.heading} code example`}
+          />
         </div>
         <div {...stylex.props(styles.visual)}>
           <ChoroplethGlobe
@@ -502,8 +433,8 @@ const DatasetSection = ({
             }
           />
           {showList ? (
-            <ol {...stylex.props(styles.rankList)}>
-              {topEntries.map((entry, index) => (
+            <ul {...stylex.props(styles.rankList)}>
+              {featuredEntries.map((entry) => (
                 <li key={entry.alpha2}>
                   <button
                     onBlur={() => globeRef.current?.clearHoveredEntry()}
@@ -524,18 +455,12 @@ const DatasetSection = ({
                     )}
                     type="button"
                   >
-                    <span
-                      aria-hidden="true"
-                      {...stylex.props(styles.rankNumber)}
-                    >
-                      0{index + 1}
-                    </span>
                     {story === 'oil' || story === 'renewable' ? (
                       <Flag
                         code={entry.alpha2}
                         gradient="real-linear"
                         hasDropShadow
-                        size="S"
+                        size="s"
                       />
                     ) : null}
                     <span>{entry.label}</span>
@@ -543,7 +468,7 @@ const DatasetSection = ({
                   </button>
                 </li>
               ))}
-            </ol>
+            </ul>
           ) : null}
         </div>
       </div>
