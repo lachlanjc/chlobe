@@ -71,7 +71,7 @@ const getHoverCountryIds = (): Uint8Array => {
   return countryIds;
 };
 
-const getHoverCountryId = (longitude: number, latitude: number): number => {
+export const getHoverCell = (longitude: number, latitude: number): number => {
   const normalizedLongitude = (((longitude + 180) % 360) + 360) % 360;
   const x = Math.min(
     HOVER_MAP_WIDTH - 1,
@@ -84,8 +84,14 @@ const getHoverCountryId = (longitude: number, latitude: number): number => {
       Math.floor(((90 - latitude) / 180) * HOVER_MAP_HEIGHT)
     )
   );
-  return getHoverCountryIds()[y * HOVER_MAP_WIDTH + x];
+  return y * HOVER_MAP_WIDTH + x;
 };
+
+const getHoverCountryId = (longitude: number, latitude: number): number =>
+  getHoverCountryIds()[getHoverCell(longitude, latitude)];
+
+export const getCountryAtCell = (cell: number): string | null =>
+  getAlpha2ForCountryId(getHoverCountryIds()[cell]);
 
 let dotCountryIds: Uint8Array | null = null;
 
@@ -125,8 +131,7 @@ export const getDotCountryIds = (): Uint8Array => {
 export const getCountryAtCoordinates = (
   longitude: number,
   latitude: number
-): string | null =>
-  getAlpha2ForCountryId(getHoverCountryId(longitude, latitude));
+): string | null => getCountryAtCell(getHoverCell(longitude, latitude));
 
 let countryCentroids: ReadonlyMap<string, [number, number]> | null = null;
 

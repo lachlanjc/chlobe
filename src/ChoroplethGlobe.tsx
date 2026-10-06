@@ -50,7 +50,10 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
     const prefersReducedMotion = usePrefersReducedMotion();
     const [uncontrolledActiveEntryId, setUncontrolledActiveEntryId] =
       useState(defaultActiveEntryId);
-    const activeEntryId = controlledActiveEntryId ?? uncontrolledActiveEntryId;
+    const activeEntryId =
+      controlledActiveEntryId === undefined
+        ? uncontrolledActiveEntryId
+        : controlledActiveEntryId;
     const [tooltip, setTooltip] = useState<ChoroplethGlobeTooltip | null>(null);
     const centroids = getCountryCentroids();
 
@@ -62,7 +65,6 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
     const targetPhiRef = useRef<number | null>(null);
     const dragRef = useRef<{ startPhi: number; startX: number } | null>(null);
     const hoveringCanvasRef = useRef(false);
-    const lastLookupCoordsRef = useRef<[number, number] | null>(null);
     const dataRef = useRef(data);
     const centroidsRef = useRef(centroids);
     const activeEntryIdRef = useRef(activeEntryId);
@@ -177,7 +179,6 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
         drag: dragRef,
         globe: globeRef,
         hoveringCanvas: hoveringCanvasRef,
-        lastLookupCoordinates: lastLookupCoordsRef,
         options: optionsRef,
         palette: paletteRef,
         prefersReducedMotion: reducedMotionRef,

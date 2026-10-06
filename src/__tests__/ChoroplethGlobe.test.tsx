@@ -16,8 +16,9 @@ import type { ChoroplethGlobeHandle } from '../globeTypes';
 const mocks = vi.hoisted(() => ({
   createGlobe: vi.fn(),
   generatePalette: vi.fn(),
-  getCountryAtCoordinates: vi.fn(),
+  getCountryAtCell: vi.fn<(cell: number) => string | null>(),
   getCountryCentroids: vi.fn(),
+  getHoverCell: vi.fn<(longitude: number, latitude: number) => number>(),
 }));
 
 vi.mock(import('../globeRenderer'), () => ({ default: mocks.createGlobe }));
@@ -25,8 +26,9 @@ vi.mock(import('../choropleth-palette'), () => ({
   generateChoroplethPalette: mocks.generatePalette,
 }));
 vi.mock(import('../worldGeoData'), () => ({
-  getCountryAtCoordinates: mocks.getCountryAtCoordinates,
+  getCountryAtCell: mocks.getCountryAtCell,
   getCountryCentroids: mocks.getCountryCentroids,
+  getHoverCell: mocks.getHoverCell,
 }));
 
 const data = [
@@ -45,11 +47,16 @@ const colors = {
   missing: [204, 204, 204],
 } as const;
 const formatValue = (value: number) => `${value} tCO₂e`;
+const renderTooltipSource = (tooltip: { source: string }) => (
+  <span>{tooltip.source}</span>
+);
 
 const globe = {
   destroy: vi.fn(),
   project: vi.fn(() => ({ visible: true, x: 0.5, y: 0.5 })),
-  unproject: vi.fn(() => [39, -98] as [number, number]),
+  unproject: vi.fn<(nx: number, ny: number) => [number, number] | null>(() => [
+    39, -98,
+  ]),
   update: vi.fn(),
   updatePalette: vi.fn(),
 };
@@ -78,6 +85,8 @@ class ResizeObserverMock {
   }
 }
 
+// Separate native observer mocks keep their callbacks and lifetimes independent.
+// oxlint-disable-next-line eslint/max-classes-per-file
 class IntersectionObserverMock {
   static instances: IntersectionObserverMock[] = [];
   callback: (entries: { isIntersecting: boolean }[]) => void;
@@ -94,7 +103,8 @@ beforeEach(() => {
   vi.resetAllMocks();
   mocks.createGlobe.mockReturnValue(globe);
   mocks.generatePalette.mockReturnValue(new Uint8Array(1024));
-  mocks.getCountryAtCoordinates.mockReturnValue('US');
+  mocks.getCountryAtCell.mockReturnValue('US');
+  mocks.getHoverCell.mockReturnValue(1);
   mocks.getCountryCentroids.mockReturnValue(new Map([['US', [39, -98]]]));
   Object.defineProperty(HTMLCanvasElement.prototype, 'clientHeight', {
     configurable: true,
@@ -204,7 +214,7 @@ describe(ChoroplethGlobe, () => {
     );
     const canvas = getByLabelText('Country choropleth globe');
     fireEvent.pointerMove(canvas, { offsetX: 50, offsetY: 60 });
-    expect(mocks.getCountryAtCoordinates).not.toHaveBeenCalled();
+    expect(mocks.getCountryAtCell).not.toHaveBeenCalled();
 
     const onCountryHover = vi.fn();
     const renderTooltip = vi.fn(() => null);
@@ -246,6 +256,73 @@ describe(ChoroplethGlobe, () => {
     expect(globe.update).toHaveBeenCalledWith({ phi: 0.25 });
   });
 
+  it('moves pointer tooltips within a cell and only emits country transitions', () => {
+    const onCountryHover = vi.fn<(alpha2: string | null) => void>();
+    const renderTooltip = vi.fn(() => null);
+    const { getByLabelText } = render(
+      <ChoroplethGlobe
+        colors={colors}
+        data={data}
+        onCountryHover={onCountryHover}
+        renderTooltip={renderTooltip}
+        size={200}
+      />
+    );
+    const canvas = getByLabelText('Country choropleth globe');
+    const move = (x: number) =>
+      fireEvent(
+        canvas,
+        Object.assign(new Event('pointermove', { bubbles: true }), {
+          offsetX: x,
+          offsetY: 60,
+        })
+      );
+    move(50);
+    move(51);
+    expect(mocks.getCountryAtCell).toHaveBeenCalledOnce();
+    expect(renderTooltip).toHaveBeenLastCalledWith(
+      expect.objectContaining({ x: 51, y: 60 })
+    );
+
+    mocks.getHoverCell.mockReturnValue(2);
+    mocks.getCountryAtCell.mockReturnValue('CA');
+    globe.unproject.mockReturnValue([39.01, -98.01]);
+    move(52);
+    expect(onCountryHover).toHaveBeenLastCalledWith('CA');
+    globe.unproject.mockReturnValue(null);
+    move(53);
+    fireEvent.pointerLeave(canvas);
+    expect(onCountryHover).toHaveBeenLastCalledWith(null);
+    expect(onCountryHover).toHaveBeenCalledTimes(3);
+  });
+
+  it('honors an explicit null controlled selection', () => {
+    const { rerender, queryByText } = render(
+      <ChoroplethGlobe
+        activeEntryId="us"
+        colors={colors}
+        data={data}
+        defaultActiveEntryId="us"
+        renderTooltip={renderTooltipSource}
+        size={200}
+      />
+    );
+    runAnimationFrame();
+    expect(queryByText('entry')).not.toBeNull();
+    rerender(
+      <ChoroplethGlobe
+        activeEntryId={null}
+        colors={colors}
+        data={data}
+        defaultActiveEntryId="us"
+        renderTooltip={renderTooltipSource}
+        size={200}
+      />
+    );
+    runAnimationFrame();
+    expect(queryByText('entry')).toBeNull();
+  });
+
   it('uploads a new palette after data changes', () => {
     const { rerender } = render(
       <ChoroplethGlobe colors={colors} data={data} size={200} />
@@ -279,8 +356,8 @@ describe(ChoroplethGlobe, () => {
         colorScheme="dark"
         globe={{
           autoRotate: false,
-          interactive: false,
           baseColor: [10, 20, 30],
+          interactive: false,
         }}
         size={300}
       />
@@ -289,10 +366,10 @@ describe(ChoroplethGlobe, () => {
     expect(globe.destroy).not.toHaveBeenCalled();
     expect(globe.update).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        width: 300,
-        height: 300,
-        dark: 1,
         baseColor: [10 / 255, 20 / 255, 30 / 255],
+        dark: 1,
+        height: 300,
+        width: 300,
       })
     );
     globe.update.mockClear();
@@ -326,7 +403,7 @@ describe(ChoroplethGlobe, () => {
 
   it('pauses offscreen rotation and resumes when the globe returns', () => {
     render(<ChoroplethGlobe colors={colors} data={[]} size={200} />);
-    const observer = IntersectionObserverMock.instances[0];
+    const [observer] = IntersectionObserverMock.instances;
     act(() => observer.callback([{ isIntersecting: false }]));
     expect(animationFrames.size).toBe(0);
     act(() => observer.callback([{ isIntersecting: true }]));

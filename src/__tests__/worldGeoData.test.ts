@@ -7,6 +7,7 @@ import {
   getCountryCentroids,
   getCountryIdByAlpha2,
   getDotCountryIds,
+  getHoverCell,
 } from '../worldGeoData';
 
 describe('generated country data', () => {
@@ -67,6 +68,10 @@ describe(getCountryCentroids, () => {
 });
 
 describe(getCountryAtCoordinates, () => {
+  it('distinguishes raster cells even for movement smaller than half a degree', () => {
+    expect(getHoverCell(-0.1, 0)).not.toBe(getHoverCell(0.1, 0));
+    expect(getHoverCell(0.1, 0)).toBe(getHoverCell(0.2, 0));
+  });
   const cases: { lng: number; lat: number; expected: string | null }[] = [
     { expected: 'US', lat: 39, lng: -98 },
     { expected: 'FR', lat: 47, lng: 2 },
