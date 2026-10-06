@@ -24,7 +24,9 @@ const findEntry = (
   data: readonly ChoroplethGlobeData[],
   id: string | null
 ): ChoroplethGlobeData | null =>
-  id === null ? null : (data.find((entry) => entry.id === id) ?? null);
+  id === null
+    ? null
+    : (data.find((entry) => (entry.id ?? entry.alpha2) === id) ?? null);
 
 const ChoroplethGlobe = forwardRef<ChoroplethGlobeHandle, ChoroplethGlobeProps>(
   (

@@ -22,11 +22,10 @@ describe('public API', () => {
   });
 
   it('supports one data model for shading, labels, and tooltip identity', () => {
-    expectTypeOf<ChoroplethGlobeData>().toMatchTypeOf({
-      alpha2: 'US',
-      id: 'united-states',
-      value: 42,
-    });
+    expectTypeOf<{
+      alpha2: string;
+      value: number;
+    }>().toMatchTypeOf<ChoroplethGlobeData>();
 
     const tooltip = {
       alpha2: 'US',

@@ -78,7 +78,9 @@ const findEntry = (
   data: readonly ChoroplethGlobeData[],
   id: string | null
 ): ChoroplethGlobeData | null =>
-  id === null ? null : (data.find((entry) => entry.id === id) ?? null);
+  id === null
+    ? null
+    : (data.find((entry) => (entry.id ?? entry.alpha2) === id) ?? null);
 
 export const useGlobeRenderer = ({
   colorScheme,
@@ -148,7 +150,7 @@ export const useGlobeRenderer = ({
       const next: ChoroplethGlobeTooltip = {
         alpha2: entry.alpha2,
         entry,
-        entryId: entry.id,
+        entryId: entry.id ?? entry.alpha2,
         formattedValue:
           refs.callbacks.current.formatValue?.(entry.value, entry) ?? null,
         label: entry.label ?? null,
@@ -310,7 +312,7 @@ export const useGlobeRenderer = ({
         return {
           alpha2,
           entry,
-          entryId: entry?.id ?? null,
+          entryId: entry ? (entry.id ?? entry.alpha2) : null,
           formattedValue,
           label: entry?.label ?? null,
           source: 'pointer',

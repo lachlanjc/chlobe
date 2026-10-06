@@ -208,6 +208,38 @@ describe(ChoroplethGlobe, () => {
     expect(onActiveEntryChange).toHaveBeenLastCalledWith('us');
   });
 
+  it('defaults omitted entry IDs to country codes for pointer and entry tooltips', async () => {
+    const entry = { alpha2: 'US', value: 42 };
+    const ref = createRef<ChoroplethGlobeHandle>();
+    const onActiveEntryChange = vi.fn();
+    const renderTooltip = vi.fn(() => null);
+    const { getByLabelText } = render(
+      <ChoroplethGlobe
+        colors={colors}
+        data={[entry]}
+        onActiveEntryChange={onActiveEntryChange}
+        ref={ref}
+        renderTooltip={renderTooltip}
+        size={200}
+      />
+    );
+    fireEvent.pointerMove(getByLabelText('Country choropleth globe'), {
+      offsetX: 50,
+      offsetY: 60,
+    });
+    expect(renderTooltip).toHaveBeenCalledWith(
+      expect.objectContaining({ entry, entryId: 'US', source: 'pointer' })
+    );
+    act(() => ref.current?.hoverEntry('US'));
+    expect(onActiveEntryChange).toHaveBeenLastCalledWith('US');
+    await waitFor(() => {
+      runAnimationFrame();
+      expect(renderTooltip).toHaveBeenCalledWith(
+        expect.objectContaining({ entry, entryId: 'US', source: 'entry' })
+      );
+    });
+  });
+
   it('only performs country hit testing for requested hover features', async () => {
     const { getByLabelText, rerender } = render(
       <ChoroplethGlobe colors={colors} data={data} size={200} />

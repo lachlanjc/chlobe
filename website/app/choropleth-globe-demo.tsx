@@ -415,7 +415,6 @@ const DatasetSection = ({
     }
     globeData.push({
       alpha2: entry.alpha2,
-      id: entry.alpha2,
       label: entry.label,
       value: getGlobeValue(story, entry.value),
     });
@@ -426,7 +425,7 @@ const DatasetSection = ({
     _value: number,
     entry: ChoroplethGlobeData
   ) => {
-    const source = sourceById.get(entry.id);
+    const source = sourceById.get(entry.id ?? entry.alpha2);
     return source ? `${formatValue(story, source.value)} · ${source.year}` : '';
   };
 

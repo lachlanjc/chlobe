@@ -39,7 +39,7 @@ export const EmissionsGlobe = () => (
 );
 ```
 
-Each entry needs a stable `id`, an ISO 3166-1 alpha-2 `alpha2` country code, and a numeric `value`. `label` is optional metadata for your UI. RGB colors use channels from `0` through `255`.
+Each entry needs an ISO 3166-1 alpha-2 `alpha2` country code and a numeric `value`. The optional stable `id` defaults to `alpha2` for active-entry controls, imperative methods, and tooltip `entryId`. `label` is optional metadata for your UI. RGB colors use channels from `0` through `255`.
 
 (Why RGB tuples? Shaders use [Here’s a converter](https://retool.com/utilities/hex-to-rgb).)
 

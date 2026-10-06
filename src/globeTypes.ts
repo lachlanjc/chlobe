@@ -2,8 +2,8 @@ import type { CSSProperties, ReactNode } from 'react';
 
 /** One country and the value used to shade it. */
 export interface ChoroplethGlobeData {
-  /** Stable application identifier, used by active-entry controls. */
-  id: string;
+  /** Stable application identifier for active-entry controls. Defaults to alpha2. */
+  id?: string;
   /** ISO 3166-1 alpha-2 country code. */
   alpha2: string;
   /** Numeric value used to calculate the country's fill. */
