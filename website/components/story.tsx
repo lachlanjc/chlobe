@@ -16,9 +16,10 @@ const Story = () => (
     <p {...stylex.props(contentStyles.paragraph)}>
       But cobe doesn’t know where countries are. Adding GeoJSON data and
       rendering it is easily &gt;100KB. <strong>chlobe</strong> evolves cobe’s
-      approach, uniquely coloring each country in the compressed bitmap, then
-      keeps an index of country names &amp; colors to render levels over each
-      country’s dots using a provided color scale. It’s just 15KB.
+      approach, preprocessing the GeoJSON and uniquely coloring each country
+      into the compressed bitmap, then keeps an index of country codes &amp;
+      colors to render levels over each country’s dots using a provided color
+      scale. The library is just 15KB minified.
     </p>
     <p {...stylex.props(contentStyles.paragraph)}>
       Thanks to{' '}

@@ -139,10 +139,13 @@ const getExampleCode = (story: Story, entries: readonly DatasetEntry[]) => {
     })
     .join('\n');
 
-  return `import { ChoroplethGlobe } from 'chlobe';
+  return `'use client';
+
+import { ChoroplethGlobe } from 'chlobe';
 
 export const Globe = () => (
   <ChoroplethGlobe
+    aria-label="${STORY_DETAILS[story].heading} by country"
     data={[
 ${sampleData}
     ]}

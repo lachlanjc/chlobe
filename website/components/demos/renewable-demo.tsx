@@ -158,10 +158,10 @@ const RenewableDemo = ({ dataset }: { dataset: Dataset }) => {
                   </span>
                   <span>{entry.label}</span>
                 </span>
-                <strong {...stylex.props(styles.value)}>
+                <span {...stylex.props(styles.value)}>
                   {entry.value.toFixed(1)}
                   <span {...stylex.props(demoStyles.summary)}>%</span>
-                </strong>
+                </span>
                 <span aria-hidden="true" {...stylex.props(styles.mix)}>
                   <span {...stylex.props(styles.mixFill(entry.value))} />
                 </span>

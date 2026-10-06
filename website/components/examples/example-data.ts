@@ -1,4 +1,7 @@
-import type { ChoroplethGlobeColors } from '../../../dist/index.js';
+import type {
+  ChoroplethGlobeColors,
+  ChoroplethGlobeOptions,
+} from '../../../dist/index.js';
 
 const initialColors = {
   filled: [
@@ -7,6 +10,15 @@ const initialColors = {
   ],
   missing: [148, 163, 184],
 } satisfies ChoroplethGlobeColors;
+
+type GlobeAppearance = Required<
+  Pick<ChoroplethGlobeOptions, 'baseColor' | 'glowColor'>
+>;
+
+const initialAppearance: GlobeAppearance = {
+  baseColor: [255, 255, 255],
+  glowColor: [217, 217, 230],
+};
 
 // Renewable electricity share (%), 2021, rounded to one decimal place.
 const data = [
@@ -18,4 +30,5 @@ const data = [
 ];
 const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
-export { countryNames, data, initialColors };
+export { countryNames, data, initialAppearance, initialColors };
+export type { GlobeAppearance };

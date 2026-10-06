@@ -1,5 +1,6 @@
 import type { ChoroplethGlobeColors } from '../../../dist/index.js';
 import { data } from './example-data';
+import type { GlobeAppearance } from './example-data';
 
 const dataCode = `// Renewable electricity share (%), 2021.
 const data = [
@@ -9,8 +10,11 @@ ${data.map(({ alpha2, value }) => `  { alpha2: '${alpha2}', value: ${value} },`)
 const getBasicCode = (
   colors: ChoroplethGlobeColors,
   autoRotate: boolean,
-  interactive: boolean
-) => `import { ChoroplethGlobe } from 'chlobe';
+  interactive: boolean,
+  appearance: GlobeAppearance
+) => `'use client';
+
+import { ChoroplethGlobe } from 'chlobe';
 
 ${dataCode}
 
@@ -21,13 +25,19 @@ ${dataCode}
     missing: [${colors.missing.join(', ')}]
   }}
   data={data}
-  globe={{ autoRotate: ${autoRotate}, interactive: ${interactive} }}
+  globe={{
+    autoRotate: ${autoRotate},
+    interactive: ${interactive},
+    baseColor: [${appearance.baseColor.join(', ')}],
+    glowColor: [${appearance.glowColor.join(', ')}],
+  }}
 />`;
 
 const getLegendCode = (
   colors: ChoroplethGlobeColors,
   autoRotate: boolean,
-  interactive: boolean
+  interactive: boolean,
+  appearance: GlobeAppearance
 ) => `'use client';
 
 import { useRef } from 'react';
@@ -45,7 +55,12 @@ export const GlobeWithLegend = () => {
         aria-label="Custom legend globe preview"
         ref={globe}
         data={data}
-        globe={{ autoRotate: ${autoRotate}, interactive: ${interactive} }}
+        globe={{
+          autoRotate: ${autoRotate},
+          interactive: ${interactive},
+          baseColor: [${appearance.baseColor.join(', ')}],
+          glowColor: [${appearance.glowColor.join(', ')}],
+        }}
         colors={{
           filled: [[${colors.filled[0].join(', ')}], [${colors.filled[1].join(', ')}]],
           missing: [${colors.missing.join(', ')}]
@@ -71,8 +86,11 @@ export const GlobeWithLegend = () => {
 const getTooltipCode = (
   colors: ChoroplethGlobeColors,
   autoRotate: boolean,
-  interactive: boolean
-) => `import { ChoroplethGlobe } from 'chlobe';
+  interactive: boolean,
+  appearance: GlobeAppearance
+) => `'use client';
+
+import { ChoroplethGlobe } from 'chlobe';
 
 ${dataCode}
 const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
@@ -84,7 +102,12 @@ const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
     filled: [[${colors.filled[0].join(', ')}], [${colors.filled[1].join(', ')}]],
     missing: [${colors.missing.join(', ')}]
   }}
-  globe={{ autoRotate: ${autoRotate}, interactive: ${interactive} }}
+  globe={{
+    autoRotate: ${autoRotate},
+    interactive: ${interactive},
+    baseColor: [${appearance.baseColor.join(', ')}],
+    glowColor: [${appearance.glowColor.join(', ')}],
+  }}
   formatValue={(value) => \`\${value}% renewable electricity\`}
   renderTooltip={({ alpha2, label, formattedValue, x, y }) => (
     <div

@@ -12,6 +12,7 @@ const contentStyles = stylex.create({
     gridColumn: '1 / -1',
     margin: 0,
   },
+  inlineCode: { fontSize: '0.85em' },
   link: { color: '#0B2471', textUnderlineOffset: 3 },
   paragraph: {
     fontSize: 18,

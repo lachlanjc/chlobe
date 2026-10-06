@@ -8,7 +8,7 @@ const styles = stylex.create({
   button: {
     alignSelf: 'flex-start',
     backgroundColor: 'transparent',
-    borderColor: 'currentColor',
+    borderColor: 'color-mix(in srgb, currentColor 30%, transparent)',
     borderRadius: 2,
     borderStyle: 'solid',
     borderWidth: 1,
@@ -20,11 +20,11 @@ const styles = stylex.create({
   },
   focus: { outline: '2px solid currentColor', outlineOffset: 3 },
   hover: {
-    backgroundColor: 'color-mix(in srgb, currentColor 10%, transparent)',
+    backgroundColor: 'color-mix(in srgb, currentColor 5%, transparent)',
   },
   overlay: { position: 'absolute', right: 10, top: 8 },
   pressed: {
-    backgroundColor: 'color-mix(in srgb, currentColor 18%, transparent)',
+    backgroundColor: 'color-mix(in srgb, currentColor 10%, transparent)',
   },
 });
 

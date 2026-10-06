@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
+import { ApiReference } from './api-reference';
 import { contentStyles } from './content-styles';
 import { BasicGlobeExample } from './examples/basic-globe-example';
 import { LegendGlobeExample } from './examples/legend-globe-example';
@@ -15,17 +16,13 @@ const UsageGuide = () => (
       <div>
         <h2 {...stylex.props(contentStyles.heading)}>Install &amp; use</h2>
         <p {...stylex.props(contentStyles.paragraph)}>
-          Add with your preferred package manager:
+          Requires React 18+ and WebGL:
         </p>
-        <CodeBlock
-          aria-label="Install chlobe and React"
-          fontSize={14}
-          lang="shell"
-        >
+        <CodeBlock aria-label="Install chlobe" fontSize={14} lang="shell">
           pnpm add chlobe
         </CodeBlock>
         <p {...stylex.props(contentStyles.paragraph)}>
-          Then render a globe in React with an RGB color ramp:
+          Render a globe with an RGB color ramp (it’s more efficient for shaders):
         </p>
         <BasicGlobeExample />
       </div>
@@ -41,11 +38,11 @@ const UsageGuide = () => (
         <h2 {...stylex.props(contentStyles.heading)}>Custom tooltip</h2>
         <p {...stylex.props(contentStyles.paragraph)}>
           Hover a country to see its name and renewable electricity share.
-          Brazil is selected initially; countries outside the dataset show “No
-          data”.
+          Countries outside the dataset show “No data”.
         </p>
         <TooltipGlobeExample />
       </div>
+      <ApiReference />
     </div>
   </section>
 );

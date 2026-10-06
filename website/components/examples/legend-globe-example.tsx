@@ -10,7 +10,12 @@ import type {
 } from '../../../dist/index.js';
 import { CodeBlock } from '../ui/code-block';
 import { getLegendCode } from './example-code';
-import { countryNames, data, initialColors } from './example-data';
+import {
+  countryNames,
+  data,
+  initialAppearance,
+  initialColors,
+} from './example-data';
 import { exampleStyles } from './example-styles';
 import { GlobeControls } from './globe-controls';
 
@@ -38,6 +43,7 @@ const styles = stylex.create({
 });
 
 const LegendGlobeExample = () => {
+  const [appearance, setAppearance] = useState(initialAppearance);
   const [colors, setColors] = useState<ChoroplethGlobeColors>(initialColors);
   const globe = useRef<ChoroplethGlobeRef>(null);
   const [autoRotate, setAutoRotate] = useState(true);
@@ -51,7 +57,7 @@ const LegendGlobeExample = () => {
         lang="typescript"
         title="globe-legend.tsx"
       >
-        {getLegendCode(colors, autoRotate, interactive)}
+        {getLegendCode(colors, autoRotate, interactive, appearance)}
       </CodeBlock>
       <div {...stylex.props(exampleStyles.preview)}>
         <div {...stylex.props(exampleStyles.previewLayout)}>
@@ -60,7 +66,7 @@ const LegendGlobeExample = () => {
               aria-label="Custom legend globe preview"
               colors={colors}
               data={data}
-              globe={{ autoRotate, interactive }}
+              globe={{ autoRotate, interactive, ...appearance }}
               ref={globe}
             />
             <div {...stylex.props(styles.legend)}>
@@ -81,6 +87,8 @@ const LegendGlobeExample = () => {
             </div>
           </div>
           <GlobeControls
+            appearance={appearance}
+            onAppearanceChange={setAppearance}
             autoRotate={autoRotate}
             colors={colors}
             interactive={interactive}

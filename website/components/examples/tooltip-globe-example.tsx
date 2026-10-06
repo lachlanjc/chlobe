@@ -10,7 +10,12 @@ import type {
 } from '../../../dist/index.js';
 import { CodeBlock } from '../ui/code-block';
 import { getTooltipCode } from './example-code';
-import { countryNames, data, initialColors } from './example-data';
+import {
+  countryNames,
+  data,
+  initialAppearance,
+  initialColors,
+} from './example-data';
 import { exampleStyles } from './example-styles';
 import { GlobeControls } from './globe-controls';
 
@@ -59,6 +64,7 @@ const renderCountryTooltip = ({
 );
 
 const TooltipGlobeExample = () => {
+  const [appearance, setAppearance] = useState(initialAppearance);
   const [colors, setColors] = useState<ChoroplethGlobeColors>(initialColors);
   const [autoRotate, setAutoRotate] = useState(true);
   const [interactive, setInteractive] = useState(true);
@@ -71,7 +77,7 @@ const TooltipGlobeExample = () => {
         lang="typescript"
         title="globe-tooltip.tsx"
       >
-        {getTooltipCode(colors, autoRotate, interactive)}
+        {getTooltipCode(colors, autoRotate, interactive, appearance)}
       </CodeBlock>
       <div {...stylex.props(exampleStyles.preview)}>
         <div {...stylex.props(exampleStyles.previewLayout)}>
@@ -81,11 +87,13 @@ const TooltipGlobeExample = () => {
               colors={colors}
               data={data}
               formatValue={formatRenewableValue}
-              globe={{ autoRotate, interactive }}
+              globe={{ autoRotate, interactive, ...appearance }}
               renderTooltip={renderCountryTooltip}
             />
           </div>
           <GlobeControls
+            appearance={appearance}
+            onAppearanceChange={setAppearance}
             autoRotate={autoRotate}
             colors={colors}
             interactive={interactive}

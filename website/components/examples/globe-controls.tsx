@@ -9,6 +9,7 @@ import type {
 } from '../../../dist/index.js';
 import { ColorPicker } from '../ui/color-picker';
 import { Switch } from '../ui/switch';
+import type { GlobeAppearance } from './example-data';
 
 const styles = stylex.create({
   colorControls: {
@@ -53,16 +54,20 @@ const toRgb = (color: Color): ChoroplethRgb => {
 };
 
 const GlobeControls = ({
+  appearance,
   autoRotate,
   colors,
   interactive,
+  onAppearanceChange,
   onAutoRotateChange,
   onColorsChange,
   onInteractiveChange,
 }: {
+  appearance: GlobeAppearance;
   autoRotate: boolean;
   colors: ChoroplethGlobeColors;
   interactive: boolean;
+  onAppearanceChange: (appearance: GlobeAppearance) => void;
   onAutoRotateChange: (selected: boolean) => void;
   onColorsChange: (colors: ChoroplethGlobeColors) => void;
   onInteractiveChange: (selected: boolean) => void;
@@ -112,6 +117,20 @@ const GlobeControls = ({
           onColorsChange({ ...colors, missing: toRgb(color) })
         }
         value={`rgb(${colors.missing.join(', ')})`}
+      />
+      <ColorPicker
+        label="Base"
+        onChange={(color) =>
+          onAppearanceChange({ ...appearance, baseColor: toRgb(color) })
+        }
+        value={`rgb(${appearance.baseColor.join(', ')})`}
+      />
+      <ColorPicker
+        label="Glow"
+        onChange={(color) =>
+          onAppearanceChange({ ...appearance, glowColor: toRgb(color) })
+        }
+        value={`rgb(${appearance.glowColor.join(', ')})`}
       />
     </div>
   </fieldset>
