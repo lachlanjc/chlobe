@@ -2,7 +2,7 @@
 
 [cobe](https://cobe.vercel.app/) is a brilliant, 5kb library for rendering globes on the web.
 
-This library is a superfast superset (16kb total) for visualizing country-level data (e.g. population density per country) on a cobe-style WebGL choropleth globe. Give it country values and a color ramp; it renders the globe while you can control labels, value formatting, and tooltip UI.
+This library is a superfast superset (15kb total) for visualizing country-level data (e.g. population density per country) on a cobe-style WebGL choropleth globe. Give it country values and a color ramp; it renders the globe while you can control labels, value formatting, and tooltip UI.
 
 ## Install
 
@@ -18,9 +18,9 @@ pnpm add chlobe
 import { ChoroplethGlobe } from 'chlobe';
 
 const emissions = [
-  { alpha2: 'US', label: 'United States', value: 6 },
-  { alpha2: 'BR', label: 'Brazil', value: 1.3 },
-  { alpha2: 'IN', label: 'India', value: 4.1 },
+  { alpha2: 'US', value: 6 },
+  { alpha2: 'BR', value: 1.3 },
+  { alpha2: 'IN', value: 4.1 },
 ];
 
 export const EmissionsGlobe = () => (
@@ -41,7 +41,7 @@ export const EmissionsGlobe = () => (
 
 Each entry needs an ISO 3166-1 alpha-2 `alpha2` country code and a numeric `value`. The optional stable `id` defaults to `alpha2` for active-entry controls, imperative methods, and tooltip `entryId`. `label` is optional metadata for your UI. RGB colors use channels from `0` through `255`.
 
-(Why RGB tuples? Shaders use [Here’s a converter](https://retool.com/utilities/hex-to-rgb).)
+(Why RGB tuples? They’re more efficient for shaders. [Here’s a converter](https://retool.com/utilities/hex-to-rgb).)
 
 With no `size`, the globe fills the width of its container and keeps a square aspect ratio. Pass `size={360}` for a fixed CSS-pixel square.
 

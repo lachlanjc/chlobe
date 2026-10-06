@@ -26,6 +26,7 @@ const styles = stylex.create({
     flexDirection: 'column',
     gap: 24,
     position: 'relative',
+    width: '100%',
     zIndex: 1,
   },
   heroPattern: {
@@ -66,7 +67,9 @@ const styles = stylex.create({
     lineHeight: 0.98,
     margin: 0,
     maxWidth: 760,
+    textAlign: 'center',
     textWrap: 'balance',
+    width: '100%',
   },
 });
 
