@@ -29,8 +29,8 @@ const styles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
     gap: 16,
-    minHeight: '64svh',
-    padding: 'clamp(40px, 8vw, 120px) clamp(24px, 6vw, 88px)',
+    // minHeight: '64svh',
+    padding: 'clamp(30px, 8vh, 60px) clamp(24px, 6vw, 88px)',
     textAlign: 'center',
   },
   intro: {
@@ -38,9 +38,27 @@ const styles = stylex.create({
     flexDirection: 'column',
     gap: 16,
   },
-  shell: {
-    display: 'flex',
-    flexDirection: 'column',
+  tech: {
+    display: 'grid',
+    gap: 32,
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    marginInline: 'auto',
+    maxWidth: 1200,
+    padding: 'clamp(30px, 8vh, 60px) clamp(24px, 6vw, 88px)',
+  },
+  techHead: {
+    fontSize: 24,
+    fontWeight: 700,
+    gridColumn: '1 / -1',
+    margin: 0,
+  },
+  techP: {
+    // color: '#d5ddf7',
+    fontSize: 18,
+    lineHeight: 1.5,
+    marginBlock: 12,
+    maxWidth: 560,
+    textWrap: 'pretty',
   },
   title: {
     fontSize: 'clamp(38px, 7vw, 72px)',
@@ -57,15 +75,15 @@ const styles = stylex.create({
 });
 
 const Home = () => (
-  <main {...stylex.props(styles.shell)}>
-    <section {...stylex.props(styles.hero, styles.intro)}>
+  <>
+    <header {...stylex.props(styles.hero, styles.intro)}>
       <p {...stylex.props(styles.eyebrow)}>`bun add chlobe`</p>
       <h1 {...stylex.props(styles.title)}>
         Visualize country data on a gl
         <span {...stylex.props(styles.titleGlobe)}></span>be.
       </h1>
       <p {...stylex.props(styles.description)}>
-        It’s a{' '}
+        A 15KB{' '}
         <a
           {...stylex.props(styles.titleGlobe)}
           href="https://en.wikipedia.org/wiki/Choropleth_map"
@@ -78,6 +96,48 @@ const Home = () => (
         </a>
         .
       </p>
+    </header>
+    <section {...stylex.props(styles.tech)}>
+      <div>
+        <h2 {...stylex.props(styles.techHead)}>The story</h2>
+        <p {...stylex.props(styles.techP)}>
+          Most globes on the web use 3D renderers, which are massive. Shu Ding’s{' '}
+          <a
+            {...stylex.props(styles.titleGlobe)}
+            href="https://cobe.vercel.app/"
+          >
+            cobe
+          </a>{' '}
+          realized you could prebuild a tiny bitmap of where land is and render
+          a sphere with a shader in just 5KB. Brilliant!
+        </p>
+        <p {...stylex.props(styles.techP)}>
+          But cobe doesn’t know where countries are. Adding GeoJSON data and
+          rendering it is easily &gt;100KB. <strong>chlobe</strong> evolves
+          cobe’s approach, uniquely coloring each country in the compressed
+          bitmap, then keeps an index of country names &amp; colors to render
+          levels over each country’s dots using a provided color scale. It’s
+          just 15KB.
+        </p>
+      </div>
+      <div>
+        <h2 {...stylex.props(styles.techHead)}>Behavior</h2>
+        <ul {...stylex.props(styles.techP)}>
+          <li>
+            <strong>Auto-rotate:</strong> spins the globe slowly by default, but
+            stops when you interact with it.
+          </li>
+          <li>
+            <strong>Interactive:</strong> rotate it with your mouse or touch
+            gestures. Hovering over a country will highlight it and show its
+            name and value in a tooltip.
+          </li>
+          <li>
+            <strong>Remote control:</strong> quickly rotate to a country when
+            you hover its legend entry
+          </li>
+        </ul>
+      </div>
     </section>
     <ChoroplethGlobeDemo
       forest={forest}
@@ -85,7 +145,7 @@ const Home = () => (
       renewable={renewable}
       water={water}
     />
-  </main>
+  </>
 );
 
 export default Home;
