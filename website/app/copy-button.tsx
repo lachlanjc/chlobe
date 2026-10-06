@@ -30,10 +30,12 @@ const styles = stylex.create({
 
 const CopyButton = ({
   code,
+  copyLabel = 'Copy',
   label,
   overlay = false,
 }: {
   code: string;
+  copyLabel?: string;
   label: string;
   overlay?: boolean;
 }) => {
@@ -71,7 +73,7 @@ const CopyButton = ({
       onPress={copy}
       type="button"
     >
-      <span aria-live="polite">{status}</span>
+      <span aria-live="polite">{status === 'Copy' ? copyLabel : status}</span>
     </Button>
   );
 };

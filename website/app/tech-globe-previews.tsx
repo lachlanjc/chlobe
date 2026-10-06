@@ -390,7 +390,7 @@ const LegendGlobeExample = () => {
         aria-label="Custom legend example"
         fontSize={14}
         lang="typescript"
-        title="legend.tsx"
+        title="globe-legend.tsx"
       >
         {getLegendCode(colors, autoRotate, interactive)}
       </CodeBlock>
@@ -446,7 +446,7 @@ const TooltipGlobeExample = () => {
         aria-label="Country tooltip example"
         fontSize={14}
         lang="typescript"
-        title="tooltip.tsx"
+        title="globe-tooltip.tsx"
       >
         {getTooltipCode(colors, autoRotate, interactive)}
       </CodeBlock>
