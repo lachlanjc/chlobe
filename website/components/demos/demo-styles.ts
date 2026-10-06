@@ -12,7 +12,6 @@ const demoStyles = stylex.create({
     textAlign: 'left',
     width: '100%',
   },
-  container: { marginInline: 'auto', maxWidth: 1260, minWidth: 0 },
   footer: {
     alignItems: 'center',
     display: 'flex',
@@ -28,7 +27,6 @@ const demoStyles = stylex.create({
     margin: 0,
     textWrap: 'balance',
   },
-  section: { padding: 'clamp(40px, 7vw, 88px) clamp(24px, 6vw, 88px)' },
   small: { fontSize: 12, lineHeight: 1.5, margin: 0 },
   source: {
     fontSize: 12,

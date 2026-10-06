@@ -22,9 +22,9 @@ const styles = stylex.create({
     color: '#354150',
     cursor: 'pointer',
     display: 'flex',
-    gap: 12,
     fontSize: 14,
-    padding:4
+    gap: 12,
+    padding: 4,
   },
   dialog: { display: 'grid', gap: 12, outline: 'none', width: 200 },
   field: { alignItems: 'center', display: 'flex', fontSize: 12, gap: 8 },

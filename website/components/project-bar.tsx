@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { demoStyles } from './demo-styles';
+import { siteStyles } from './site-styles';
 
 const styles = stylex.create({
   bar: {
@@ -29,7 +29,7 @@ const ProjectBar = ({ as }: { as: 'header' | 'footer' }) => {
   const Element = as;
   return (
     <Element {...stylex.props(styles.bar)}>
-      <div {...stylex.props(demoStyles.container, styles.content)}>
+      <div {...stylex.props(siteStyles.container, styles.content)}>
         <span>chlobe</span>
         <nav
           aria-label={`${as === 'header' ? 'Primary' : 'Footer'} project links`}

@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { CopyButton } from './copy-button';
+import { CopyButton } from './ui/copy-button';
 
 const styles = stylex.create({
   description: {

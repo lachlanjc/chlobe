@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import type {
   ChoroplethGlobeData,
   ChoroplethGlobeRef,
-} from '../../dist/index.js';
+} from '../../../dist/index.js';
 import { formatValue, getFeaturedEntries, getGlobeValue } from './demo-data';
 import type { Dataset, DatasetEntry, Story } from './demo-data';
 

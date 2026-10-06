@@ -2,15 +2,9 @@
 
 import * as stylex from '@stylexjs/stylex';
 
-import { ChoroplethGlobe } from '../../dist/index.js';
-import type { ChoroplethGlobeTooltip } from '../../dist/index.js';
-import { CopyButton } from './copy-button';
-import {
-  formatYearRange,
-  getExampleCode,
-  SOURCE_REGISTRY,
-  STORY_DETAILS,
-} from './demo-data';
+import { ChoroplethGlobe } from '../../../dist/index.js';
+import type { ChoroplethGlobeTooltip } from '../../../dist/index.js';
+import { STORY_DETAILS } from './demo-data';
 import type { Dataset, Story } from './demo-data';
 import { demoStyles } from './demo-styles';
 import type { useDatasetGlobe } from './use-dataset-globe';
@@ -71,46 +65,4 @@ const DatasetGlobe = ({
   );
 };
 
-const SourceNote = ({
-  dataset,
-  halfWidth = false,
-  story,
-}: {
-  dataset: Dataset;
-  halfWidth?: boolean;
-  story: Story;
-}) => (
-  <p
-    {...stylex.props(
-      demoStyles.source,
-      halfWidth && demoStyles.sourceHalfWidth
-    )}
-  >
-    {dataset.name} · {dataset.entries.length} countries · {dataset.unit} ·
-    latest available: {formatYearRange(dataset.entries)} ·{' '}
-    <a
-      href={SOURCE_REGISTRY[story]}
-      rel="noopener noreferrer"
-      target="_blank"
-      {...stylex.props(demoStyles.sourceLink)}
-    >
-      {dataset.source}
-    </a>
-  </p>
-);
-
-const DemoCopyButton = ({
-  dataset,
-  story,
-}: {
-  dataset: Dataset;
-  story: Story;
-}) => (
-  <CopyButton
-    code={getExampleCode(story, dataset.entries)}
-    copyLabel="Copy code"
-    label={`${STORY_DETAILS[story].heading} code example`}
-  />
-);
-
-export { DatasetGlobe, DemoCopyButton, SourceNote };
+export { DatasetGlobe };

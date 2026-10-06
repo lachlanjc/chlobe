@@ -3,9 +3,12 @@
 import * as stylex from '@stylexjs/stylex';
 import Flag from 'react-flagpack';
 
+import { siteStyles } from '../site-styles';
+import { DatasetGlobe } from './dataset-globe';
+import { DemoCopyButton } from './demo-copy-button';
 import type { Dataset } from './demo-data';
-import { DatasetGlobe, DemoCopyButton, SourceNote } from './demo-primitives';
 import { demoStyles } from './demo-styles';
+import { SourceNote } from './source-note';
 import { useDatasetGlobe } from './use-dataset-globe';
 
 const styles = stylex.create({
@@ -101,9 +104,9 @@ const RenewableDemo = ({ dataset }: { dataset: Dataset }) => {
   return (
     <section
       aria-labelledby="renewable-heading"
-      {...stylex.props(demoStyles.section, styles.section)}
+      {...stylex.props(siteStyles.section, styles.section)}
     >
-      <div {...stylex.props(demoStyles.container)}>
+      <div {...stylex.props(siteStyles.container)}>
         <div {...stylex.props(styles.layout)}>
           <div {...stylex.props(styles.content)}>
             <h2 id="renewable-heading" {...stylex.props(demoStyles.heading)}>

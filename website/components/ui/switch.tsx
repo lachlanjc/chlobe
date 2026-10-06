@@ -12,7 +12,7 @@ const styles = stylex.create({
     display: 'flex',
     fontSize: 14,
     gap: 12,
-    padding:4,
+    padding: 4,
     position: 'relative',
   },
   switchFocus: { outline: '2px solid currentColor', outlineOffset: 3 },

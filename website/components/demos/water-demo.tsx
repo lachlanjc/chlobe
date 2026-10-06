@@ -2,10 +2,13 @@
 
 import * as stylex from '@stylexjs/stylex';
 
+import { siteStyles } from '../site-styles';
+import { DatasetGlobe } from './dataset-globe';
+import { DemoCopyButton } from './demo-copy-button';
 import { formatValue, getFillColor } from './demo-data';
 import type { Dataset } from './demo-data';
-import { DatasetGlobe, DemoCopyButton, SourceNote } from './demo-primitives';
 import { demoStyles } from './demo-styles';
+import { SourceNote } from './source-note';
 import { useDatasetGlobe } from './use-dataset-globe';
 
 const styles = stylex.create({
@@ -91,9 +94,9 @@ const WaterDemo = ({ dataset }: { dataset: Dataset }) => {
   return (
     <section
       aria-labelledby="water-heading"
-      {...stylex.props(demoStyles.section, styles.section)}
+      {...stylex.props(siteStyles.section, styles.section)}
     >
-      <div {...stylex.props(demoStyles.container)}>
+      <div {...stylex.props(siteStyles.container)}>
         <header {...stylex.props(styles.header)}>
           <h2
             id="water-heading"
