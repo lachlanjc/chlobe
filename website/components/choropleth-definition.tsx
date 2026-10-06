@@ -8,10 +8,14 @@ import { PreviewTrigger } from 'react-aria-components/PreviewTrigger';
 
 const definitionUrl = 'https://en.wikipedia.org/wiki/Choropleth_map';
 
+const fade = stylex.keyframes({
+  from: { opacity: 0 },
+  to: { opacity: 1 },
+});
+
 const styles = stylex.create({
   definition: { fontSize: 14, lineHeight: 1.5, margin: '0 0 12px' },
   dialog: { outline: 'none' },
-  fade: { opacity: 0 },
   link: {
     color: '#0B2471',
     fontSize: 14,
@@ -20,6 +24,20 @@ const styles = stylex.create({
     textUnderlineOffset: 3,
   },
   popover: {
+    animationDirection: {
+      ':is([data-exiting])': 'reverse',
+      default: 'normal',
+    },
+    animationDuration: {
+      '@media (prefers-reduced-motion: reduce)': '50ms',
+      default: '95ms',
+    },
+    animationFillMode: 'both',
+    animationName: {
+      ':is([data-entering], [data-exiting])': fade,
+      default: 'none',
+    },
+    animationTimingFunction: 'cubic-bezier(0.23, 1, 0.32, 1)',
     backgroundColor: 'hsl(0 0% 100% / 0.9)',
     borderColor: 'rgb(11 36 113 / 0.15)',
     borderRadius: 2,
@@ -28,11 +46,7 @@ const styles = stylex.create({
     boxShadow: '0 8px 24px rgb(11 36 113 / 0.15)',
     color: '#354150',
     maxWidth: 'calc(100vw - 24px)',
-    opacity: 1,
     padding: 16,
-    transitionDuration:  '95ms',
-    transitionProperty: 'opacity',
-    transitionTimingFunction: 'cubic-bezier(0.23, 1, 0.32, 1)',
     width: 280,
   },
   trigger: {
@@ -44,17 +58,15 @@ const styles = stylex.create({
 });
 
 const ChoroplethDefinition = () => (
-  <PreviewTrigger>
+  <PreviewTrigger delay={0}>
     <Link href={definitionUrl} {...stylex.props(styles.trigger)}>
       choropleth
     </Link>
     <Popover
-      className={({ isEntering, isExiting }) =>
-        stylex.props(styles.popover, (isEntering || isExiting) && styles.fade)
-          .className ?? ''
-      }
       offset={8}
       placement="bottom"
+      shouldSkipAnimation={false}
+      {...stylex.props(styles.popover)}
     >
       <Dialog
         aria-label="Choropleth definition"
