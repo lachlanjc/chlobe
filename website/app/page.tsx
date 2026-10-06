@@ -21,9 +21,9 @@ const styles = stylex.create({
     fontWeight: 700,
     letterSpacing: '0.08em',
     margin: 0,
-    textTransform: 'uppercase',
   },
   hero: {
+    alignItems: 'center',
     backgroundColor: '#0B2471',
     color: '#FFFBF3',
     display: 'flex',
@@ -31,6 +31,7 @@ const styles = stylex.create({
     gap: 16,
     minHeight: '64svh',
     padding: 'clamp(40px, 8vw, 120px) clamp(24px, 6vw, 88px)',
+    textAlign: 'center',
   },
   intro: {
     display: 'flex',
@@ -51,20 +52,31 @@ const styles = stylex.create({
   },
   titleGlobe: {
     color: '#ABF1D0',
+    textUnderlineOffset: '3px',
   },
 });
 
 const Home = () => (
   <main {...stylex.props(styles.shell)}>
     <section {...stylex.props(styles.hero, styles.intro)}>
-      <p {...stylex.props(styles.eyebrow)}>Chlobe</p>
+      <p {...stylex.props(styles.eyebrow)}>`bun add chlobe`</p>
       <h1 {...stylex.props(styles.title)}>
         Visualize country data on a gl
         <span {...stylex.props(styles.titleGlobe)}></span>be.
       </h1>
       <p {...stylex.props(styles.description)}>
-        Four environmental datasets, each with a globe tailored to the story it
-        tells. Hover or drag the interactive maps to explore.
+        It’s a{' '}
+        <a
+          {...stylex.props(styles.titleGlobe)}
+          href="https://en.wikipedia.org/wiki/Choropleth_map"
+        >
+          chloropleth
+        </a>{' '}
+        version of the brilliant{' '}
+        <a {...stylex.props(styles.titleGlobe)} href="https://cobe.vercel.app/">
+          cobe
+        </a>
+        .
       </p>
     </section>
     <ChoroplethGlobeDemo

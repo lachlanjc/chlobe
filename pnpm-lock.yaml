@@ -86,6 +86,9 @@ importers:
       '@stylexjs/stylex':
         specifier: ^0.19.0
         version: 0.19.0
+      '@sugar-high/react':
+        specifier: ^2.4.1
+        version: 2.4.1(react@19.2.8)
       next:
         specifier: ^16.3.0
         version: 16.3.0(@babel/core@7.29.7)(@playwright/test@1.62.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1286,6 +1289,11 @@ packages:
 
   '@stylexswc/webpack-plugin@0.18.3':
     resolution: {integrity: sha512-VS5FO8NCIOpMve5uyhb7uUK3GswRMLfHQAeQvRPsMFTOFR3K8JYR3dQ1Z/58rN5N3brXDoNqaglunEGHUvM9Ww==}
+
+  '@sugar-high/react@2.4.1':
+    resolution: {integrity: sha512-neyeiAhHx/0pmpY97SwR/4tcpQ0Q94D36Uy0IuOb8V49B49XWdIg5kGNdQmXKH5p/Ol68srtCczhfz+andwh2g==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
 
   '@swc/core-darwin-arm64@1.15.47':
     resolution: {integrity: sha512-GsoMtan3ojGGMGFbl31mmRu5ctZ56re8grGE8mO/OHJ8O+JRkzod02fe7X6ZQ8JvamA3imkEkx/h3u+vsOgPgA==}
@@ -2514,6 +2522,14 @@ packages:
     engines: {node: '>=16 || 14 >=14.17'}
     hasBin: true
 
+  sugar-high@2.5.1:
+    resolution: {integrity: sha512-Skhak2gN96Ywvkdwi8q3kmCmV4rbBTUuYOd71ilxao8wZ1G3O87zofSxl1FogNyeTT2bHC5NMfEEm6/i7Pc8SA==}
+    peerDependencies:
+      gpu-lexer: '>=0.0.2'
+    peerDependenciesMeta:
+      gpu-lexer:
+        optional: true
+
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
@@ -3606,6 +3622,13 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/core'
       - supports-color
+
+  '@sugar-high/react@2.4.1(react@19.2.8)':
+    dependencies:
+      react: 19.2.8
+      sugar-high: 2.5.1
+    transitivePeerDependencies:
+      - gpu-lexer
 
   '@swc/core-darwin-arm64@1.15.47':
     optional: true
@@ -4859,6 +4882,8 @@ snapshots:
       pirates: 4.0.7
       tinyglobby: 0.2.17
       ts-interface-checker: 0.1.13
+
+  sugar-high@2.5.1: {}
 
   supports-color@7.2.0:
     dependencies:

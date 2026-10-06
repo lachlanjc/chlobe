@@ -1,6 +1,8 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
+import { Code } from '@sugar-high/react';
+import { vercel } from '@sugar-high/react/themes';
 import React, { useRef, useState } from 'react';
 
 import 'react-flagpack/dist/style.css';
@@ -112,7 +114,7 @@ const FOREST_LEGEND = [
 const WATER_LEGEND = [0, 500, 1000, 2000, 3500] as const;
 
 const styles = stylex.create({
-  content: { display: 'flex', flexDirection: 'column', gap: 22 },
+  content: { display: 'flex', flexDirection: 'column', gap: 22, minWidth: 0 },
   forest: { backgroundColor: '#eff7ed', color: '#15522f' },
   forestHighlight: { borderLeft: '4px solid #15522f' },
   forestSwatch0: { backgroundColor: '#eff7ed' },
@@ -306,6 +308,38 @@ const getGlobeValue = (story: Story, value: number) => {
   return story === 'water' ? Math.sqrt(value) : value;
 };
 
+const getExampleCode = (story: Story, entries: readonly DatasetEntry[]) => {
+  const { colors } = STORY_DETAILS[story];
+  const sampleData = getTopEntries(entries)
+    .slice(0, 2)
+    .map(({ alpha2, value }) => {
+      let sampleValue = `${value}`;
+      if (story === 'oil') {
+        sampleValue = `Math.log1p(${value})`;
+      } else if (story === 'water') {
+        sampleValue = `Math.sqrt(${value})`;
+      }
+      return `    { id: '${alpha2}', alpha2: '${alpha2}', value: ${sampleValue} },`;
+    })
+    .join('\n');
+
+  return `import { ChoroplethGlobe } from 'chlobe';
+
+export const Globe = () => (
+  <ChoroplethGlobe
+    data={[
+${sampleData}
+    ]}
+    colors={{
+      filled: [[${colors.filled[0].join(', ')}], [${colors.filled[1].join(', ')}]],
+      missing: [${colors.missing.join(', ')}],
+      missingAlpha: ${colors.missingAlpha},
+    }}
+    globe={{ autoRotate: ${story === 'forest' || story === 'renewable'}, interactive: ${story !== 'forest'} }}
+  />
+);`;
+};
+
 const ForestLegend = () => (
   <div aria-label="Forest area per person scale">
     <div {...stylex.props(styles.legendStack)}>
@@ -426,6 +460,17 @@ const DatasetSection = ({
             {dataset.name} · {dataset.unit} · latest available:{' '}
             {formatYearRange(dataset.entries)} · {dataset.source}
           </p>
+          <Code
+            aria-label={`${details.heading} code example`}
+            controls
+            fontSize={12}
+            lang="typescript"
+            style={{ colorScheme: story === 'oil' ? 'dark' : 'light' }}
+            theme={vercel}
+            title={`${story}-globe.tsx`}
+          >
+            {getExampleCode(story, dataset.entries)}
+          </Code>
         </div>
         <div {...stylex.props(styles.visual)}>
           <ChoroplethGlobe
