@@ -206,6 +206,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
           aspectRatio: '1',
           maxWidth: '100%',
           position: 'relative',
+          userSelect: 'none',
           width: fixedSize ?? '100%',
           ...style,
         }}
