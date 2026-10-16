@@ -51,11 +51,11 @@ const DatasetGlobe = ({
         data={data}
         formatValue={formatTooltipValue}
         globe={{
-          autoRotate: story === 'renewable',
+          autoRotate: true,
           baseColor: details.glow,
           glowColor: details.glow,
           initialPhi: details.initialPhi,
-          interactive: story !== 'forest',
+          interactive: true,
         }}
         onActiveEntryChange={handleActiveEntryChange}
         ref={globeRef}
