@@ -23,6 +23,7 @@ const styles = stylex.create({
     textUnderlineOffset: 3,
   },
   links: { display: 'flex', flexWrap: 'wrap', gap: 24 },
+  wordmark: { color: '#fff', fontWeight: 700 },
 });
 
 const ProjectBar = ({ as }: { as: 'header' | 'footer' }) => {
@@ -30,7 +31,7 @@ const ProjectBar = ({ as }: { as: 'header' | 'footer' }) => {
   return (
     <Element {...stylex.props(styles.bar)}>
       <div {...stylex.props(siteStyles.container, styles.content)}>
-        <span>chlobe</span>
+        <span {...stylex.props(styles.wordmark)}>chlobe</span>
         <nav
           aria-label={`${as === 'header' ? 'Primary' : 'Footer'} project links`}
           {...stylex.props(styles.links)}

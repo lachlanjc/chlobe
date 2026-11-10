@@ -154,7 +154,7 @@ ${sampleData}
       missing: [${colors.missing.join(', ')}],
       missingAlpha: ${colors.missingAlpha},
     }}
-    globe={{ autoRotate: ${story === 'renewable'}, interactive: ${story !== 'forest'} }}
+    globe={{ autoRotate: ${story === 'renewable'}, interactive: true }}
   />
 );`;
 };

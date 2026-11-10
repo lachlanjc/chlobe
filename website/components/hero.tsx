@@ -48,7 +48,7 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: 1,
     color: '#b8c9ff',
-    fontFamily: 'ui-monospace, monospace',
+    fontFamily: 'var(--font-fragment-mono), monospace',
     fontSize: 14,
     lineHeight: 1.5,
     margin: 0,
@@ -83,7 +83,7 @@ const Hero = () => (
         <span {...stylex.props(styles.link)}></span>be.
       </h1>
       <p {...stylex.props(styles.description)}>
-        <strong>chlobe:</strong> a 15KB React <ChoroplethDefinition /> version
+        <strong>chlobe:</strong> a 15kb React <ChoroplethDefinition /> version
         of the brilliant{' '}
         <a href="https://cobe.vercel.app/" {...stylex.props(styles.link)}>
           cobe

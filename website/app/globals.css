@@ -20,6 +20,12 @@
     border: none;
   }
 
+  pre,
+  code {
+    font-family: var(--font-fragment-mono), ui-monospace, monospace;
+    font-size: 13px;
+  }
+
   html {
     -ms-text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;

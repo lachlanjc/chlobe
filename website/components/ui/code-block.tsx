@@ -28,7 +28,7 @@ const styles = stylex.create({
     colorScheme: 'light',
   },
   header: {
-    fontFamily: 'ui-monospace, monospace',
+    fontFamily: 'var(--font-fragment-mono), monospace',
     fontSize: 14,
     lineHeight: 1,
     padding: '4px 90px 4px 16px',

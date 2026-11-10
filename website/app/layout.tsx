@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Fragment_Mono } from 'next/font/google';
 import localFont from 'next/font/local';
 import React from 'react';
 import type { ReactNode } from 'react';
@@ -28,6 +29,12 @@ const booton = localFont({
   variable: '--font-booton',
 });
 
+const fragmentMono = Fragment_Mono({
+  subsets: ['latin'],
+  variable: '--font-fragment-mono',
+  weight: '400',
+});
+
 export const metadata: Metadata = {
   description:
     'Lightweight WebGL globe for rendering values of countries as shaded regions.',
@@ -36,7 +43,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html className={booton.variable} lang="en">
+    <html className={`${booton.variable} ${fragmentMono.variable}`} lang="en">
       <body>{children}</body>
     </html>
   );
