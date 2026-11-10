@@ -80,6 +80,9 @@ const CopyButton = ({
         <span aria-hidden="true" {...stylex.props(styles.labelPlaceholder)}>
           {copyLabel}
         </span>
+        <span aria-hidden="true" {...stylex.props(styles.labelPlaceholder)}>
+          Copied
+        </span>
         <span aria-live="polite" {...stylex.props(styles.labelValue)}>
           {status === 'Copy' ? copyLabel : status}
         </span>

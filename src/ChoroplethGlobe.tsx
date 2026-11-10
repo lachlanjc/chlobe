@@ -227,12 +227,12 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
           ref={canvasRef}
           role={interactive ? 'application' : 'img'}
           style={{
+            WebkitUserSelect: 'none',
             cursor: interactive ? 'grab' : 'default',
             display: 'block',
             height: '100%',
             touchAction: interactive ? 'none' : 'auto',
             userSelect: 'none',
-            WebkitUserSelect: 'none',
             width: '100%',
           }}
           tabIndex={interactive ? 0 : undefined}

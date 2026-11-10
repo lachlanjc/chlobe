@@ -10,10 +10,10 @@ import { WaterDemo } from './water-demo';
 
 const DatasetDemos = () => (
   <>
-    <RenewableDemo dataset={renewable} />
-    <OilDemo dataset={oil} />
-    <ForestDemo dataset={forest} />
     <WaterDemo dataset={water} />
+    <ForestDemo dataset={forest} />
+    <OilDemo dataset={oil} />
+    <RenewableDemo dataset={renewable} />
   </>
 );
 

@@ -107,10 +107,11 @@ const ApiReference = () => (
     <p {...stylex.props(contentStyles.paragraph)}>
       Always include an{' '}
       <code {...stylex.props(contentStyles.inlineCode)}>aria-label</code> with a
-      text summary. Reduced motion stops idle rotation automatically. Interactive globes support keyboard rotation.
-      </p><p {...stylex.props(contentStyles.paragraph)}>
-      For a static
-      globe image, pass{' '}
+      text summary. Reduced motion stops idle rotation automatically.
+      Interactive globes support keyboard rotation.
+    </p>
+    <p {...stylex.props(contentStyles.paragraph)}>
+      For a static globe image, pass{' '}
       <code {...stylex.props(contentStyles.inlineCode)}>
         {'interactive={false}'}
       </code>{' '}
@@ -118,7 +119,7 @@ const ApiReference = () => (
       <code {...stylex.props(contentStyles.inlineCode)}>
         {'autoRotate={false}'}
       </code>{' '}
-      and chlobe will set an image role. 
+      and chlobe will set an image role.
     </p>
   </div>
 );
