@@ -22,11 +22,15 @@ const propRows = [
   ],
   ['colors.missingAlpha', '0.25', 'Missing-country opacity'],
   ['colors.base / colors.glow', 'Color scheme', 'Surface and glow RGB tuples'],
+  [
+    'colorScheme',
+    'light',
+    'Light or dark shading and default surface and glow colors; custom colors override the defaults',
+  ],
+  ['size', 'Container width', 'Square size in CSS pixels'],
   ['autoRotate', 'true', 'Idle rotation'],
   ['interactive', 'true', 'Dragging, hover, and left/right arrows'],
   ['initialPhi', '0', 'Starting rotation in radians'],
-  ['size', 'Container width', 'Square size in CSS pixels'],
-  ['colorScheme', 'light', 'light or dark'],
   [
     'activeEntryId',
     'Uncontrolled',
@@ -40,9 +44,9 @@ const propRows = [
     'Pointer country code or null; independent of selection',
   ],
   ['formatValue', '', 'Formats (value, entry)'],
-  ['renderTooltip', '', 'Your tooltip UI; absent by default'],
-  ['onError', '', 'WebGL initialization or context-loss errors'],
+  ['renderTooltip', '', 'Custom tooltip UI; absent by default'],
   ['aria-label', 'Country choropleth globe', 'Describe your data'],
+  ['onError', '', 'WebGL initialization or context-loss errors'],
   ['className / style', '', 'Applied to the container'],
 ] as const;
 
@@ -52,17 +56,6 @@ const ApiReference = () => (
       API reference
     </h2>
     <ReferenceTable label="Globe props and defaults" rows={propRows} />
-    <p {...stylex.props(contentStyles.paragraph)}>
-      A static image needs both{' '}
-      <code {...stylex.props(contentStyles.inlineCode)}>
-        {'interactive={false}'}
-      </code>{' '}
-      and{' '}
-      <code {...stylex.props(contentStyles.inlineCode)}>
-        {'autoRotate={false}'}
-      </code>
-      .
-    </p>
     <p {...stylex.props(contentStyles.paragraph)}>
       Each data entry must have a unique country code. Duplicate{' '}
       <code {...stylex.props(contentStyles.inlineCode)}>alpha2</code> values
@@ -112,10 +105,20 @@ const ApiReference = () => (
     </p>
     <h3 {...stylex.props(styles.heading)}>Accessibility</h3>
     <p {...stylex.props(contentStyles.paragraph)}>
-      Include an{' '}
+      Always include an{' '}
       <code {...stylex.props(contentStyles.inlineCode)}>aria-label</code> with a
-      text summary. Interactive globes support keyboard rotation; static globes
-      use an image role. Reduced motion stops idle rotation.
+      text summary. Reduced motion stops idle rotation automatically. Interactive globes support keyboard rotation.
+      </p><p {...stylex.props(contentStyles.paragraph)}>
+      For a static
+      globe image, pass{' '}
+      <code {...stylex.props(contentStyles.inlineCode)}>
+        {'interactive={false}'}
+      </code>{' '}
+      and{' '}
+      <code {...stylex.props(contentStyles.inlineCode)}>
+        {'autoRotate={false}'}
+      </code>{' '}
+      and chlobe will set an image role. 
     </p>
   </div>
 );

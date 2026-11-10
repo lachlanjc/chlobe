@@ -14,6 +14,7 @@ const styles = stylex.create({
   heading: { backgroundColor: '#f5f7fc', fontWeight: 600 },
   name: {
     fontFamily: 'var(--font-mono)',
+    fontSize: 14,
     whiteSpace: 'nowrap',
   },
   propertyColumn: { width: '36%' },
