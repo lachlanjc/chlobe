@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { ChoroplethDefinition } from './choropleth-definition';
-import { CopyButton } from './ui/copy-button';
+import { InstallPrompt } from './install-prompt';
 
 const styles = stylex.create({
   description: {
@@ -9,7 +9,7 @@ const styles = stylex.create({
     fontSize: 18,
     lineHeight: 1.5,
     margin: 0,
-    maxWidth: 560,
+    maxWidth: 720,
   },
   hero: {
     alignItems: 'center',
@@ -40,7 +40,16 @@ const styles = stylex.create({
     pointerEvents: 'none',
     position: 'absolute',
   },
-  install: { minWidth: 0, position: 'relative' },
+  install: {
+    alignItems: 'center',
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'center',
+    minWidth: 0,
+  },
+  installButton: { display: 'flex' },
+  installCode: { fontSize: 12 },
   installCommand: {
     backgroundColor: 'rgb(255 255 255 / 0.06)',
     borderColor: 'rgb(184 201 255 / 0.25)',
@@ -48,13 +57,13 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: 1,
     color: '#b8c9ff',
-    fontFamily: 'var(--font-fragment-mono), monospace',
-    fontSize: 14,
-    lineHeight: 1.5,
+    fontFamily: 'var(--font-mono)',
+    fontSize: 12,
+    lineHeight: '18px',
     margin: 0,
     maxWidth: '100%',
     overflowX: 'auto',
-    padding: '10px 120px 10px 16px',
+    padding: '3px 8px',
   },
   link: {
     color: '#ABF1D0',
@@ -83,8 +92,8 @@ const Hero = () => (
         <span {...stylex.props(styles.link)}></span>be.
       </h1>
       <p {...stylex.props(styles.description)}>
-        <strong>chlobe:</strong> a 15kb React <ChoroplethDefinition /> version
-        of the brilliant{' '}
+        <strong>chlobe:</strong> a 15kb React <ChoroplethDefinition /> globe,
+        inspired by the brilliant{' '}
         <a href="https://cobe.vercel.app/" {...stylex.props(styles.link)}>
           cobe
         </a>
@@ -95,16 +104,13 @@ const Hero = () => (
           aria-label="Install chlobe"
           {...stylex.props(styles.installCommand)}
         >
-          <code>
+          <code {...stylex.props(styles.installCode)}>
             <span aria-hidden="true">$ </span>pnpm add @lachlanjc/chlobe
           </code>
         </pre>
-        <CopyButton
-          code="Install cobe to visualize country data per https://raw.githubusercontent.com/lachlanjc/chlobe/refs/heads/main/README.md"
-          copyLabel="Copy prompt"
-          label="install prompt"
-          overlay
-        />
+        <div {...stylex.props(styles.installButton)}>
+          <InstallPrompt />
+        </div>
       </div>
     </div>
   </section>

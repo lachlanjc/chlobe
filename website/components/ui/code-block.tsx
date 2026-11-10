@@ -28,10 +28,11 @@ const styles = stylex.create({
     colorScheme: 'light',
   },
   header: {
-    fontFamily: 'var(--font-fragment-mono), monospace',
-    fontSize: 14,
+    color: '#7b8491',
+    fontFamily: 'var(--font-mono)',
+    fontSize: 13,
     lineHeight: 1,
-    padding: '4px 90px 4px 16px',
+    padding: '12px 90px 12px 16px',
     textAlign: 'center',
   },
 });
@@ -41,7 +42,6 @@ const CodeBlock = ({ children, className, title, ...props }: CodeProps) => {
     styles.block,
     styles.defaultTheme
   );
-
   return (
     <div className={`${blockClassName} ${className ?? ''}`}>
       {title ? <div {...stylex.props(styles.header)}>{title}</div> : null}

@@ -48,6 +48,7 @@ const styles = stylex.create({
     marginTop: 8,
   },
   legend: {
+    alignItems: 'center',
     display: 'flex',
     flexWrap: 'wrap',
     fontSize: 12,

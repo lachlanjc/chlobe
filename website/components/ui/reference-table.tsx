@@ -12,7 +12,10 @@ const styles = stylex.create({
   defaultColumn: { width: '22%' },
   descriptionColumn: { width: '42%' },
   heading: { backgroundColor: '#f5f7fc', fontWeight: 600 },
-  name: { fontFamily: 'ui-monospace, monospace', whiteSpace: 'nowrap' },
+  name: {
+    fontFamily: 'var(--font-mono)',
+    whiteSpace: 'nowrap',
+  },
   propertyColumn: { width: '36%' },
   table: {
     borderCollapse: 'collapse',

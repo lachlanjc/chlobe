@@ -22,6 +22,9 @@ const styles = stylex.create({
   hover: {
     backgroundColor: 'color-mix(in srgb, currentColor 5%, transparent)',
   },
+  label: { display: 'grid' },
+  labelPlaceholder: { gridArea: '1 / 1', visibility: 'hidden' },
+  labelValue: { gridArea: '1 / 1' },
   overlay: { position: 'absolute', right: 10, top: 8 },
   pressed: {
     backgroundColor: 'color-mix(in srgb, currentColor 10%, transparent)',
@@ -73,7 +76,14 @@ const CopyButton = ({
       onPress={copy}
       type="button"
     >
-      <span aria-live="polite">{status === 'Copy' ? copyLabel : status}</span>
+      <span {...stylex.props(styles.label)}>
+        <span aria-hidden="true" {...stylex.props(styles.labelPlaceholder)}>
+          {copyLabel}
+        </span>
+        <span aria-live="polite" {...stylex.props(styles.labelValue)}>
+          {status === 'Copy' ? copyLabel : status}
+        </span>
+      </span>
     </Button>
   );
 };

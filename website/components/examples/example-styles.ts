@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 const exampleStyles = stylex.create({
   example: {
-    alignItems: 'center',
+    alignItems: 'start',
     display: 'grid',
     gap: 32,
     gridTemplateColumns: {

@@ -23,7 +23,7 @@ const styles = stylex.create({
     display: 'grid',
     gap: 16,
     height: '100%',
-    padding: 20,
+    padding: '16px 20px 20px',
   },
   cardHeader: { alignItems: 'center', display: 'flex', gap: 10, minHeight: 28 },
   cards: {

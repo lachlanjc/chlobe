@@ -35,7 +35,7 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: 1,
     color: '#354150',
-    fontFamily: 'ui-monospace, monospace',
+    fontFamily: 'var(--font-mono)',
     fontSize: 13,
     minWidth: 0,
     padding: '6px 8px',
