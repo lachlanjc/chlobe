@@ -4,7 +4,7 @@ import type { CSSProperties, ReactNode } from 'react';
 export interface ChoroplethGlobeData {
   /** Stable application identifier for active-entry controls. Defaults to alpha2. */
   id?: string;
-  /** ISO 3166-1 alpha-2 country code. */
+  /** ISO 3166-1 alpha-2 country code, unique within the data. */
   alpha2: string;
   /** Numeric value used to calculate the country's fill. */
   value: number;
@@ -52,7 +52,7 @@ export interface ChoroplethGlobeRef {
 }
 
 export interface ChoroplethGlobeProps {
-  /** The single source of truth for country values and tooltip metadata. */
+  /** Country values and tooltip metadata; duplicate alpha2 codes throw an error. */
   data: readonly ChoroplethGlobeData[];
   colors: ChoroplethGlobeColors;
   /** Fixed square size in CSS pixels. Omit for responsive container sizing. */

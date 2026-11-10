@@ -13,7 +13,7 @@ const propRows = [
   [
     'data',
     'Required',
-    'Country entries: alpha2, value, optional id and label · IDs default to alpha2',
+    'Country entries: unique alpha2, value, optional id and label · IDs default to alpha2',
   ],
   [
     'colors',
@@ -62,6 +62,11 @@ const ApiReference = () => (
         {'autoRotate={false}'}
       </code>
       .
+    </p>
+    <p {...stylex.props(contentStyles.paragraph)}>
+      Each data entry must have a unique country code. Duplicate{' '}
+      <code {...stylex.props(contentStyles.inlineCode)}>alpha2</code> values
+      throw an error.
     </p>
     <h3 {...stylex.props(styles.heading)}>Colors</h3>
     <p {...stylex.props(contentStyles.paragraph)}>

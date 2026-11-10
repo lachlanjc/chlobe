@@ -424,6 +424,20 @@ describe(ChoroplethGlobe, () => {
     expect(queryByText('entry')).toBeNull();
   });
 
+  it('rejects duplicate country codes on initial render and updates', () => {
+    const duplicates = [data[0], { ...data[0], id: 'other', value: 84 }];
+    expect(() =>
+      render(<ChoroplethGlobe colors={colors} data={duplicates} size={200} />)
+    ).toThrow('Duplicate alpha2 country code: US');
+
+    const { rerender } = render(
+      <ChoroplethGlobe colors={colors} data={data} size={200} />
+    );
+    expect(() =>
+      rerender(<ChoroplethGlobe colors={colors} data={duplicates} size={200} />)
+    ).toThrow('Duplicate alpha2 country code: US');
+  });
+
   it('uploads a new palette after data changes', () => {
     const { rerender } = render(
       <ChoroplethGlobe colors={colors} data={data} size={200} />

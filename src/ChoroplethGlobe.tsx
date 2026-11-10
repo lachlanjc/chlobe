@@ -28,6 +28,19 @@ const findEntry = (
     ? null
     : (data.find((entry) => (entry.id ?? entry.alpha2) === id) ?? null);
 
+const getValuesByAlpha2 = (
+  data: readonly ChoroplethGlobeData[]
+): [string, number][] => {
+  const countryCodes = new Set<string>();
+  return data.map(({ alpha2, value }) => {
+    if (countryCodes.has(alpha2)) {
+      throw new Error(`Duplicate alpha2 country code: ${alpha2}`);
+    }
+    countryCodes.add(alpha2);
+    return [alpha2, value];
+  });
+};
+
 const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
   (
     {
@@ -121,9 +134,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
       filledColorRange: colors.filled,
       missingAlpha: colors.missingAlpha,
       missingColor: colors.missing,
-      valuesByAlpha2: data.map(
-        ({ alpha2, value }) => [alpha2, value] as [string, number]
-      ),
+      valuesByAlpha2: getValuesByAlpha2(data),
     });
 
     useEffect(() => {
