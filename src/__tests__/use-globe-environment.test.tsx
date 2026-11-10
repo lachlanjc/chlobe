@@ -66,7 +66,7 @@ describe('useGlobeEnvironment', () => {
     const { container } = render(<Environment />);
     const element = container.firstElementChild;
     if (!(element instanceof HTMLDivElement)) {
-      throw new Error('Expected environment element');
+      throw new TypeError('Expected environment element');
     }
     expect(element.dataset.prefersReducedMotion).toBe('false');
 
@@ -79,7 +79,7 @@ describe('useGlobeEnvironment', () => {
     const { container, unmount } = render(<Environment />);
     const element = container.firstElementChild;
     if (!(element instanceof HTMLDivElement)) {
-      throw new Error('Expected environment element');
+      throw new TypeError('Expected environment element');
     }
     responsiveWidth = 320;
     act(() =>
