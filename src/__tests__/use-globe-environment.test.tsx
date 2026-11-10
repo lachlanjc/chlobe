@@ -4,7 +4,10 @@ import { act, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { usePrefersReducedMotion, useSquareSize } from '../useGlobeEnvironment';
+import {
+  usePrefersReducedMotion,
+  useSquareSize,
+} from '../use-globe-environment';
 
 let changeListener: (() => void) | undefined;
 let responsiveWidth = 0;
@@ -13,18 +16,18 @@ const mediaQuery = {
     changeListener = listener;
   },
   matches: false,
-  removeEventListener: vi.fn(),
+  removeEventListener: vi.fn<(event: string, listener: () => void) => void>(),
 };
 
 class ResizeObserverMock {
   static instance: ResizeObserverMock | undefined;
-  callback: ResizeObserverCallback;
-  disconnect = vi.fn();
-  observe = vi.fn();
-  unobserve = vi.fn();
+  resizeCallback: ResizeObserverCallback;
+  disconnect = vi.fn<() => void>();
+  observe = vi.fn<(element: Element) => void>();
+  unobserve = vi.fn<(element: Element) => void>();
 
-  constructor(callback: ResizeObserverCallback) {
-    this.callback = callback;
+  constructor(resizeCallback: ResizeObserverCallback) {
+    this.resizeCallback = resizeCallback;
     ResizeObserverMock.instance = this;
   }
 }
@@ -41,24 +44,24 @@ const Environment = ({ fixedSize }: { fixedSize?: number }) => {
   );
 };
 
-beforeEach(() => {
-  responsiveWidth = 0;
-  ResizeObserverMock.instance = undefined;
-  mediaQuery.matches = false;
-  Object.defineProperty(HTMLDivElement.prototype, 'clientWidth', {
-    configurable: true,
-    get: () => responsiveWidth,
-  });
-  vi.stubGlobal('ResizeObserver', ResizeObserverMock);
-  vi.stubGlobal('matchMedia', () => mediaQuery);
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
-  changeListener = undefined;
-});
-
 describe('useGlobeEnvironment', () => {
+  beforeEach(() => {
+    responsiveWidth = 0;
+    ResizeObserverMock.instance = undefined;
+    mediaQuery.matches = false;
+    Object.defineProperty(HTMLDivElement.prototype, 'clientWidth', {
+      configurable: true,
+      get: () => responsiveWidth,
+    });
+    vi.stubGlobal('ResizeObserver', ResizeObserverMock);
+    vi.stubGlobal('matchMedia', () => mediaQuery);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    changeListener = undefined;
+  });
+
   it('reacts to reduced-motion preference changes', () => {
     const { container } = render(<Environment />);
     const element = container.firstElementChild;
@@ -80,7 +83,10 @@ describe('useGlobeEnvironment', () => {
     }
     responsiveWidth = 320;
     act(() =>
-      ResizeObserverMock.instance?.callback([], ResizeObserverMock.instance)
+      ResizeObserverMock.instance?.resizeCallback(
+        [],
+        ResizeObserverMock.instance
+      )
     );
     expect(element.dataset.size).toBe('320');
 

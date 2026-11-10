@@ -1,4 +1,4 @@
-export { default as ChoroplethGlobe } from './ChoroplethGlobe';
+export { default as ChoroplethGlobe } from './choropleth-globe';
 export type {
   ChoroplethGlobeColors,
   ChoroplethGlobeData,
@@ -6,4 +6,4 @@ export type {
   ChoroplethGlobeProps,
   ChoroplethRgb,
   ChoroplethGlobeTooltip,
-} from './globeTypes';
+} from './globe-types';

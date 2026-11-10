@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     coverage: {
       exclude: ['src/__tests__/**'],
-      include: ['src/rotation.ts', 'src/worldGeoData.ts'],
+      include: ['src/rotation.ts', 'src/world-geo-data.ts'],
       provider: 'v8',
       thresholds: {
         branches: 85,

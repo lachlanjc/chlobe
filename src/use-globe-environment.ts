@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export function usePrefersReducedMotion(): boolean {
+export const usePrefersReducedMotion = (): boolean => {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -12,12 +12,14 @@ export function usePrefersReducedMotion(): boolean {
   }, []);
 
   return prefersReducedMotion;
-}
+};
 
-export function useSquareSize(size: number | undefined): {
+export const useSquareSize = (
+  size: number | undefined
+): {
   containerRef: (element: HTMLDivElement | null) => void;
   size: number;
-} {
+} => {
   const [element, setElement] = useState<HTMLDivElement | null>(null);
   const [responsiveSize, setResponsiveSize] = useState(0);
 
@@ -33,4 +35,4 @@ export function useSquareSize(size: number | undefined): {
   }, [element, size]);
 
   return { containerRef: setElement, size: size ?? responsiveSize };
-}
+};

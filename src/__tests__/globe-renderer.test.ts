@@ -2,8 +2,8 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import createGlobe from '../globeRenderer';
-import type { GlobeOptions } from '../globeRenderer';
+import createGlobe from '../globe-renderer';
+import type { GlobeOptions } from '../globe-renderer';
 
 const options: GlobeOptions = {
   baseColor: [1, 1, 1],

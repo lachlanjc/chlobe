@@ -69,7 +69,7 @@ describe(stepPhiTowardTarget, () => {
   it('converges to done within a bounded number of steps', () => {
     let phi = 0;
     let done = false;
-    for (let i = 0; i < 200 && !done; i++) {
+    for (let i = 0; i < 200 && !done; i += 1) {
       ({ phi, done } = stepPhiTowardTarget(phi, Math.PI));
     }
     expect(done).toBeTruthy();

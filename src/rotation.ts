@@ -18,18 +18,17 @@ const TWO_PI = 2 * Math.PI;
  * The phi rotation that centers the given longitude (degrees) on screen,
  * facing the viewer.
  */
-export function phiForLongitude(lonDegrees: number): number {
-  return (3 * Math.PI) / 2 - (lonDegrees * Math.PI) / 180;
-}
+export const phiForLongitude = (lonDegrees: number): number =>
+  (3 * Math.PI) / 2 - (lonDegrees * Math.PI) / 180;
 
 /**
  * The signed shortest-path rotation from `from` to `to`, normalized into
  * (-PI, PI] so the globe never spins the long way around.
  */
-export function shortestPhiDelta(from: number, to: number): number {
+export const shortestPhiDelta = (from: number, to: number): number => {
   const delta = to - from;
   return delta - Math.round(delta / TWO_PI) * TWO_PI;
-}
+};
 
 /**
  * One frame of easing `currentPhi` toward `targetPhi`: moves by
@@ -37,16 +36,16 @@ export function shortestPhiDelta(from: number, to: number): number {
  * target (and reporting `done`) once the remainder is below
  * `PHI_SNAP_THRESHOLD`.
  */
-export function stepPhiTowardTarget(
+export const stepPhiTowardTarget = (
   currentPhi: number,
   targetPhi: number
-): { phi: number; done: boolean } {
+): { phi: number; done: boolean } => {
   const delta = shortestPhiDelta(currentPhi, targetPhi);
   if (Math.abs(delta) < PHI_SNAP_THRESHOLD) {
     return { done: true, phi: targetPhi };
   }
   return { done: false, phi: currentPhi + delta * PHI_EASING_FACTOR };
-}
+};
 
 /**
  * The target phi that centers `lonDegrees` on screen, expressed as the
@@ -54,9 +53,8 @@ export function stepPhiTowardTarget(
  * path (e.g. easing from 6.2 to a longitude at phi 0.1 targets ~6.38
  * rather than unwinding almost a full turn).
  */
-export function targetPhiForLongitude(
+export const targetPhiForLongitude = (
   currentPhi: number,
   lonDegrees: number
-): number {
-  return currentPhi + shortestPhiDelta(currentPhi, phiForLongitude(lonDegrees));
-}
+): number =>
+  currentPhi + shortestPhiDelta(currentPhi, phiForLongitude(lonDegrees));

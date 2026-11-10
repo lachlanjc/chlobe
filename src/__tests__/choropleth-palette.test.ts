@@ -4,7 +4,7 @@ import {
   computeCountryFill,
   generateChoroplethPalette,
 } from '../choropleth-palette';
-import { getCountryIdByAlpha2 } from '../worldGeoData';
+import { getCountryIdByAlpha2 } from '../world-geo-data';
 
 describe(computeCountryFill, () => {
   const filledColorRange = [

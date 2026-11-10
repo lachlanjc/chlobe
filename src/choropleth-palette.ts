@@ -1,6 +1,6 @@
 import { COUNTRY_COUNT } from './generated-country-data';
-import type { ChoroplethRgb } from './globeTypes';
-import { getCountryIdByAlpha2 } from './worldGeoData';
+import type { ChoroplethRgb } from './globe-types';
+import { getCountryIdByAlpha2 } from './world-geo-data';
 
 const DEFAULT_MISSING_ALPHA = 0.25;
 const FILLED_ALPHA_BASE = 0.7;

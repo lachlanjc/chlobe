@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 
-import createGlobe from './globeRenderer';
-import type { Globe, GlobeOptions } from './globeRenderer';
+import createGlobe from './globe-renderer';
+import type { Globe, GlobeOptions } from './globe-renderer';
 import type {
   ChoroplethRgb,
   ChoroplethGlobeData,
   ChoroplethGlobeTooltip,
-} from './globeTypes';
+} from './globe-types';
 import { AUTO_ROTATE_PHI_PER_FRAME, stepPhiTowardTarget } from './rotation';
-import { getCountryAtCell, getHoverCell } from './worldGeoData';
+import { getCountryAtCell, getHoverCell } from './world-geo-data';
 
 const KEYBOARD_ROTATION_STEP = 0.25;
 const TOUCH_DRAG_THRESHOLD = 8;

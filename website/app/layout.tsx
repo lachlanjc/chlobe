@@ -41,10 +41,10 @@ export const metadata: Metadata = {
   title: 'Chlobe',
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
-    <html className={`${booton.variable} ${fragmentMono.variable}`} lang="en">
-      <body>{children}</body>
-    </html>
-  );
-}
+const RootLayout = ({ children }: { children: ReactNode }) => (
+  <html className={`${booton.variable} ${fragmentMono.variable}`} lang="en">
+    <body>{children}</body>
+  </html>
+);
+
+export default RootLayout;

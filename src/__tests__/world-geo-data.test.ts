@@ -8,7 +8,7 @@ import {
   getCountryIdByAlpha2,
   getDotCountryIds,
   getHoverCell,
-} from '../worldGeoData';
+} from '../world-geo-data';
 
 describe('generated country data', () => {
   it('indexes major countries by alpha-2 code', () => {

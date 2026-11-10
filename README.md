@@ -142,19 +142,23 @@ const globe = useRef<ChoroplethGlobeRef>(null);
 const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 // Attach ref={globe} to your ChoroplethGlobe, then render:
-{emissions.map(({ alpha2, value }) => (
-  <button
-    key={alpha2}
-    type="button"
-    onMouseEnter={() => globe.current?.setActiveEntry(alpha2)}
-    onMouseLeave={() => globe.current?.clearActiveEntry()}
-    onFocus={() => globe.current?.setActiveEntry(alpha2)}
-    onBlur={() => globe.current?.clearActiveEntry()}
-    onClick={() => globe.current?.navigateToEntry(alpha2)}
-  >
-    {countryNames.of(alpha2) ?? alpha2} · {value}B metric tons CO₂e
-  </button>
-))}
+return (
+  <>
+    {emissions.map(({ alpha2, value }) => (
+      <button
+        key={alpha2}
+        type="button"
+        onMouseEnter={() => globe.current?.setActiveEntry(alpha2)}
+        onMouseLeave={() => globe.current?.clearActiveEntry()}
+        onFocus={() => globe.current?.setActiveEntry(alpha2)}
+        onBlur={() => globe.current?.clearActiveEntry()}
+        onClick={() => globe.current?.navigateToEntry(alpha2)}
+      >
+        {countryNames.of(alpha2) ?? alpha2} · {value}B metric tons CO₂e
+      </button>
+    ))}
+  </>
+);
 ```
 
 ## Options
@@ -165,7 +169,10 @@ Adjust behavior with top-level props and customize colors in `colors`:
 <ChoroplethGlobe
   aria-label="Country values"
   colors={{
-    filled: [[219, 234, 254], [29, 78, 216]],
+    filled: [
+      [219, 234, 254],
+      [29, 78, 216],
+    ],
     missing: [148, 163, 184],
     missingAlpha: 0.25,
     base: [255, 255, 255],

@@ -1,5 +1,4 @@
 import {
-  default as React,
   forwardRef,
   useEffect,
   useImperativeHandle,
@@ -8,17 +7,20 @@ import {
 } from 'react';
 
 import { generateChoroplethPalette } from './choropleth-palette';
-import type { Globe } from './globeRenderer';
+import type { Globe } from './globe-renderer';
 import type {
   ChoroplethGlobeData,
   ChoroplethGlobeRef,
   ChoroplethGlobeProps,
   ChoroplethGlobeTooltip,
-} from './globeTypes';
+} from './globe-types';
 import { targetPhiForLongitude } from './rotation';
-import { usePrefersReducedMotion, useSquareSize } from './useGlobeEnvironment';
-import { useGlobeRenderer } from './useGlobeRenderer';
-import { getCountryAnchors } from './worldGeoData';
+import {
+  usePrefersReducedMotion,
+  useSquareSize,
+} from './use-globe-environment';
+import { useGlobeRenderer } from './use-globe-renderer';
+import { getCountryAnchors } from './world-geo-data';
 
 const findEntry = (
   data: readonly ChoroplethGlobeData[],
@@ -42,7 +44,9 @@ const getValuesByAlpha2 = (
 };
 
 const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
-  (
+  // The React component rule requires a named function expression here.
+  // oxlint-disable-next-line eslint/prefer-arrow-callback
+  function ChoroplethGlobe(
     {
       activeEntryId: controlledActiveEntryId,
       'aria-label': ariaLabel = 'Country choropleth globe',
@@ -63,7 +67,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
       style,
     },
     ref
-  ) => {
+  ) {
     const { containerRef, size } = useSquareSize(fixedSize);
     const prefersReducedMotion = usePrefersReducedMotion();
     const [uncontrolledActiveEntryId, setUncontrolledActiveEntryId] =
@@ -121,13 +125,6 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
       renderTooltip,
     ]);
 
-    const setActiveEntry = (id: string | null) => {
-      if (controlledActiveEntryId === undefined) {
-        setUncontrolledActiveEntryId(id);
-      }
-      onActiveEntryChange?.(id);
-    };
-
     const textureKey = JSON.stringify({
       filledColorRange: colors.filled,
       missingAlpha: colors.missingAlpha,
@@ -165,7 +162,12 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
     useImperativeHandle(
       ref,
       () => ({
-        clearActiveEntry: () => setActiveEntry(null),
+        clearActiveEntry: () => {
+          if (controlledActiveEntryId === undefined) {
+            setUncontrolledActiveEntryId(null);
+          }
+          onActiveEntryChange?.(null);
+        },
         navigateToEntry: (id) => {
           const entry = findEntry(dataRef.current, id);
           const location = entry ? anchorsRef.current?.get(entry.alpha2) : null;
@@ -179,11 +181,14 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
         },
         setActiveEntry: (id) => {
           if (findEntry(dataRef.current, id)) {
-            setActiveEntry(id);
+            if (controlledActiveEntryId === undefined) {
+              setUncontrolledActiveEntryId(id);
+            }
+            onActiveEntryChange?.(id);
           }
         },
       }),
-      [setActiveEntry]
+      [controlledActiveEntryId, onActiveEntryChange]
     );
 
     useGlobeRenderer({

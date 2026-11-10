@@ -21,7 +21,7 @@ import {
   GLOBE_FRAGMENT_SHADER as MINIFIED_GLOBE_FRAGMENT_SHADER,
   GLOBE_VERTEX_SHADER as MINIFIED_GLOBE_VERTEX_SHADER,
 } from './generated-globe-shaders';
-import { getDotCountryIds } from './worldGeoData';
+import { getDotCountryIds } from './world-geo-data';
 
 export interface GlobeOptions {
   width: number;
@@ -73,11 +73,26 @@ const DOT_TEXTURE_HEIGHT = Math.ceil((DOT_COUNT + 1) / DOT_TEXTURE_WIDTH);
  */
 const PROJECTION_ELEVATION = 0.05;
 
-function compileShader(
+const latLonToVec3 = ([lat, lon]: [number, number]): [
+  number,
+  number,
+  number,
+] => {
+  const latRad = (lat * Math.PI) / 180;
+  const lonRad = (lon * Math.PI) / 180 - Math.PI;
+  const cosLat = Math.cos(latRad);
+  return [
+    -cosLat * Math.cos(lonRad),
+    Math.sin(latRad),
+    cosLat * Math.sin(lonRad),
+  ];
+};
+
+const compileShader = (
   gl: WebGLRenderingContext,
   type: number,
   source: string
-): WebGLShader {
+): WebGLShader => {
   const shader = gl.createShader(type);
   if (!shader) {
     throw new Error('Unable to create WebGL shader');
@@ -92,13 +107,13 @@ function compileShader(
     );
   }
   return shader;
-}
+};
 
-function createProgram(
+const createProgram = (
   gl: WebGLRenderingContext,
   vertexSource: string,
   fragmentSource: string
-): WebGLProgram {
+): WebGLProgram => {
   const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexSource);
   let fragmentShader: WebGLShader | null = null;
   try {
@@ -124,38 +139,33 @@ function createProgram(
       gl.deleteShader(fragmentShader);
     }
   }
-}
-
-function getGlobeUniformLocations(
-  gl: WebGLRenderingContext,
-  program: WebGLProgram
-) {
-  return {
-    baseColor: gl.getUniformLocation(program, 'baseColor'),
-    dark: gl.getUniformLocation(program, 'dark'),
-    dots: gl.getUniformLocation(program, 'dots'),
-    glowColor: gl.getUniformLocation(program, 'glowColor'),
-    offset: gl.getUniformLocation(program, 'offset'),
-    rotation: gl.getUniformLocation(program, 'rotation'),
-    scale: gl.getUniformLocation(program, 'scale'),
-    uCountryIds: gl.getUniformLocation(program, 'uCountryIds'),
-    uCountryPalette: gl.getUniformLocation(program, 'uCountryPalette'),
-    uResolution: gl.getUniformLocation(program, 'uResolution'),
-  };
-}
-
-const NOOP_GLOBE: Globe = {
-  destroy: () => {},
-  project: () => ({ visible: false, x: 0, y: 0 }),
-  unproject: () => null,
-  update: () => {},
-  updatePalette: () => {},
 };
 
-export default function createGlobe(
-  canvas: HTMLCanvasElement,
-  opts: GlobeOptions
-): Globe {
+const getGlobeUniformLocations = (
+  gl: WebGLRenderingContext,
+  program: WebGLProgram
+) => ({
+  baseColor: gl.getUniformLocation(program, 'baseColor'),
+  dark: gl.getUniformLocation(program, 'dark'),
+  dots: gl.getUniformLocation(program, 'dots'),
+  glowColor: gl.getUniformLocation(program, 'glowColor'),
+  offset: gl.getUniformLocation(program, 'offset'),
+  rotation: gl.getUniformLocation(program, 'rotation'),
+  scale: gl.getUniformLocation(program, 'scale'),
+  uCountryIds: gl.getUniformLocation(program, 'uCountryIds'),
+  uCountryPalette: gl.getUniformLocation(program, 'uCountryPalette'),
+  uResolution: gl.getUniformLocation(program, 'uResolution'),
+});
+
+const NOOP_GLOBE: Globe = {
+  destroy: () => null,
+  project: () => ({ visible: false, x: 0, y: 0 }),
+  unproject: () => null,
+  update: () => null,
+  updatePalette: () => null,
+};
+
+const createGlobe = (canvas: HTMLCanvasElement, opts: GlobeOptions): Globe => {
   const contextAttributes: WebGLContextAttributes = {
     alpha: true,
     antialias: true,
@@ -247,7 +257,7 @@ export default function createGlobe(
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-  function uploadPalette(palette: Uint8Array): void {
+  const uploadPalette = (palette: Uint8Array): void => {
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, countryPaletteTexture);
     gl.texImage2D(
@@ -263,42 +273,54 @@ export default function createGlobe(
     );
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  }
+  };
 
   uploadPalette(opts.countryPalette ?? new Uint8Array(256 * 4));
 
-  function render(state: Partial<GlobeOptions>): void {
-    if (state.phi !== undefined) {
-      phi = state.phi;
+  const render = (state: Partial<GlobeOptions>): void => {
+    const {
+      baseColor: nextBaseColor,
+      dark: nextDark,
+      glowColor: nextGlowColor,
+      height,
+      mapSamples: nextMapSamples,
+      offset: nextOffset,
+      phi: nextPhi,
+      scale: nextScale,
+      theta: nextTheta,
+      width,
+    } = state;
+    if (nextPhi !== undefined) {
+      phi = nextPhi;
     }
-    if (state.theta !== undefined) {
-      theta = state.theta;
+    if (nextTheta !== undefined) {
+      theta = nextTheta;
     }
-    if (state.width && state.height) {
-      const width = state.width * devicePixelRatio;
-      const height = state.height * devicePixelRatio;
-      if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
+    if (width && height) {
+      const pixelWidth = width * devicePixelRatio;
+      const pixelHeight = height * devicePixelRatio;
+      if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+        canvas.width = pixelWidth;
+        canvas.height = pixelHeight;
       }
     }
-    if (state.mapSamples !== undefined) {
-      mapSamples = state.mapSamples;
+    if (nextMapSamples !== undefined) {
+      mapSamples = nextMapSamples;
     }
-    if (state.baseColor !== undefined) {
-      baseColor = state.baseColor;
+    if (nextBaseColor !== undefined) {
+      baseColor = nextBaseColor;
     }
-    if (state.glowColor !== undefined) {
-      glowColor = state.glowColor;
+    if (nextGlowColor !== undefined) {
+      glowColor = nextGlowColor;
     }
-    if (state.dark !== undefined) {
-      dark = state.dark;
+    if (nextDark !== undefined) {
+      dark = nextDark;
     }
-    if (state.offset !== undefined) {
-      offset = state.offset;
+    if (nextOffset !== undefined) {
+      offset = nextOffset;
     }
-    if (state.scale !== undefined) {
-      scale = state.scale;
+    if (nextScale !== undefined) {
+      scale = nextScale;
     }
 
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -330,32 +352,19 @@ export default function createGlobe(
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, countryPaletteTexture);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
-  }
+  };
 
   /**
    * Converts a [lat, lng] coordinate (degrees) into a unit vector on the
    * sphere, in cobe's shader coordinate space (longitude shifted by -PI).
    */
-  function latLonToVec3([lat, lon]: [number, number]): [
-    number,
-    number,
-    number,
-  ] {
-    const latRad = (lat * Math.PI) / 180;
-    const lonRad = (lon * Math.PI) / 180 - Math.PI;
-    const cosLat = Math.cos(latRad);
-    return [
-      -cosLat * Math.cos(lonRad),
-      Math.sin(latRad),
-      cosLat * Math.sin(lonRad),
-    ];
-  }
-
-  function project(location: [number, number]): {
+  const project = (
+    location: [number, number]
+  ): {
     x: number;
     y: number;
     visible: boolean;
-  } {
+  } => {
     const unit = latLonToVec3(location);
     const radius = GLOBE_RADIUS + PROJECTION_ELEVATION;
     const point: [number, number, number] = [
@@ -389,9 +398,9 @@ export default function createGlobe(
           1) /
         2,
     };
-  }
+  };
 
-  function unproject(nx: number, ny: number): [number, number] | null {
+  const unproject = (nx: number, ny: number): [number, number] | null => {
     const aspect = canvas.width / canvas.height;
     const worldX =
       ((nx * 2 - 1 - (offset[0] * scale * devicePixelRatio) / canvas.width) /
@@ -422,7 +431,7 @@ export default function createGlobe(
       ((Math.atan2(sphereZ / cosLat, -sphereX / cosLat) + Math.PI) * 180) /
       Math.PI;
     return [(latRad * 180) / Math.PI, ((lonShifted + 180) % 360) - 180];
-  }
+  };
 
   render({});
 
@@ -441,4 +450,6 @@ export default function createGlobe(
       render({});
     },
   };
-}
+};
+
+export default createGlobe;

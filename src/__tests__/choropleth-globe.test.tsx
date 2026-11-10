@@ -10,22 +10,26 @@ import {
 import React, { createRef } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import ChoroplethGlobe from '../ChoroplethGlobe';
-import type { ChoroplethGlobeRef } from '../globeTypes';
+import ChoroplethGlobe from '../choropleth-globe';
+import type { generateChoroplethPalette } from '../choropleth-palette';
+import type { Globe, GlobeOptions } from '../globe-renderer';
+import type { ChoroplethGlobeRef } from '../globe-types';
+import type { getCountryAnchors } from '../world-geo-data';
 
 const mocks = vi.hoisted(() => ({
-  createGlobe: vi.fn(),
-  generatePalette: vi.fn(),
-  getCountryAnchors: vi.fn(),
+  createGlobe:
+    vi.fn<(canvas: HTMLCanvasElement, options: GlobeOptions) => Globe>(),
+  generatePalette: vi.fn<typeof generateChoroplethPalette>(),
+  getCountryAnchors: vi.fn<typeof getCountryAnchors>(),
   getCountryAtCell: vi.fn<(cell: number) => string | null>(),
   getHoverCell: vi.fn<(longitude: number, latitude: number) => number>(),
 }));
 
-vi.mock(import('../globeRenderer'), () => ({ default: mocks.createGlobe }));
+vi.mock(import('../globe-renderer'), () => ({ default: mocks.createGlobe }));
 vi.mock(import('../choropleth-palette'), () => ({
   generateChoroplethPalette: mocks.generatePalette,
 }));
-vi.mock(import('../worldGeoData'), () => ({
+vi.mock(import('../world-geo-data'), () => ({
   getCountryAnchors: mocks.getCountryAnchors,
   getCountryAtCell: mocks.getCountryAtCell,
   getHoverCell: mocks.getHoverCell,
@@ -52,13 +56,15 @@ const renderTooltipSource = (tooltip: { source: string }) => (
 );
 
 const globe = {
-  destroy: vi.fn(),
-  project: vi.fn(() => ({ visible: true, x: 0.5, y: 0.5 })),
+  destroy: vi.fn<() => void>(),
+  project: vi.fn<
+    (location: [number, number]) => { visible: boolean; x: number; y: number }
+  >(() => ({ visible: true, x: 0.5, y: 0.5 })),
   unproject: vi.fn<(nx: number, ny: number) => [number, number] | null>(() => [
     39, -98,
   ]),
-  update: vi.fn(),
-  updatePalette: vi.fn(),
+  update: vi.fn<(state: Partial<GlobeOptions>) => void>(),
+  updatePalette: vi.fn<(palette: Uint8Array) => void>(),
 };
 const animationFrames = new Map<number, FrameRequestCallback>();
 let nextFrameId = 0;
@@ -68,19 +74,19 @@ const runAnimationFrame = () => {
   if (!frame) {
     throw new Error('No animation frame was requested');
   }
-  const [id, callback] = frame;
+  const [id, frameCallback] = frame;
   animationFrames.delete(id);
-  act(() => callback(0));
+  act(() => frameCallback(0));
 };
 
 class ResizeObserverMock {
   static instances: ResizeObserverMock[] = [];
-  callback: ResizeObserverCallback;
-  disconnect = vi.fn();
-  observe = vi.fn();
+  resizeCallback: ResizeObserverCallback;
+  disconnect = vi.fn<() => void>();
+  observe = vi.fn<(element: Element) => void>();
 
-  constructor(callback: ResizeObserverCallback) {
-    this.callback = callback;
+  constructor(resizeCallback: ResizeObserverCallback) {
+    this.resizeCallback = resizeCallback;
     ResizeObserverMock.instances.push(this);
   }
 }
@@ -89,63 +95,68 @@ class ResizeObserverMock {
 // oxlint-disable-next-line eslint/max-classes-per-file
 class IntersectionObserverMock {
   static instances: IntersectionObserverMock[] = [];
-  callback: (entries: { isIntersecting: boolean }[]) => void;
+  observerCallback: (entries: { isIntersecting: boolean }[]) => void;
   disconnect = vi.fn<() => void>();
   observe = vi.fn<(element: Element) => void>();
 
-  constructor(callback: (entries: { isIntersecting: boolean }[]) => void) {
-    this.callback = callback;
+  constructor(
+    observerCallback: (entries: { isIntersecting: boolean }[]) => void
+  ) {
+    this.observerCallback = observerCallback;
     IntersectionObserverMock.instances.push(this);
   }
 }
 
-beforeEach(() => {
-  vi.resetAllMocks();
-  mocks.createGlobe.mockReturnValue(globe);
-  mocks.generatePalette.mockReturnValue(new Uint8Array(1024));
-  mocks.getCountryAtCell.mockReturnValue('US');
-  mocks.getHoverCell.mockReturnValue(1);
-  mocks.getCountryAnchors.mockReturnValue(new Map([['US', [39, -98]]]));
-  Object.defineProperty(HTMLCanvasElement.prototype, 'clientHeight', {
-    configurable: true,
-    get: () => 200,
-  });
-  Object.defineProperty(HTMLCanvasElement.prototype, 'clientWidth', {
-    configurable: true,
-    get: () => 200,
-  });
-  vi.stubGlobal('ResizeObserver', ResizeObserverMock);
-  vi.stubGlobal('IntersectionObserver', IntersectionObserverMock);
-  vi.stubGlobal('matchMedia', () => ({
-    addEventListener: vi.fn(),
-    matches: false,
-    removeEventListener: vi.fn(),
-  }));
-  vi.stubGlobal(
-    'cancelAnimationFrame',
-    vi.fn((id: number) => animationFrames.delete(id))
-  );
-  vi.stubGlobal(
-    'requestAnimationFrame',
-    vi.fn((callback: FrameRequestCallback) => {
-      nextFrameId += 1;
-      animationFrames.set(nextFrameId, callback);
-      return nextFrameId;
-    })
-  );
-});
-
-afterEach(() => {
-  cleanup();
-  animationFrames.clear();
-  nextFrameId = 0;
-  vi.unstubAllGlobals();
-  vi.restoreAllMocks();
-  ResizeObserverMock.instances = [];
-  IntersectionObserverMock.instances = [];
-});
-
 describe(ChoroplethGlobe, () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mocks.createGlobe.mockReturnValue(globe);
+    mocks.generatePalette.mockReturnValue(new Uint8Array(1024));
+    mocks.getCountryAtCell.mockReturnValue('US');
+    mocks.getHoverCell.mockReturnValue(1);
+    mocks.getCountryAnchors.mockReturnValue(new Map([['US', [39, -98]]]));
+    Object.defineProperty(HTMLCanvasElement.prototype, 'clientHeight', {
+      configurable: true,
+      get: () => 200,
+    });
+    Object.defineProperty(HTMLCanvasElement.prototype, 'clientWidth', {
+      configurable: true,
+      get: () => 200,
+    });
+    vi.stubGlobal('ResizeObserver', ResizeObserverMock);
+    vi.stubGlobal('IntersectionObserver', IntersectionObserverMock);
+    vi.stubGlobal('matchMedia', () => ({
+      addEventListener: vi.fn<(event: string, listener: () => void) => void>(),
+      matches: false,
+      removeEventListener:
+        vi.fn<(event: string, listener: () => void) => void>(),
+    }));
+    vi.stubGlobal(
+      'cancelAnimationFrame',
+      vi.fn<(id: number) => boolean>((id) => animationFrames.delete(id))
+    );
+    vi.stubGlobal(
+      'requestAnimationFrame',
+      vi.fn<(frameCallback: FrameRequestCallback) => number>(
+        (frameCallback) => {
+          nextFrameId += 1;
+          animationFrames.set(nextFrameId, frameCallback);
+          return nextFrameId;
+        }
+      )
+    );
+  });
+
+  afterEach(() => {
+    cleanup();
+    animationFrames.clear();
+    nextFrameId = 0;
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    ResizeObserverMock.instances = [];
+    IntersectionObserverMock.instances = [];
+  });
+
   it('renders an accessible, non-interactive image and cleans up its renderer', () => {
     const { getByLabelText, unmount } = render(
       <ChoroplethGlobe
@@ -174,8 +185,8 @@ describe(ChoroplethGlobe, () => {
 
   it('provides entry identity to tooltip consumers and supports the imperative escape hatch', async () => {
     const ref = createRef<ChoroplethGlobeRef>();
-    const onActiveEntryChange = vi.fn();
-    const renderTooltip = vi.fn(() => null);
+    const onActiveEntryChange = vi.fn<(id: string | null) => void>();
+    const renderTooltip = vi.fn<typeof renderTooltipSource>(() => null);
     render(
       <ChoroplethGlobe
         colors={colors}
@@ -211,8 +222,8 @@ describe(ChoroplethGlobe, () => {
   it('defaults omitted entry IDs to country codes for pointer and entry tooltips', async () => {
     const entry = { alpha2: 'US', value: 42 };
     const ref = createRef<ChoroplethGlobeRef>();
-    const onActiveEntryChange = vi.fn();
-    const renderTooltip = vi.fn(() => null);
+    const onActiveEntryChange = vi.fn<(id: string | null) => void>();
+    const renderTooltip = vi.fn<typeof renderTooltipSource>(() => null);
     const { getByLabelText } = render(
       <ChoroplethGlobe
         colors={colors}
@@ -489,8 +500,8 @@ describe(ChoroplethGlobe, () => {
     fireEvent.pointerMove(canvas, { offsetX: 50, offsetY: 60 });
     expect(mocks.getCountryAtCell).not.toHaveBeenCalled();
 
-    const onCountryHover = vi.fn();
-    const renderTooltip = vi.fn(() => null);
+    const onCountryHover = vi.fn<(alpha2: string | null) => void>();
+    const renderTooltip = vi.fn<typeof renderTooltipSource>(() => null);
     rerender(
       <ChoroplethGlobe
         colors={colors}
@@ -531,7 +542,7 @@ describe(ChoroplethGlobe, () => {
 
   it('moves pointer tooltips within a cell and only emits country transitions', () => {
     const onCountryHover = vi.fn<(alpha2: string | null) => void>();
-    const renderTooltip = vi.fn(() => null);
+    const renderTooltip = vi.fn<typeof renderTooltipSource>(() => null);
     const { getByLabelText } = render(
       <ChoroplethGlobe
         colors={colors}
@@ -688,9 +699,9 @@ describe(ChoroplethGlobe, () => {
   it('pauses offscreen rotation and resumes when the globe returns', () => {
     render(<ChoroplethGlobe colors={colors} data={[]} size={200} />);
     const [observer] = IntersectionObserverMock.instances;
-    act(() => observer.callback([{ isIntersecting: false }]));
+    act(() => observer.observerCallback([{ isIntersecting: false }]));
     expect(animationFrames.size).toBe(0);
-    act(() => observer.callback([{ isIntersecting: true }]));
+    act(() => observer.observerCallback([{ isIntersecting: true }]));
     runAnimationFrame();
     expect(globe.update).toHaveBeenLastCalledWith({ phi: 0.0025 });
     expect(animationFrames.size).toBe(1);
@@ -698,9 +709,10 @@ describe(ChoroplethGlobe, () => {
 
   it('snaps navigation and stops idle scheduling for reduced motion', () => {
     vi.stubGlobal('matchMedia', () => ({
-      addEventListener: vi.fn(),
+      addEventListener: vi.fn<(event: string, listener: () => void) => void>(),
       matches: true,
-      removeEventListener: vi.fn(),
+      removeEventListener:
+        vi.fn<(event: string, listener: () => void) => void>(),
     }));
     const ref = createRef<ChoroplethGlobeRef>();
     render(
