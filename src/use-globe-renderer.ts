@@ -389,7 +389,9 @@ export const useGlobeRenderer = ({
           return;
         }
         if (drag.pointerType === 'touch') {
-          drag.moved ||= isTouchDrag(event, drag);
+          if (!drag.moved) {
+            drag.moved = isTouchDrag(event, drag);
+          }
           if (!drag.moved) {
             return;
           }
@@ -515,6 +517,8 @@ export const useGlobeRenderer = ({
       globeRef.current = null;
     };
   }, [
+    // This state intentionally restarts renderer setup after context restoration.
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
     contextVersion,
     refs.activeEntryId,
     refs.callbacks,
@@ -549,6 +553,8 @@ export const useGlobeRenderer = ({
     requestRenderRef.current?.();
   }, [
     colorScheme,
+    // This state intentionally replays the latest appearance after restoration.
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
     contextVersion,
     baseColor,
     glowColor,

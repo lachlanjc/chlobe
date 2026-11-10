@@ -16,9 +16,12 @@ const allowedRootFiles = new Set([
   'LICENSE.md',
   'LICENCE',
 ]);
-const unexpectedFiles = files
-  .map(({ path }) => path)
-  .filter((path) => !path.startsWith('dist/') && !allowedRootFiles.has(path));
+const unexpectedFiles = [];
+for (const { path: filePath } of files) {
+  if (!filePath.startsWith('dist/') && !allowedRootFiles.has(filePath)) {
+    unexpectedFiles.push(filePath);
+  }
+}
 
 if (unexpectedFiles.length > 0) {
   throw new Error(

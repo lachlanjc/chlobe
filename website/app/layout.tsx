@@ -35,6 +35,8 @@ const fragmentMono = Fragment_Mono({
   weight: '400',
 });
 
+// Next.js requires metadata to be exported from the layout module.
+// oxlint-disable-next-line react-doctor/only-export-components
 export const metadata: Metadata = {
   description:
     'Lightweight WebGL globe for rendering values of countries as shaded regions.',

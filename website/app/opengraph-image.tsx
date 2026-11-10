@@ -3,8 +3,12 @@ import path from 'node:path';
 
 import { ImageResponse } from 'next/og';
 
+// Next.js requires these metadata exports in the image route module.
+// oxlint-disable-next-line react-doctor/only-export-components
 export const alt = 'Chlobe — visualize country data on a globe.';
+// oxlint-disable-next-line react-doctor/only-export-components
 export const size = { height: 630, width: 1200 };
+// oxlint-disable-next-line react-doctor/only-export-components
 export const contentType = 'image/png';
 
 export default async function Image() {

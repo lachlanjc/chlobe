@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+// oxlint-disable eslint/max-classes-per-file -- The renderer test needs separate mocks for two distinct browser observer APIs.
 
 import {
   act,
@@ -92,7 +93,6 @@ class ResizeObserverMock {
 }
 
 // Separate native observer mocks keep their callbacks and lifetimes independent.
-// oxlint-disable-next-line eslint/max-classes-per-file
 class IntersectionObserverMock {
   static instances: IntersectionObserverMock[] = [];
   observerCallback: (entries: { isIntersecting: boolean }[]) => void;

@@ -1,6 +1,7 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
+import { useId } from 'react';
 import { Button } from 'react-aria-components/Button';
 import { ColorArea, ColorThumb } from 'react-aria-components/ColorArea';
 import { ColorField } from 'react-aria-components/ColorField';
@@ -81,53 +82,64 @@ const ColorPicker = ({
   label: string;
   value: string;
   onChange: (color: Color) => void;
-}) => (
-  <AriaColorPicker onChange={onChange} value={value}>
-    <DialogTrigger>
-      <Button
-        aria-label={`${label} color`}
-        className={({ isFocusVisible }) =>
-          stylex.props(styles.button, isFocusVisible && styles.focus)
-            .className ?? ''
-        }
-      >
-        <ColorSwatch {...stylex.props(styles.swatch)} />
-        <span>{label}</span>
-      </Button>
-      <Popover offset={8} placement="bottom" {...stylex.props(styles.popover)}>
-        <Dialog aria-label={`${label} color`} {...stylex.props(styles.dialog)}>
-          <ColorArea
-            aria-label="Saturation and brightness"
-            colorSpace="hsb"
-            xChannel="saturation"
-            yChannel="brightness"
-            {...stylex.props(styles.area)}
+}) => {
+  const hexInputId = useId();
+
+  return (
+    <AriaColorPicker onChange={onChange} value={value}>
+      <DialogTrigger>
+        <Button
+          aria-label={`${label} color`}
+          className={({ isFocusVisible }) =>
+            stylex.props(styles.button, isFocusVisible && styles.focus)
+              .className ?? ''
+          }
+        >
+          <ColorSwatch {...stylex.props(styles.swatch)} />
+          <span>{label}</span>
+        </Button>
+        <Popover
+          offset={8}
+          placement="bottom"
+          {...stylex.props(styles.popover)}
+        >
+          <Dialog
+            aria-label={`${label} color`}
+            {...stylex.props(styles.dialog)}
           >
-            <ColorThumb
-              className={({ isFocusVisible }) =>
-                stylex.props(styles.thumb, isFocusVisible && styles.focus)
-                  .className ?? ''
-              }
-            />
-          </ColorArea>
-          <ColorSlider aria-label="Hue" channel="hue" colorSpace="hsb">
-            <SliderTrack {...stylex.props(styles.track)}>
+            <ColorArea
+              aria-label="Saturation and brightness"
+              colorSpace="hsb"
+              xChannel="saturation"
+              yChannel="brightness"
+              {...stylex.props(styles.area)}
+            >
               <ColorThumb
                 className={({ isFocusVisible }) =>
                   stylex.props(styles.thumb, isFocusVisible && styles.focus)
                     .className ?? ''
                 }
               />
-            </SliderTrack>
-          </ColorSlider>
-          <ColorField {...stylex.props(styles.field)}>
-            <Label>Hex</Label>
-            <Input {...stylex.props(styles.input)} />
-          </ColorField>
-        </Dialog>
-      </Popover>
-    </DialogTrigger>
-  </AriaColorPicker>
-);
+            </ColorArea>
+            <ColorSlider aria-label="Hue" channel="hue" colorSpace="hsb">
+              <SliderTrack {...stylex.props(styles.track)}>
+                <ColorThumb
+                  className={({ isFocusVisible }) =>
+                    stylex.props(styles.thumb, isFocusVisible && styles.focus)
+                      .className ?? ''
+                  }
+                />
+              </SliderTrack>
+            </ColorSlider>
+            <ColorField {...stylex.props(styles.field)}>
+              <Label htmlFor={hexInputId}>Hex</Label>
+              <Input id={hexInputId} {...stylex.props(styles.input)} />
+            </ColorField>
+          </Dialog>
+        </Popover>
+      </DialogTrigger>
+    </AriaColorPicker>
+  );
+};
 
 export { ColorPicker };
