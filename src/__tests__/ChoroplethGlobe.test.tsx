@@ -370,6 +370,35 @@ describe(ChoroplethGlobe, () => {
     expect(globe.unproject).not.toHaveBeenCalled();
   });
 
+  it('keeps mouse dragging tied to the pointer that started it', () => {
+    const { getByLabelText } = render(
+      <ChoroplethGlobe
+        autoRotate={false}
+        colors={colors}
+        data={data}
+        size={200}
+      />
+    );
+    const canvas = getByLabelText('Country choropleth globe');
+    const pointer = (type: string, pointerId: number, clientX: number) =>
+      fireEvent(
+        canvas,
+        Object.assign(new Event(type, { bubbles: true }), {
+          clientX,
+          clientY: 60,
+          pointerId,
+          pointerType: 'mouse',
+        })
+      );
+    pointer('pointerdown', 1, 50);
+    pointer('pointermove', 2, 100);
+    pointer('pointerup', 2, 100);
+    pointer('pointermove', 1, 70);
+    pointer('pointerup', 1, 70);
+    runAnimationFrame();
+    expect(globe.update).toHaveBeenCalledWith({ phi: 0.2 });
+  });
+
   it('pauses idle rotation for a tapped tooltip and resumes after dismissal', () => {
     const { getByLabelText, queryByText } = render(
       <ChoroplethGlobe

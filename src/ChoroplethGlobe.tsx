@@ -81,8 +81,6 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
     const paletteRef = useRef<Uint8Array | null>(null);
     const currentPhiRef = useRef(initialPhi);
     const targetPhiRef = useRef<number | null>(null);
-    const dragRef = useRef<{ startPhi: number; startX: number } | null>(null);
-    const hoveringCanvasRef = useRef(false);
     const dataRef = useRef(data);
     const anchorsRef = useRef(anchors);
     const activeEntryIdRef = useRef(activeEntryId);
@@ -200,9 +198,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
         canvas: canvasRef,
         currentPhi: currentPhiRef,
         data: dataRef,
-        drag: dragRef,
         globe: globeRef,
-        hoveringCanvas: hoveringCanvasRef,
         options: optionsRef,
         palette: paletteRef,
         prefersReducedMotion: reducedMotionRef,
@@ -235,6 +231,8 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
             display: 'block',
             height: '100%',
             touchAction: interactive ? 'none' : 'auto',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
             width: '100%',
           }}
           tabIndex={interactive ? 0 : undefined}

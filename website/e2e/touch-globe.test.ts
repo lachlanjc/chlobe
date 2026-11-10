@@ -7,6 +7,7 @@ test('keeps a country tooltip visible after a tap with or without rotation', asy
   page,
 }) => {
   await page.goto('/');
+  await page.waitForLoadState('networkidle');
   const canvas = page.getByLabel('Country tooltip globe preview');
   const tooltip = page.getByRole('tooltip');
   const autoRotate = page.getByRole('switch', { name: 'Auto-rotate' }).nth(2);
@@ -41,24 +42,17 @@ test('keeps a country tooltip visible after a tap with or without rotation', asy
     if (!bounds) {
       throw new Error('Globe canvas has no bounding box');
     }
-    console.log('rotate', rotate, 'bounds', bounds);
 
     // Sample the visible globe until a country is found as the globe rotates.
-    for (const [x, y] of [
-      [0.5, 0.5],
-      [0.4, 0.4],
-      [0.6, 0.4],
-      [0.3, 0.5],
-      [0.7, 0.5],
-      [0.4, 0.6],
-      [0.6, 0.6],
-    ]) {
+    const positions = [0.3, 0.4, 0.5, 0.6, 0.7].flatMap((y) =>
+      [0.3, 0.4, 0.5, 0.6, 0.7].map((x) => [x, y])
+    );
+    for (const [x, y] of positions) {
       // oxlint-disable-next-line eslint/no-await-in-loop
       await page.touchscreen.tap(
         bounds.x + bounds.width * x,
         bounds.y + bounds.height * y
       );
-      console.log('tap', x, y, await canvas.evaluate((element: HTMLCanvasElement) => {const rect=element.getBoundingClientRect(); return {y:rect.y, on:document.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2)===element};}), await tooltip.count());
       // oxlint-disable-next-line eslint/no-await-in-loop
       if (await tooltip.isVisible()) {
         break;

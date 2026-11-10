@@ -14,6 +14,19 @@ import { getCountryAtCell, getHoverCell } from './worldGeoData';
 const KEYBOARD_ROTATION_STEP = 0.25;
 const TOUCH_DRAG_THRESHOLD = 8;
 
+interface DragState {
+  moved: boolean;
+  pointerId: number;
+  pointerType: string;
+  startPhi: number;
+  startX: number;
+  startY: number;
+}
+
+const isTouchDrag = (event: PointerEvent, drag: DragState): boolean =>
+  Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) >
+  TOUCH_DRAG_THRESHOLD;
+
 const normalizeRgb = (color: ChoroplethRgb): [number, number, number] => [
   color[0] / 255,
   color[1] / 255,
@@ -53,9 +66,7 @@ interface GlobeRendererRefs {
   anchors: MutableRefObject<ReadonlyMap<string, [number, number]> | null>;
   currentPhi: MutableRefObject<number>;
   data: MutableRefObject<readonly ChoroplethGlobeData[]>;
-  drag: MutableRefObject<{ startPhi: number; startX: number } | null>;
   globe: MutableRefObject<Globe | null>;
-  hoveringCanvas: MutableRefObject<boolean>;
   options: MutableRefObject<{ autoRotate: boolean; interactive: boolean }>;
   palette: MutableRefObject<Uint8Array | null>;
   prefersReducedMotion: MutableRefObject<boolean>;
@@ -97,12 +108,9 @@ export const useGlobeRenderer = ({
     size,
   });
   const [contextVersion, setContextVersion] = useState(0);
-  const {
-    drag: dragRef,
-    globe: globeRef,
-    hoveringCanvas: hoveringCanvasRef,
-    requestRender: requestRenderRef,
-  } = refs;
+  const dragRef = useRef<DragState | null>(null);
+  const hoveringCanvasRef = useRef(false);
+  const { globe: globeRef, requestRender: requestRenderRef } = refs;
   useEffect(() => {
     const canvas = refs.canvas.current;
     if (!canvas) {
@@ -136,14 +144,8 @@ export const useGlobeRenderer = ({
     let isVisible = true;
     let contextLost = rendererFailed;
     let shownTooltip: ChoroplethGlobeTooltip | null = null;
-    let touchTooltipPinned = false;
-    let pinnedActiveEntryId: string | null = null;
-    let touchGesture: {
-      moved: boolean;
-      pointerId: number;
-      startX: number;
-      startY: number;
-    } | null = null;
+    // Undefined means unpinned; null is a valid active-entry state.
+    let pinnedActiveEntryId: string | null | undefined;
     const clearPointerTooltip = () =>
       setTooltip((current) => (current?.source === 'pointer' ? null : current));
     let lastCell: number | null = null;
@@ -154,6 +156,16 @@ export const useGlobeRenderer = ({
         hoveredAlpha2 = alpha2;
         refs.callbacks.current.onCountryHover?.(alpha2);
       }
+    };
+    const clearHover = () => {
+      lastCell = null;
+      emitCountryHover(null);
+      clearPointerTooltip();
+    };
+    const dismissTouchTooltip = () => {
+      pinnedActiveEntryId = undefined;
+      hoveringCanvasRef.current = false;
+      clearHover();
     };
     const clearEntryTooltip = () => {
       if (shownTooltip) {
@@ -213,14 +225,11 @@ export const useGlobeRenderer = ({
         return;
       }
       if (
-        touchTooltipPinned &&
+        pinnedActiveEntryId !== undefined &&
         (!refs.options.current.interactive ||
           refs.activeEntryId.current !== pinnedActiveEntryId)
       ) {
-        touchTooltipPinned = false;
-        hoveringCanvasRef.current = false;
-        emitCountryHover(null);
-        clearPointerTooltip();
+        dismissTouchTooltip();
       }
       let phi = refs.currentPhi.current;
       if (!dragRef.current) {
@@ -242,7 +251,7 @@ export const useGlobeRenderer = ({
         globe.update({ phi });
         lastRenderedPhi = phi;
       }
-      if (!touchTooltipPinned) {
+      if (pinnedActiveEntryId === undefined) {
         if (refs.activeEntryId.current === null) {
           clearEntryTooltip();
         } else {
@@ -302,9 +311,7 @@ export const useGlobeRenderer = ({
         y / canvas.clientHeight
       );
       if (!coordinates) {
-        lastCell = null;
-        emitCountryHover(null);
-        clearPointerTooltip();
+        clearHover();
         return false;
       }
       const [latitude, longitude] = coordinates;
@@ -358,24 +365,17 @@ export const useGlobeRenderer = ({
       ) {
         return;
       }
-      touchTooltipPinned = false;
-      touchGesture =
-        event.pointerType === 'touch'
-          ? {
-              moved: false,
-              pointerId: event.pointerId,
-              startX: event.clientX,
-              startY: event.clientY,
-            }
-          : null;
+      pinnedActiveEntryId = undefined;
       dragRef.current = {
+        moved: false,
+        pointerId: event.pointerId,
+        pointerType: event.pointerType,
         startPhi: refs.currentPhi.current,
         startX: event.clientX,
+        startY: event.clientY,
       };
       refs.targetPhi.current = null;
-      lastCell = null;
-      emitCountryHover(null);
-      clearPointerTooltip();
+      clearHover();
       canvas.setPointerCapture?.(event.pointerId);
       requestRender();
     };
@@ -385,16 +385,12 @@ export const useGlobeRenderer = ({
       }
       const drag = dragRef.current;
       if (drag) {
-        if (touchGesture) {
-          if (event.pointerId !== touchGesture.pointerId) {
-            return;
-          }
-          touchGesture.moved ||=
-            Math.hypot(
-              event.clientX - touchGesture.startX,
-              event.clientY - touchGesture.startY
-            ) > TOUCH_DRAG_THRESHOLD;
-          if (!touchGesture.moved) {
+        if (event.pointerId !== drag.pointerId) {
+          return;
+        }
+        if (drag.pointerType === 'touch') {
+          drag.moved ||= isTouchDrag(event, drag);
+          if (!drag.moved) {
             return;
           }
         }
@@ -406,40 +402,36 @@ export const useGlobeRenderer = ({
       }
     };
     const onPointerUp = (event: PointerEvent) => {
-      if (touchGesture && event.pointerId !== touchGesture.pointerId) {
+      const drag = dragRef.current;
+      if (!drag || event.pointerId !== drag.pointerId) {
         return;
       }
       dragRef.current = null;
       if (
-        touchGesture &&
-        !touchGesture.moved &&
-        Math.hypot(
-          event.clientX - touchGesture.startX,
-          event.clientY - touchGesture.startY
-        ) <= TOUCH_DRAG_THRESHOLD &&
+        drag.pointerType === 'touch' &&
+        !drag.moved &&
+        !isTouchDrag(event, drag) &&
         !contextLost &&
         refs.options.current.interactive
       ) {
         const bounds = canvas.getBoundingClientRect();
-        touchTooltipPinned = handleHover(
+        const hasTooltip = handleHover(
           event.clientX - bounds.left,
           event.clientY - bounds.top,
           true
         );
-        if (touchTooltipPinned) {
+        if (hasTooltip) {
           pinnedActiveEntryId = refs.activeEntryId.current;
           hoveringCanvasRef.current = true;
           shownTooltip = null;
         }
       }
-      touchGesture = null;
       requestRender();
     };
     const onPointerCancel = (event: PointerEvent) => {
-      if (touchGesture && event.pointerId !== touchGesture.pointerId) {
+      if (!dragRef.current || event.pointerId !== dragRef.current.pointerId) {
         return;
       }
-      touchGesture = null;
       dragRef.current = null;
       requestRender();
     };
@@ -458,33 +450,25 @@ export const useGlobeRenderer = ({
       }
     };
     const onPointerEnter = (event: PointerEvent) => {
-      if (touchTooltipPinned && event.pointerType !== 'touch') {
-        touchTooltipPinned = false;
+      if (pinnedActiveEntryId !== undefined && event.pointerType !== 'touch') {
+        pinnedActiveEntryId = undefined;
         clearPointerTooltip();
       }
       hoveringCanvasRef.current = refs.options.current?.interactive !== false;
       requestRender();
     };
     const onPointerLeave = (event: PointerEvent) => {
-      if (touchTooltipPinned && event.pointerType === 'touch') {
+      if (pinnedActiveEntryId !== undefined && event.pointerType === 'touch') {
         return;
       }
-      touchTooltipPinned = false;
-      hoveringCanvasRef.current = false;
-      lastCell = null;
-      emitCountryHover(null);
-      clearPointerTooltip();
+      dismissTouchTooltip();
       requestRender();
     };
     const onOutsidePointerDown = (event: PointerEvent) => {
-      if (!touchTooltipPinned || event.target === canvas) {
+      if (pinnedActiveEntryId === undefined || event.target === canvas) {
         return;
       }
-      touchTooltipPinned = false;
-      hoveringCanvasRef.current = false;
-      lastCell = null;
-      emitCountryHover(null);
-      clearPointerTooltip();
+      dismissTouchTooltip();
       requestRender();
     };
     const onContextLost = (event: Event) => {
@@ -493,13 +477,8 @@ export const useGlobeRenderer = ({
       cancelFrame();
       globeRef.current = null;
       dragRef.current = null;
-      touchGesture = null;
-      touchTooltipPinned = false;
-      hoveringCanvasRef.current = false;
-      lastCell = null;
-      emitCountryHover(null);
+      dismissTouchTooltip();
       clearEntryTooltip();
-      clearPointerTooltip();
       refs.callbacks.current.onError?.(
         new Error('WebGL context lost; waiting for restoration')
       );
