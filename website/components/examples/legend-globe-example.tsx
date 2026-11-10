@@ -46,11 +46,11 @@ const LegendGlobeExample = () => {
           <button
             key={alpha2}
             {...stylex.props(styles.legendButton)}
-            onBlur={() => globe.current?.clearHoveredEntry()}
+            onBlur={() => globe.current?.clearActiveEntry()}
             onClick={() => globe.current?.navigateToEntry(alpha2)}
-            onFocus={() => globe.current?.hoverEntry(alpha2)}
-            onMouseEnter={() => globe.current?.hoverEntry(alpha2)}
-            onMouseLeave={() => globe.current?.clearHoveredEntry()}
+            onFocus={() => globe.current?.setActiveEntry(alpha2)}
+            onMouseEnter={() => globe.current?.setActiveEntry(alpha2)}
+            onMouseLeave={() => globe.current?.clearActiveEntry()}
             type="button"
           >
             {countryNames.of(alpha2) ?? alpha2} · {value}%

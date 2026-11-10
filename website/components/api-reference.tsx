@@ -33,7 +33,12 @@ const propRows = [
     'Selected ID; null clears · Pair with onActiveEntryChange',
   ],
   ['defaultActiveEntryId', 'null', 'Initial uncontrolled selection'],
-  ['onCountryHover', '', 'Hovered country code or null'],
+  ['onActiveEntryChange', '', 'Requested active ID or null from ref methods'],
+  [
+    'onCountryHover',
+    '',
+    'Pointer country code or null; independent of selection',
+  ],
   ['formatValue', '', 'Formats (value, entry)'],
   ['renderTooltip', '', 'Your tooltip UI; absent by default'],
   ['onError', '', 'WebGL initialization or context-loss errors'],
@@ -69,16 +74,25 @@ const ApiReference = () => (
     <h3 {...stylex.props(styles.heading)}>Selection and tooltips</h3>
     <p {...stylex.props(contentStyles.paragraph)}>
       Active entries rotate into view and pause idle rotation. Ref methods:{' '}
-      <code {...stylex.props(contentStyles.inlineCode)}>hoverEntry(id)</code>{' '}
-      selects,{' '}
       <code {...stylex.props(contentStyles.inlineCode)}>
-        clearHoveredEntry()
+        setActiveEntry(id)
       </code>{' '}
-      clears, and{' '}
+      requests an active entry,{' '}
+      <code {...stylex.props(contentStyles.inlineCode)}>
+        clearActiveEntry()
+      </code>{' '}
+      requests clearing it, and{' '}
       <code {...stylex.props(contentStyles.inlineCode)}>
         navigateToEntry(id)
       </code>{' '}
-      only rotates.
+      only rotates. The first two call{' '}
+      <code {...stylex.props(contentStyles.inlineCode)}>
+        onActiveEntryChange
+      </code>
+      ; controlled callers apply the requested change. Pointer hover reports a
+      country through{' '}
+      <code {...stylex.props(contentStyles.inlineCode)}>onCountryHover</code>{' '}
+      without changing the active entry.
     </p>
     <p {...stylex.props(contentStyles.paragraph)}>
       Tooltips receive{' '}

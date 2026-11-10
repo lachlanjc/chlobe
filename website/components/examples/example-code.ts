@@ -63,10 +63,10 @@ export const GlobeWithLegend = () => {
         <button
           key={alpha2}
           type="button"
-          onMouseEnter={() => globe.current?.hoverEntry(alpha2)}
-          onMouseLeave={() => globe.current?.clearHoveredEntry()}
-          onFocus={() => globe.current?.hoverEntry(alpha2)}
-          onBlur={() => globe.current?.clearHoveredEntry()}
+          onMouseEnter={() => globe.current?.setActiveEntry(alpha2)}
+          onMouseLeave={() => globe.current?.clearActiveEntry()}
+          onFocus={() => globe.current?.setActiveEntry(alpha2)}
+          onBlur={() => globe.current?.clearActiveEntry()}
           onClick={() => globe.current?.navigateToEntry(alpha2)}
         >
           {countryNames.of(alpha2) ?? alpha2} · {value}%

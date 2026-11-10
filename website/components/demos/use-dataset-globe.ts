@@ -27,11 +27,11 @@ const useDatasetGlobe = (dataset: Dataset, story: Story) => {
   };
   const entryProps = (entry: DatasetEntry) => ({
     'aria-pressed': activeEntryId === entry.alpha2,
-    onBlur: () => globeRef.current?.clearHoveredEntry(),
+    onBlur: () => globeRef.current?.clearActiveEntry(),
     onClick: () => globeRef.current?.navigateToEntry(entry.alpha2),
-    onFocus: () => globeRef.current?.hoverEntry(entry.alpha2),
-    onMouseEnter: () => globeRef.current?.hoverEntry(entry.alpha2),
-    onMouseLeave: () => globeRef.current?.clearHoveredEntry(),
+    onFocus: () => globeRef.current?.setActiveEntry(entry.alpha2),
+    onMouseEnter: () => globeRef.current?.setActiveEntry(entry.alpha2),
+    onMouseLeave: () => globeRef.current?.clearActiveEntry(),
   });
 
   return {

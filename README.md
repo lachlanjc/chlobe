@@ -123,11 +123,11 @@ export const InteractiveGlobe = () => {
 };
 ```
 
-`activeEntryId` is controlled when provided. For uncontrolled use, set `defaultActiveEntryId`. Active entries rotate into view, pause auto-rotation, and take precedence over pointer tooltips. `onCountryHover` receives a country code or `null`. Canvas dragging and arrow keys rotate; your controls select entries.
+`activeEntryId` is controlled when provided. For uncontrolled use, set `defaultActiveEntryId`. Active entries rotate into view, pause auto-rotation, and take precedence over pointer tooltips. `onCountryHover` independently reports the country code under the pointer, including countries absent from `data`, or `null` when it leaves a country. Hovering does not change the active entry. Canvas dragging and arrow keys rotate; your controls select entries.
 
 Tooltip `source` is `'pointer'` or `'entry'`. Countries outside your data have null entry metadata; `formattedValue` is null without `formatValue`.
 
-Ref methods use `entry.id ?? entry.alpha2`: `hoverEntry(id)` selects and notifies `onActiveEntryChange`, `clearHoveredEntry()` clears selection, and `navigateToEntry(id)` only rotates.
+Ref methods use `entry.id ?? entry.alpha2`: `setActiveEntry(id)` requests an active entry, `clearActiveEntry()` requests clearing it, and `navigateToEntry(id)` only rotates. The first two call `onActiveEntryChange` with the requested ID or `null`. With a controlled `activeEntryId`, update the prop in response; otherwise the component updates its own state. Unknown IDs are ignored.
 
 ## Custom legend
 
@@ -146,10 +146,10 @@ const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
   <button
     key={alpha2}
     type="button"
-    onMouseEnter={() => globe.current?.hoverEntry(alpha2)}
-    onMouseLeave={() => globe.current?.clearHoveredEntry()}
-    onFocus={() => globe.current?.hoverEntry(alpha2)}
-    onBlur={() => globe.current?.clearHoveredEntry()}
+    onMouseEnter={() => globe.current?.setActiveEntry(alpha2)}
+    onMouseLeave={() => globe.current?.clearActiveEntry()}
+    onFocus={() => globe.current?.setActiveEntry(alpha2)}
+    onBlur={() => globe.current?.clearActiveEntry()}
     onClick={() => globe.current?.navigateToEntry(alpha2)}
   >
     {countryNames.of(alpha2) ?? alpha2} · {value}B metric tons CO₂e

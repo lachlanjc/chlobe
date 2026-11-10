@@ -156,12 +156,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
     useImperativeHandle(
       ref,
       () => ({
-        clearHoveredEntry: () => setActiveEntry(null),
-        hoverEntry: (id) => {
-          if (findEntry(dataRef.current, id)) {
-            setActiveEntry(id);
-          }
-        },
+        clearActiveEntry: () => setActiveEntry(null),
         navigateToEntry: (id) => {
           const entry = findEntry(dataRef.current, id);
           const location = entry ? anchorsRef.current?.get(entry.alpha2) : null;
@@ -171,6 +166,11 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
               location[1]
             );
             requestRenderRef.current?.();
+          }
+        },
+        setActiveEntry: (id) => {
+          if (findEntry(dataRef.current, id)) {
+            setActiveEntry(id);
           }
         },
       }),

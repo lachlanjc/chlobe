@@ -202,9 +202,9 @@ describe(ChoroplethGlobe, () => {
       );
     });
 
-    ref.current?.clearHoveredEntry();
+    ref.current?.clearActiveEntry();
     expect(onActiveEntryChange).toHaveBeenLastCalledWith(null);
-    ref.current?.hoverEntry('us');
+    ref.current?.setActiveEntry('us');
     expect(onActiveEntryChange).toHaveBeenLastCalledWith('us');
   });
 
@@ -230,7 +230,7 @@ describe(ChoroplethGlobe, () => {
     expect(renderTooltip).toHaveBeenCalledWith(
       expect.objectContaining({ entry, entryId: 'US', source: 'pointer' })
     );
-    act(() => ref.current?.hoverEntry('US'));
+    act(() => ref.current?.setActiveEntry('US'));
     expect(onActiveEntryChange).toHaveBeenLastCalledWith('US');
     await waitFor(() => {
       runAnimationFrame();
@@ -238,6 +238,75 @@ describe(ChoroplethGlobe, () => {
         expect.objectContaining({ entry, entryId: 'US', source: 'entry' })
       );
     });
+  });
+
+  it('keeps pointer hover and rotation independent of the active entry', () => {
+    const ref = createRef<ChoroplethGlobeRef>();
+    const onActiveEntryChange = vi.fn<(id: string | null) => void>();
+    const onCountryHover = vi.fn<(alpha2: string | null) => void>();
+    mocks.getCountryAtCell.mockReturnValue('CA');
+    const { getByLabelText } = render(
+      <ChoroplethGlobe
+        autoRotate={false}
+        colors={colors}
+        data={data}
+        onActiveEntryChange={onActiveEntryChange}
+        onCountryHover={onCountryHover}
+        ref={ref}
+        size={200}
+      />
+    );
+    const canvas = getByLabelText('Country choropleth globe');
+    fireEvent.pointerMove(canvas, { offsetX: 50, offsetY: 60 });
+    fireEvent.keyDown(canvas, { key: 'ArrowRight' });
+    act(() => ref.current?.navigateToEntry('us'));
+    expect(onCountryHover).toHaveBeenCalledWith('CA');
+    expect(onActiveEntryChange).not.toHaveBeenCalled();
+    fireEvent.pointerLeave(canvas);
+    expect(onCountryHover).toHaveBeenLastCalledWith(null);
+  });
+
+  it('requests controlled active-entry changes without applying them internally', () => {
+    const ref = createRef<ChoroplethGlobeRef>();
+    const onActiveEntryChange = vi.fn<(id: string | null) => void>();
+    const { queryByText, rerender } = render(
+      <ChoroplethGlobe
+        activeEntryId={null}
+        autoRotate={false}
+        colors={colors}
+        data={data}
+        onActiveEntryChange={onActiveEntryChange}
+        ref={ref}
+        renderTooltip={renderTooltipSource}
+        size={200}
+      />
+    );
+    act(() => ref.current?.setActiveEntry('unknown'));
+    expect(onActiveEntryChange).not.toHaveBeenCalled();
+    act(() => ref.current?.setActiveEntry('us'));
+    expect(onActiveEntryChange).toHaveBeenLastCalledWith('us');
+    runAnimationFrame();
+    expect(queryByText('entry')).toBeNull();
+
+    rerender(
+      <ChoroplethGlobe
+        activeEntryId="us"
+        autoRotate={false}
+        colors={colors}
+        data={data}
+        onActiveEntryChange={onActiveEntryChange}
+        ref={ref}
+        renderTooltip={renderTooltipSource}
+        size={200}
+      />
+    );
+    runAnimationFrame();
+    expect(queryByText('entry')).not.toBeNull();
+    act(() => ref.current?.clearActiveEntry());
+    expect({
+      change: onActiveEntryChange.mock.lastCall,
+      entryVisible: queryByText('entry') !== null,
+    }).toStrictEqual({ change: [null], entryVisible: true });
   });
 
   it('only performs country hit testing for requested hover features', async () => {

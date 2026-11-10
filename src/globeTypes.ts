@@ -43,8 +43,11 @@ export interface ChoroplethGlobeTooltip {
 
 /** Imperative helpers for integrations that cannot use controlled props. */
 export interface ChoroplethGlobeRef {
-  hoverEntry: (id: string) => void;
-  clearHoveredEntry: () => void;
+  /** Request an active entry by ID; unknown IDs are ignored. */
+  setActiveEntry: (id: string) => void;
+  /** Request that the active entry be cleared. */
+  clearActiveEntry: () => void;
+  /** Rotate to an entry without changing the active entry. */
   navigateToEntry: (id: string) => void;
 }
 
@@ -65,9 +68,9 @@ export interface ChoroplethGlobeProps {
   activeEntryId?: string | null;
   /** Initial active entry in uncontrolled usage. */
   defaultActiveEntryId?: string | null;
-  /** Called for canvas keyboard/pointer selection and imperative hover changes. */
+  /** Called when a ref method requests an active-entry change. */
   onActiveEntryChange?: (id: string | null) => void;
-  /** Called when pointer hit-testing enters or leaves a country. */
+  /** Reports pointer hover by country code, independently of the active entry. */
   onCountryHover?: (alpha2: string | null) => void;
   /** Reports WebGL initialization failures and recoverable context loss. */
   onError?: (error: Error) => void;
