@@ -123,7 +123,7 @@ export const InteractiveGlobe = () => {
 };
 ```
 
-`activeEntryId` is controlled when provided. For uncontrolled use, set `defaultActiveEntryId`. Active entries rotate into view, pause auto-rotation, and take precedence over pointer tooltips. `onCountryHover` independently reports the country code under the pointer, including countries absent from `data`, or `null` when it leaves a country. Hovering does not change the active entry. Canvas dragging and arrow keys rotate; your controls select entries.
+`activeEntryId` is controlled when provided. For uncontrolled use, set `defaultActiveEntryId`. Active entries rotate into view, pause auto-rotation, and take precedence over mouse-hover tooltips. On touch screens, tap a country to show its tooltip until the next interaction; auto-rotation pauses while it is visible. `onCountryHover` independently reports the country code under the pointer, including countries absent from `data`, or `null` when it leaves a country. Hovering or tapping does not change the active entry. Canvas dragging and arrow keys rotate; your controls select entries.
 
 Tooltip `source` is `'pointer'` or `'entry'`. Countries outside your data have null entry metadata; `formattedValue` is null without `formatValue`.
 
