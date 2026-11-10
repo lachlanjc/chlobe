@@ -5,10 +5,9 @@ import { useState } from 'react';
 import type { ComponentProps, ReactNode } from 'react';
 
 import { ChoroplethGlobe } from '../../../dist/index.js';
-import type { ChoroplethGlobeColors } from '../../../dist/index.js';
 import { CodeBlock } from '../ui/code-block';
 import type { getBasicCode } from './example-code';
-import { data, initialAppearance, initialColors } from './example-data';
+import { data, initialColors } from './example-data';
 import { exampleStyles } from './example-styles';
 import { GlobeControls } from './globe-controls';
 
@@ -30,8 +29,7 @@ const GlobeExample = ({
   label,
   title,
 }: GlobeExampleProps) => {
-  const [appearance, setAppearance] = useState(initialAppearance);
-  const [colors, setColors] = useState<ChoroplethGlobeColors>(initialColors);
+  const [colors, setColors] = useState(initialColors);
   const [autoRotate, setAutoRotate] = useState(true);
   const [interactive, setInteractive] = useState(true);
 
@@ -43,7 +41,7 @@ const GlobeExample = ({
         lang="typescript"
         title={title}
       >
-        {getCode(colors, autoRotate, interactive, appearance)}
+        {getCode(colors, autoRotate, interactive)}
       </CodeBlock>
       <div {...stylex.props(exampleStyles.preview)}>
         <div {...stylex.props(exampleStyles.previewLayout)}>
@@ -52,13 +50,12 @@ const GlobeExample = ({
               {...globeProps}
               colors={colors}
               data={data}
-              globe={{ autoRotate, interactive, ...appearance }}
+              autoRotate={autoRotate}
+              interactive={interactive}
             />
             {children}
           </div>
           <GlobeControls
-            appearance={appearance}
-            onAppearanceChange={setAppearance}
             autoRotate={autoRotate}
             colors={colors}
             interactive={interactive}

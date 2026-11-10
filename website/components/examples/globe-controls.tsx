@@ -3,13 +3,10 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Color } from 'react-aria-components/ColorPicker';
 
-import type {
-  ChoroplethGlobeColors,
-  ChoroplethRgb,
-} from '../../../dist/index.js';
+import type { ChoroplethRgb } from '../../../dist/index.js';
 import { ColorPicker } from '../ui/color-picker';
 import { Switch } from '../ui/switch';
-import type { GlobeAppearance } from './example-data';
+import type { ExampleColors } from './example-data';
 
 const styles = stylex.create({
   colorControls: {
@@ -53,22 +50,18 @@ const toRgb = (color: Color): ChoroplethRgb => {
 };
 
 const GlobeControls = ({
-  appearance,
   autoRotate,
   colors,
   interactive,
-  onAppearanceChange,
   onAutoRotateChange,
   onColorsChange,
   onInteractiveChange,
 }: {
-  appearance: GlobeAppearance;
   autoRotate: boolean;
-  colors: ChoroplethGlobeColors;
+  colors: ExampleColors;
   interactive: boolean;
-  onAppearanceChange: (appearance: GlobeAppearance) => void;
   onAutoRotateChange: (selected: boolean) => void;
-  onColorsChange: (colors: ChoroplethGlobeColors) => void;
+  onColorsChange: (colors: ExampleColors) => void;
   onInteractiveChange: (selected: boolean) => void;
 }) => (
   <fieldset {...stylex.props(styles.controls)}>
@@ -119,17 +112,13 @@ const GlobeControls = ({
       />
       <ColorPicker
         label="Base"
-        onChange={(color) =>
-          onAppearanceChange({ ...appearance, baseColor: toRgb(color) })
-        }
-        value={`rgb(${appearance.baseColor.join(', ')})`}
+        onChange={(color) => onColorsChange({ ...colors, base: toRgb(color) })}
+        value={`rgb(${colors.base.join(', ')})`}
       />
       <ColorPicker
         label="Glow"
-        onChange={(color) =>
-          onAppearanceChange({ ...appearance, glowColor: toRgb(color) })
-        }
-        value={`rgb(${appearance.glowColor.join(', ')})`}
+        onChange={(color) => onColorsChange({ ...colors, glow: toRgb(color) })}
+        value={`rgb(${colors.glow.join(', ')})`}
       />
     </div>
   </fieldset>

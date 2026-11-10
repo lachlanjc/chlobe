@@ -49,11 +49,14 @@ describe('public API', () => {
     const props = {
       activeEntryId: 'united-states',
       'aria-label': 'Emissions by country',
+      autoRotate: true,
       colors: {
+        base: [255, 255, 255],
         filled: [
           [15, 23, 42],
           [56, 189, 248],
         ],
+        glow: [217, 217, 230],
         missing: [226, 232, 240],
       },
       data,
@@ -63,7 +66,8 @@ describe('public API', () => {
         expectTypeOf(entry).toEqualTypeOf<ChoroplethGlobeData>();
         return `${value} tCO₂e`;
       },
-      globe: { interactive: true },
+      initialPhi: 0.5,
+      interactive: true,
       onActiveEntryChange: (entryId) => {
         expectTypeOf(entryId).toEqualTypeOf<string | null>();
       },
@@ -90,9 +94,9 @@ describe('public API', () => {
         missing: [226, 232, 240],
       },
       data,
-      globe: { interactive: false },
+      interactive: false,
     } satisfies ChoroplethGlobeProps;
 
-    expect(props.globe.interactive).toBeFalsy();
+    expect(props.interactive).toBeFalsy();
   });
 });

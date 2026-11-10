@@ -6,7 +6,6 @@ import type { Globe, GlobeOptions } from './globeRenderer';
 import type {
   ChoroplethRgb,
   ChoroplethGlobeData,
-  ChoroplethGlobeOptions,
   ChoroplethGlobeTooltip,
 } from './globeTypes';
 import { AUTO_ROTATE_PHI_PER_FRAME, stepPhiTowardTarget } from './rotation';
@@ -22,7 +21,8 @@ const normalizeRgb = (color: ChoroplethRgb): [number, number, number] => [
 
 const getAppearance = (
   colorScheme: 'light' | 'dark',
-  options: ChoroplethGlobeOptions | undefined
+  base: ChoroplethRgb | undefined,
+  glow: ChoroplethRgb | undefined
 ): Pick<GlobeOptions, 'baseColor' | 'glowColor' | 'dark'> => {
   const isDark = colorScheme === 'dark';
   const defaultBaseColor: [number, number, number] = isDark
@@ -32,13 +32,9 @@ const getAppearance = (
     ? [0.08, 0.08, 0.15]
     : [0.85, 0.85, 0.9];
   return {
-    baseColor: options?.baseColor
-      ? normalizeRgb(options.baseColor)
-      : defaultBaseColor,
+    baseColor: base ? normalizeRgb(base) : defaultBaseColor,
     dark: isDark ? 1 : 0,
-    glowColor: options?.glowColor
-      ? normalizeRgb(options.glowColor)
-      : defaultGlowColor,
+    glowColor: glow ? normalizeRgb(glow) : defaultGlowColor,
   };
 };
 
@@ -59,7 +55,7 @@ interface GlobeRendererRefs {
   drag: MutableRefObject<{ startPhi: number; startX: number } | null>;
   globe: MutableRefObject<Globe | null>;
   hoveringCanvas: MutableRefObject<boolean>;
-  options: MutableRefObject<ChoroplethGlobeOptions | undefined>;
+  options: MutableRefObject<{ autoRotate: boolean; interactive: boolean }>;
   palette: MutableRefObject<Uint8Array | null>;
   prefersReducedMotion: MutableRefObject<boolean>;
   requestRender: MutableRefObject<(() => void) | null>;
@@ -68,7 +64,9 @@ interface GlobeRendererRefs {
 
 export interface GlobeRendererOptions {
   colorScheme: 'light' | 'dark';
-  globeOptions: ChoroplethGlobeOptions | undefined;
+  baseColor: ChoroplethRgb | undefined;
+  glowColor: ChoroplethRgb | undefined;
+  interactive: boolean;
   refs: GlobeRendererRefs;
   setTooltip: Dispatch<SetStateAction<ChoroplethGlobeTooltip | null>>;
   size: number;
@@ -84,12 +82,19 @@ const findEntry = (
 
 export const useGlobeRenderer = ({
   colorScheme,
-  globeOptions,
+  baseColor,
+  glowColor,
+  interactive,
   refs,
   setTooltip,
   size,
 }: GlobeRendererOptions): void => {
-  const initialConfiguration = useRef({ colorScheme, globeOptions, size });
+  const initialConfiguration = useRef({
+    baseColor,
+    colorScheme,
+    glowColor,
+    size,
+  });
   const [contextVersion, setContextVersion] = useState(0);
   const {
     drag: dragRef,
@@ -104,12 +109,13 @@ export const useGlobeRenderer = ({
     }
     const {
       colorScheme: initialScheme,
-      globeOptions: initialOptions,
+      baseColor: initialBaseColor,
+      glowColor: initialGlowColor,
       size: initialSize,
     } = initialConfiguration.current;
     let rendererFailed = false;
     const globe = createGlobe(canvas, {
-      ...getAppearance(initialScheme, initialOptions),
+      ...getAppearance(initialScheme, initialBaseColor, initialGlowColor),
       countryPalette: refs.palette.current ?? undefined,
       devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       height: Math.max(initialSize, 1),
@@ -445,13 +451,12 @@ export const useGlobeRenderer = ({
     if (size <= 0) {
       return;
     }
-    const options = globeOptions ?? {};
     globeRef.current?.update({
-      ...getAppearance(colorScheme, options),
+      ...getAppearance(colorScheme, baseColor, glowColor),
       height: size,
       width: size,
     });
-    if (options.interactive === false) {
+    if (!interactive) {
       dragRef.current = null;
       hoveringCanvasRef.current = false;
     }
@@ -459,7 +464,9 @@ export const useGlobeRenderer = ({
   }, [
     colorScheme,
     contextVersion,
-    globeOptions,
+    baseColor,
+    glowColor,
+    interactive,
     globeRef,
     dragRef,
     hoveringCanvasRef,

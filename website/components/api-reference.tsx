@@ -21,6 +21,10 @@ const propRows = [
     'Two filled RGB tuples and one missing tuple; channels 0–255',
   ],
   ['colors.missingAlpha', '0.25', 'Missing-country opacity'],
+  ['colors.base / colors.glow', 'Color scheme', 'Surface and glow RGB tuples'],
+  ['autoRotate', 'true', 'Idle rotation'],
+  ['interactive', 'true', 'Dragging, hover, and left/right arrows'],
+  ['initialPhi', '0', 'Starting rotation in radians'],
   ['size', 'Container width', 'Square size in CSS pixels'],
   ['colorScheme', 'light', 'light or dark'],
   [
@@ -37,28 +41,21 @@ const propRows = [
   ['className / style', '', 'Applied to the container'],
 ] as const;
 
-const optionRows = [
-  ['autoRotate', 'true', 'Idle rotation'],
-  ['interactive', 'true', 'Dragging, hover, and left/right arrows'],
-  ['initialPhi', '0', 'Starting rotation in radians'],
-  ['baseColor / glowColor', 'Color scheme', 'Surface and glow RGB tuples'],
-] as const;
-
 const ApiReference = () => (
   <div {...stylex.props(styles.container)}>
     <h2 {...stylex.props(contentStyles.heading, styles.title)}>
       API reference
     </h2>
     <ReferenceTable label="Globe props and defaults" rows={propRows} />
-    <h3 {...stylex.props(styles.heading)}>Globe options</h3>
-    <ReferenceTable label="Globe options and defaults" rows={optionRows} />
     <p {...stylex.props(contentStyles.paragraph)}>
       A static image needs both{' '}
       <code {...stylex.props(contentStyles.inlineCode)}>
-        interactive: false
+        {'interactive={false}'}
       </code>{' '}
       and{' '}
-      <code {...stylex.props(contentStyles.inlineCode)}>autoRotate: false</code>
+      <code {...stylex.props(contentStyles.inlineCode)}>
+        {'autoRotate={false}'}
+      </code>
       .
     </p>
     <h3 {...stylex.props(styles.heading)}>Colors</h3>

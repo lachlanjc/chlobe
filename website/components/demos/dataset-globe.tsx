@@ -47,16 +47,12 @@ const DatasetGlobe = ({
         activeEntryId={activeEntryId}
         aria-label={`${dataset.name} by country`}
         colorScheme={story === 'oil' ? 'dark' : 'light'}
-        colors={details.colors}
+        colors={{ ...details.colors, base: details.glow, glow: details.glow }}
         data={data}
         formatValue={formatTooltipValue}
-        globe={{
-          autoRotate: true,
-          baseColor: details.glow,
-          glowColor: details.glow,
-          initialPhi: details.initialPhi,
-          interactive: true,
-        }}
+        autoRotate
+        initialPhi={details.initialPhi}
+        interactive
         onActiveEntryChange={handleActiveEntryChange}
         ref={globeRef}
         renderTooltip={(tooltip) => renderTooltip(story, tooltip)}

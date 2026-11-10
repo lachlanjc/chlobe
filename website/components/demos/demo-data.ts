@@ -125,7 +125,7 @@ const getGlobeValue = (story: Story, value: number) => {
 };
 
 const getExampleCode = (story: Story, entries: readonly DatasetEntry[]) => {
-  const { colors } = STORY_DETAILS[story];
+  const { colors, glow, initialPhi } = STORY_DETAILS[story];
   const sampleData = getFeaturedEntries(story, entries)
     .map(({ alpha2, value }) => {
       const roundedValue = Number(value.toFixed(story === 'forest' ? 2 : 1));
@@ -153,8 +153,13 @@ ${sampleData}
       filled: [[${colors.filled[0].join(', ')}], [${colors.filled[1].join(', ')}]],
       missing: [${colors.missing.join(', ')}],
       missingAlpha: ${colors.missingAlpha},
+      base: [${glow.join(', ')}],
+      glow: [${glow.join(', ')}],
     }}
-    globe={{ autoRotate: ${story === 'renewable'}, interactive: true }}
+    autoRotate={true}
+    initialPhi={${initialPhi}}
+    interactive={true}
+    colorScheme="${story === 'oil' ? 'dark' : 'light'}"
   />
 );`;
 };

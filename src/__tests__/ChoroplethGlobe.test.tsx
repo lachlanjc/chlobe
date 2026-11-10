@@ -152,7 +152,7 @@ describe(ChoroplethGlobe, () => {
         aria-label="Country values"
         colors={colors}
         data={data}
-        globe={{ interactive: false }}
+        interactive={false}
         size={200}
       />
     );
@@ -277,7 +277,7 @@ describe(ChoroplethGlobe, () => {
       <ChoroplethGlobe
         colors={colors}
         data={data}
-        globe={{ autoRotate: false }}
+        autoRotate={false}
         size={200}
       />
     );
@@ -372,25 +372,22 @@ describe(ChoroplethGlobe, () => {
     expect(globe.updatePalette).toHaveBeenCalledOnce();
   });
 
-  it('reuses the renderer across resize, theme, and fresh options objects', () => {
+  it('reuses the renderer across resize, theme, and prop changes', () => {
     const { rerender, getByLabelText, unmount } = render(
       <ChoroplethGlobe
         colors={colors}
         data={data}
-        globe={{ autoRotate: false }}
+        autoRotate={false}
         size={200}
       />
     );
     rerender(
       <ChoroplethGlobe
-        colors={colors}
+        colors={{ ...colors, base: [10, 20, 30] }}
         data={data}
         colorScheme="dark"
-        globe={{
-          autoRotate: false,
-          baseColor: [10, 20, 30],
-          interactive: false,
-        }}
+        autoRotate={false}
+        interactive={false}
         size={300}
       />
     );
@@ -418,7 +415,7 @@ describe(ChoroplethGlobe, () => {
       <ChoroplethGlobe
         colors={colors}
         data={[]}
-        globe={{ autoRotate: false }}
+        autoRotate={false}
         size={200}
       />
     );
@@ -500,7 +497,7 @@ describe(ChoroplethGlobe, () => {
         data={data}
         colorScheme="dark"
         onError={onError}
-        globe={{ autoRotate: false }}
+        autoRotate={false}
         size={300}
       />
     );
@@ -515,12 +512,80 @@ describe(ChoroplethGlobe, () => {
     );
   });
 
-  it('normalizes globe surface and glow colors from the public RGB contract', () => {
+  it('updates surface colors without rebuilding the country palette', () => {
+    const { rerender } = render(
+      <ChoroplethGlobe colors={colors} data={[]} size={200} />
+    );
+
+    rerender(
+      <ChoroplethGlobe
+        colors={{ ...colors, base: [10, 20, 30], glow: [40, 50, 60] }}
+        data={[]}
+        size={200}
+      />
+    );
+    expect(mocks.generatePalette).toHaveBeenCalledOnce();
+    expect(globe.update).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        baseColor: [10 / 255, 20 / 255, 30 / 255],
+        glowColor: [40 / 255, 50 / 255, 60 / 255],
+      })
+    );
+
+    rerender(
+      <ChoroplethGlobe
+        colorScheme="dark"
+        colors={colors}
+        data={[]}
+        size={200}
+      />
+    );
+    expect(globe.update).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        baseColor: [0.1, 0.1, 0.15],
+        glowColor: [0.08, 0.08, 0.15],
+      })
+    );
+  });
+
+  it('uses top-level initial rotation and updates idle rotation', () => {
+    const { rerender } = render(
+      <ChoroplethGlobe
+        autoRotate={false}
+        colors={colors}
+        data={[]}
+        initialPhi={0.75}
+        size={200}
+      />
+    );
+    expect(mocks.createGlobe).toHaveBeenCalledWith(
+      expect.any(HTMLCanvasElement),
+      expect.objectContaining({ phi: 0.75 })
+    );
+    runAnimationFrame();
+    expect(animationFrames.size).toBe(0);
+
+    rerender(
+      <ChoroplethGlobe
+        autoRotate
+        colors={colors}
+        data={[]}
+        initialPhi={0.75}
+        size={200}
+      />
+    );
+    runAnimationFrame();
+    expect(globe.update).toHaveBeenLastCalledWith(
+      expect.objectContaining({ phi: 0.7525 })
+    );
+    expect(animationFrames.size).toBe(1);
+  });
+
+  it('normalizes surface and glow colors from the public RGB contract', () => {
     render(
       <ChoroplethGlobe
-        colors={colors}
+        colors={{ ...colors, base: [18, 70, 224], glow: [196, 231, 244] }}
         data={data}
-        globe={{ baseColor: [18, 70, 224], glowColor: [196, 231, 244] }}
         size={200}
       />
     );

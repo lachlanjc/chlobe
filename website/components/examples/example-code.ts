@@ -1,6 +1,5 @@
-import type { ChoroplethGlobeColors } from '../../../dist/index.js';
 import { data } from './example-data';
-import type { GlobeAppearance } from './example-data';
+import type { ExampleColors } from './example-data';
 
 const dataCode = `// Renewable electricity share (%), 2021.
 const data = [
@@ -8,10 +7,9 @@ ${data.map(({ alpha2, value }) => `  { alpha2: '${alpha2}', value: ${value} },`)
 ];`;
 
 const getBasicCode = (
-  colors: ChoroplethGlobeColors,
+  colors: ExampleColors,
   autoRotate: boolean,
-  interactive: boolean,
-  appearance: GlobeAppearance
+  interactive: boolean
 ) => `'use client';
 
 import { ChoroplethGlobe } from '@lachlanjc/chlobe';
@@ -22,22 +20,19 @@ ${dataCode}
   aria-label="Example renewable electricity shares by country"
   colors={{
     filled: [[${colors.filled[0].join(', ')}], [${colors.filled[1].join(', ')}]],
-    missing: [${colors.missing.join(', ')}]
+    missing: [${colors.missing.join(', ')}],
+    base: [${colors.base.join(', ')}],
+    glow: [${colors.glow.join(', ')}],
   }}
   data={data}
-  globe={{
-    autoRotate: ${autoRotate},
-    interactive: ${interactive},
-    baseColor: [${appearance.baseColor.join(', ')}],
-    glowColor: [${appearance.glowColor.join(', ')}],
-  }}
+  autoRotate={${autoRotate}}
+  interactive={${interactive}}
 />`;
 
 const getLegendCode = (
-  colors: ChoroplethGlobeColors,
+  colors: ExampleColors,
   autoRotate: boolean,
-  interactive: boolean,
-  appearance: GlobeAppearance
+  interactive: boolean
 ) => `'use client';
 
 import { useRef } from 'react';
@@ -55,15 +50,13 @@ export const GlobeWithLegend = () => {
         aria-label="Custom legend globe preview"
         ref={globe}
         data={data}
-        globe={{
-          autoRotate: ${autoRotate},
-          interactive: ${interactive},
-          baseColor: [${appearance.baseColor.join(', ')}],
-          glowColor: [${appearance.glowColor.join(', ')}],
-        }}
+        autoRotate={${autoRotate}}
+        interactive={${interactive}}
         colors={{
           filled: [[${colors.filled[0].join(', ')}], [${colors.filled[1].join(', ')}]],
-          missing: [${colors.missing.join(', ')}]
+          missing: [${colors.missing.join(', ')}],
+          base: [${colors.base.join(', ')}],
+          glow: [${colors.glow.join(', ')}],
         }}
       />
       {data.map(({ alpha2, value }) => (
@@ -84,10 +77,9 @@ export const GlobeWithLegend = () => {
 };`;
 
 const getTooltipCode = (
-  colors: ChoroplethGlobeColors,
+  colors: ExampleColors,
   autoRotate: boolean,
-  interactive: boolean,
-  appearance: GlobeAppearance
+  interactive: boolean
 ) => `'use client';
 
 import { ChoroplethGlobe } from '@lachlanjc/chlobe';
@@ -100,14 +92,12 @@ const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
   data={data}
   colors={{
     filled: [[${colors.filled[0].join(', ')}], [${colors.filled[1].join(', ')}]],
-    missing: [${colors.missing.join(', ')}]
+    missing: [${colors.missing.join(', ')}],
+    base: [${colors.base.join(', ')}],
+    glow: [${colors.glow.join(', ')}],
   }}
-  globe={{
-    autoRotate: ${autoRotate},
-    interactive: ${interactive},
-    baseColor: [${appearance.baseColor.join(', ')}],
-    glowColor: [${appearance.glowColor.join(', ')}],
-  }}
+  autoRotate={${autoRotate}}
+  interactive={${interactive}}
   formatValue={(value) => \`\${value}% renewable electricity\`}
   renderTooltip={({ alpha2, label, formattedValue, x, y }) => (
     <div

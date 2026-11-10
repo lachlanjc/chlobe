@@ -33,13 +33,15 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
     {
       activeEntryId: controlledActiveEntryId,
       'aria-label': ariaLabel = 'Country choropleth globe',
+      autoRotate = true,
       className,
       colors,
       colorScheme = 'light',
       data,
       defaultActiveEntryId = null,
       formatValue,
-      globe: globeOptions,
+      initialPhi = 0,
+      interactive = true,
       onActiveEntryChange,
       onCountryHover,
       onError,
@@ -64,14 +66,14 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
     const globeRef = useRef<Globe | null>(null);
     const requestRenderRef = useRef<(() => void) | null>(null);
     const paletteRef = useRef<Uint8Array | null>(null);
-    const currentPhiRef = useRef(globeOptions?.initialPhi ?? 0);
+    const currentPhiRef = useRef(initialPhi);
     const targetPhiRef = useRef<number | null>(null);
     const dragRef = useRef<{ startPhi: number; startX: number } | null>(null);
     const hoveringCanvasRef = useRef(false);
     const dataRef = useRef(data);
     const anchorsRef = useRef(anchors);
     const activeEntryIdRef = useRef(activeEntryId);
-    const optionsRef = useRef(globeOptions);
+    const optionsRef = useRef({ autoRotate, interactive });
     const reducedMotionRef = useRef(prefersReducedMotion);
     const callbacksRef = useRef({
       formatValue,
@@ -92,7 +94,7 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
       };
       anchorsRef.current = anchors;
       dataRef.current = data;
-      optionsRef.current = globeOptions;
+      optionsRef.current = { autoRotate, interactive };
       reducedMotionRef.current = prefersReducedMotion;
       requestRenderRef.current?.();
     }, [
@@ -100,7 +102,8 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
       anchors,
       data,
       formatValue,
-      globeOptions,
+      autoRotate,
+      interactive,
       onCountryHover,
       onError,
       prefersReducedMotion,
@@ -175,8 +178,10 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
     );
 
     useGlobeRenderer({
+      baseColor: colors.base,
       colorScheme,
-      globeOptions,
+      glowColor: colors.glow,
+      interactive,
       refs: {
         activeEntryId: activeEntryIdRef,
         anchors: anchorsRef,
@@ -197,7 +202,6 @@ const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
       size,
     });
 
-    const interactive = globeOptions?.interactive ?? true;
     return (
       <div
         className={className}

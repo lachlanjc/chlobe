@@ -159,27 +159,29 @@ const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 ## Options
 
-Use the `globe` prop to adjust behavior and surface colors:
+Adjust behavior with top-level props and customize colors in `colors`:
 
 ```tsx
 <ChoroplethGlobe
   aria-label="Country values"
-  colors={colors}
-  data={data}
-  globe={{
-    autoRotate: false,
-    baseColor: [15, 23, 42],
-    glowColor: [56, 189, 248],
-    initialPhi: 0.75,
-    interactive: true,
+  colors={{
+    filled: [[219, 234, 254], [29, 78, 216]],
+    missing: [148, 163, 184],
+    missingAlpha: 0.25,
+    base: [255, 255, 255],
+    glow: [217, 217, 230],
   }}
+  data={data}
+  autoRotate={false}
+  initialPhi={0.75}
+  interactive={true}
 />
 ```
 
 - `autoRotate` defaults to `true`.
-- `interactive` defaults to `true`; it enables pointer dragging and arrow-key rotation. Set it to `false` for a non-interactive image; also set `autoRotate: false` to stop rotation.
+- `interactive` defaults to `true`; it enables pointer dragging and arrow-key rotation. Set it to `false` for a non-interactive image; also set `autoRotate={false}` to stop rotation.
 - `initialPhi` is the starting horizontal rotation in radians (default `0`).
-- `baseColor` and `glowColor` use the same 0–255 RGB convention as `colors`.
+- `colors.base` and `colors.glow` use the same 0–255 RGB convention as the country colors. Both default to colors from the selected color scheme.
 - `colorScheme` accepts `'light'` (default) or `'dark'`.
 
 Provide `onError={(error) => ...}` to handle unavailable WebGL, shader compilation or linking errors, and context loss. Initialization failures leave an inert canvas; the callback receives the diagnostic. When a WebGL context is lost, animation and interaction pause until the browser restores it. The library then recreates its GPU resources and reapplies the current palette, appearance, and rotation.

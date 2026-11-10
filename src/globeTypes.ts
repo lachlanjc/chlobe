@@ -15,28 +15,18 @@ export interface ChoroplethGlobeData {
 /** An RGB color with channels in the inclusive 0-255 range. */
 export type ChoroplethRgb = readonly [number, number, number];
 
-/** Color settings used to generate the country texture. */
+/** Colors for the country palette and globe appearance. */
 export interface ChoroplethGlobeColors {
   /** Fill color ramp from the smallest to largest absolute value. */
   filled: readonly [ChoroplethRgb, ChoroplethRgb];
   /** Fill for countries absent from {@link ChoroplethGlobeProps.data}. */
   missing: ChoroplethRgb;
+  /** Neutral globe surface color. Defaults to the color scheme. */
+  base?: ChoroplethRgb;
+  /** Outer glow color. Defaults to the color scheme. */
+  glow?: ChoroplethRgb;
   /** Opacity for countries absent from the data. Defaults to 0.25. */
   missingAlpha?: number;
-}
-
-/** Small, renderer-independent controls for globe behavior and appearance. */
-export interface ChoroplethGlobeOptions {
-  /** Whether the globe rotates while it is idle. Defaults to true. */
-  autoRotate?: boolean;
-  /** Initial horizontal rotation in radians. Defaults to 0. */
-  initialPhi?: number;
-  /** Whether pointer and keyboard rotation are enabled. Defaults to true. */
-  interactive?: boolean;
-  /** Neutral globe surface color, with channels in the inclusive 0-255 range. */
-  baseColor?: ChoroplethRgb;
-  /** Outer globe glow color, with channels in the inclusive 0-255 range. */
-  glowColor?: ChoroplethRgb;
 }
 
 /** A rendered tooltip's country identity and CSS-pixel anchor. */
@@ -65,7 +55,12 @@ export interface ChoroplethGlobeProps {
   /** Fixed square size in CSS pixels. Omit for responsive container sizing. */
   size?: number;
   colorScheme?: 'light' | 'dark';
-  globe?: ChoroplethGlobeOptions;
+  /** Whether the globe rotates while idle. Defaults to true. */
+  autoRotate?: boolean;
+  /** Initial horizontal rotation in radians. Defaults to 0. */
+  initialPhi?: number;
+  /** Whether pointer and keyboard rotation are enabled. Defaults to true. */
+  interactive?: boolean;
   /** A controlled active country. It is centered and receives an entry tooltip. */
   activeEntryId?: string | null;
   /** Initial active entry in uncontrolled usage. */
