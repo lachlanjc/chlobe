@@ -2,7 +2,7 @@
 
 [cobe](https://cobe.vercel.app/) is a brilliant, 5kb library for rendering globes on the web.
 
-This library is a superfast superset (15kb total) for visualizing country-level data (e.g. population density per country) on a cobe-style WebGL choropleth globe. Give it country values and a color ramp; it renders the globe while you can control labels, value formatting, and tooltip UI.
+Chlobe is a lightweight React library for visualizing country-level data (e.g. population density per country) on a cobe-style WebGL choropleth globe. Give it country values and a color ramp; it renders the globe while you can control labels, value formatting, and tooltip UI.
 
 ## Install
 
@@ -51,7 +51,7 @@ With no `size`, the globe fills the width of its container and keeps a square as
 
 The ramp spans the smallest to largest **absolute value** among supported countries in `data`. Equal positive and negative magnitudes have the same color. Missing countries use `colors.missing`, with `missingAlpha` defaulting to `0.25`.
 
-There is no configurable domain or built-in logarithmic scale. Transform values yourself with `Math.log1p` or `Math.sqrt`, keeping originals for `formatValue(value, entry)`.
+There is no configurable domain or built-in logarithmic scale. Transform values yourself with `Math.log1p` or `Math.sqrt`. The component passes the supplied value through to `formatValue(value, entry)`, so both arguments contain the transformed value. Keep original values in a separate lookup (for example, keyed by `alpha2`) if tooltips should display them.
 
 Country names are caller-owned: provide `label` or use `Intl.DisplayNames`, as in the examples below.
 

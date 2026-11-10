@@ -67,7 +67,13 @@ const ApiReference = () => (
       countries in your data. Values of 10 and −10 get the same color. For a
       logarithmic ramp with nonnegative values, pass{' '}
       <code {...stylex.props(contentStyles.inlineCode)}>Math.log1p(value)</code>{' '}
-      as each entry’s value. Keep the original values for tooltip formatting.
+      as each entry’s value. The component passes that transformed value as both
+      the first argument and{' '}
+      <code {...stylex.props(contentStyles.inlineCode)}>entry.value</code> to{' '}
+      <code {...stylex.props(contentStyles.inlineCode)}>formatValue</code>. Keep
+      originals in a separate lookup, such as a map keyed by{' '}
+      <code {...stylex.props(contentStyles.inlineCode)}>alpha2</code>, if
+      tooltips should display them.
     </p>
     <h3 {...stylex.props(styles.heading)}>Selection and tooltips</h3>
     <p {...stylex.props(contentStyles.paragraph)}>

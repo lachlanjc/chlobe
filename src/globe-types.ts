@@ -64,7 +64,10 @@ export interface ChoroplethGlobeProps {
   initialPhi?: number;
   /** Whether pointer and keyboard rotation are enabled. Defaults to true. */
   interactive?: boolean;
-  /** A controlled active country. It is centered and receives an entry tooltip. */
+  /**
+   * Controls the active entry. A matching geographic anchor rotates into view;
+   * entry tooltips require `renderTooltip`.
+   */
   activeEntryId?: string | null;
   /** Initial active entry in uncontrolled usage. */
   defaultActiveEntryId?: string | null;
