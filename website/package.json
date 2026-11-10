@@ -9,22 +9,22 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@stylexjs/stylex": "^0.19.0",
-    "@sugar-high/react": "^2.4.1",
-    "next": "^16.3.0",
+    "@stylexjs/stylex": "^0.19.1",
+    "@sugar-high/react": "^2.5.1",
+    "next": "^16.4.5",
     "react": "catalog:",
-    "react-aria-components": "^1.21.1",
+    "react-aria-components": "^1.22.1",
     "react-dom": "catalog:",
-    "react-flagpack": "^2.0.5"
+    "react-flagpack": "^2.0.6"
   },
   "devDependencies": {
-    "@stylexjs/babel-plugin": "^0.19.0",
-    "@stylexjs/postcss-plugin": "^0.19.0",
-    "@stylexswc/nextjs-plugin": "^0.18.3",
-    "@types/node": "^24.2.1",
+    "@stylexjs/babel-plugin": "^0.19.1",
+    "@stylexjs/postcss-plugin": "^0.19.1",
+    "@stylexswc/nextjs-plugin": "^0.20.0",
+    "@types/node": "^26.6.6",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "autoprefixer": "^10.4.21",
+    "autoprefixer": "^10.6.2",
     "typescript": "catalog:"
   }
 }

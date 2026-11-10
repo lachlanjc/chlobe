@@ -59,7 +59,7 @@ test('renders and supports the environmental globe sections', async ({
   await expect(page.locator('#water-heading')).toBeVisible();
 
   const forestGlobe = page.getByLabel('Forest area per person by country');
-  await expect(forestGlobe).toHaveAttribute('role', 'img');
+  await expect(forestGlobe).toHaveAttribute('role', 'application');
 
   const oilGlobe = page.getByLabel('Oil production by country');
   await expect(oilGlobe).toHaveAttribute('role', 'application');

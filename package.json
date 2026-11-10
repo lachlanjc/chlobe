@@ -68,7 +68,7 @@
     "react": "catalog:",
     "topojson-client": "^3.1.0",
     "tsup": "^8.0.0",
-    "typescript": "catalog:",
+    "typescript": "^5.9.3",
     "ultracite": "7.10.2",
     "vitest": "^3.0.0",
     "world-atlas": "^2.0.2"
