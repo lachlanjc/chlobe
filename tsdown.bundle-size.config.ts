@@ -1,13 +1,12 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
 export default defineConfig({
   clean: true,
   entry: { index: 'scripts/bundle-size-entry.ts' },
-  external: ['react', 'react-dom'],
+  deps: { neverBundle: ['react', 'react-dom'] },
   format: ['esm'],
   minify: true,
   outDir: '.bundle-size',
   platform: 'browser',
-  splitting: true,
   target: 'es2022',
 });

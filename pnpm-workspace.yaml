@@ -4,9 +4,6 @@ packages:
 
 trustPolicy: no-downgrade
 
-overrides:
-  tsup>typescript: npm:@typescript/typescript6@^6.0.2
-
 catalog:
   '@types/react': ^19.3.0
   '@types/react-dom': ^19.3.0
