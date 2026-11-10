@@ -12,6 +12,7 @@ import { AUTO_ROTATE_PHI_PER_FRAME, stepPhiTowardTarget } from './rotation';
 import { getCountryAtCell, getHoverCell } from './worldGeoData';
 
 const KEYBOARD_ROTATION_STEP = 0.25;
+const TOUCH_DRAG_THRESHOLD = 8;
 
 const normalizeRgb = (color: ChoroplethRgb): [number, number, number] => [
   color[0] / 255,
@@ -135,6 +136,25 @@ export const useGlobeRenderer = ({
     let isVisible = true;
     let contextLost = rendererFailed;
     let shownTooltip: ChoroplethGlobeTooltip | null = null;
+    let touchTooltipPinned = false;
+    let pinnedActiveEntryId: string | null = null;
+    let touchGesture: {
+      moved: boolean;
+      pointerId: number;
+      startX: number;
+      startY: number;
+    } | null = null;
+    const clearPointerTooltip = () =>
+      setTooltip((current) => (current?.source === 'pointer' ? null : current));
+    let lastCell: number | null = null;
+    let hoveredAlpha2: string | null = null;
+    let cellAlpha2: string | null = null;
+    const emitCountryHover = (alpha2: string | null) => {
+      if (alpha2 !== hoveredAlpha2) {
+        hoveredAlpha2 = alpha2;
+        refs.callbacks.current.onCountryHover?.(alpha2);
+      }
+    };
     const clearEntryTooltip = () => {
       if (shownTooltip) {
         shownTooltip = null;
@@ -192,6 +212,16 @@ export const useGlobeRenderer = ({
       if (contextLost || !isVisible || document.hidden) {
         return;
       }
+      if (
+        touchTooltipPinned &&
+        (!refs.options.current.interactive ||
+          refs.activeEntryId.current !== pinnedActiveEntryId)
+      ) {
+        touchTooltipPinned = false;
+        hoveringCanvasRef.current = false;
+        emitCountryHover(null);
+        clearPointerTooltip();
+      }
       let phi = refs.currentPhi.current;
       if (!dragRef.current) {
         if (refs.targetPhi.current !== null) {
@@ -212,10 +242,12 @@ export const useGlobeRenderer = ({
         globe.update({ phi });
         lastRenderedPhi = phi;
       }
-      if (refs.activeEntryId.current === null) {
-        clearEntryTooltip();
-      } else {
-        setEntryTooltip();
+      if (!touchTooltipPinned) {
+        if (refs.activeEntryId.current === null) {
+          clearEntryTooltip();
+        } else {
+          setEntryTooltip();
+        }
       }
       if (
         !dragRef.current &&
@@ -258,23 +290,12 @@ export const useGlobeRenderer = ({
     observer?.observe(canvas);
     document.addEventListener('visibilitychange', onVisibilityChange);
 
-    const clearPointerTooltip = () =>
-      setTooltip((current) => (current?.source === 'pointer' ? null : current));
-    let lastCell: number | null = null;
-    let hoveredAlpha2: string | null = null;
-    let cellAlpha2: string | null = null;
-    const emitCountryHover = (alpha2: string | null) => {
-      if (alpha2 !== hoveredAlpha2) {
-        hoveredAlpha2 = alpha2;
-        refs.callbacks.current.onCountryHover?.(alpha2);
-      }
-    };
-    const handleHover = (x: number, y: number) => {
+    const handleHover = (x: number, y: number, fromTap = false): boolean => {
       if (
         !refs.callbacks.current.renderTooltip &&
         !refs.callbacks.current.onCountryHover
       ) {
-        return;
+        return false;
       }
       const coordinates = globe.unproject(
         x / canvas.clientWidth,
@@ -284,7 +305,7 @@ export const useGlobeRenderer = ({
         lastCell = null;
         emitCountryHover(null);
         clearPointerTooltip();
-        return;
+        return false;
       }
       const [latitude, longitude] = coordinates;
       const cell = getHoverCell(longitude, latitude);
@@ -296,7 +317,7 @@ export const useGlobeRenderer = ({
       emitCountryHover(alpha2);
       if (!alpha2 || !refs.callbacks.current.renderTooltip) {
         clearPointerTooltip();
-        return;
+        return false;
       }
       const entry =
         refs.data.current.find((item) => item.alpha2 === alpha2) ?? null;
@@ -305,7 +326,7 @@ export const useGlobeRenderer = ({
         : null;
       setTooltip((current) => {
         if (
-          current?.source === 'entry' ||
+          (!fromTap && current?.source === 'entry') ||
           (current?.source === 'pointer' &&
             current.x === x &&
             current.y === y &&
@@ -326,12 +347,27 @@ export const useGlobeRenderer = ({
           y,
         };
       });
+      return true;
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      if (contextLost || refs.options.current?.interactive === false) {
+      if (
+        contextLost ||
+        refs.options.current?.interactive === false ||
+        (event.pointerType === 'touch' && event.isPrimary === false)
+      ) {
         return;
       }
+      touchTooltipPinned = false;
+      touchGesture =
+        event.pointerType === 'touch'
+          ? {
+              moved: false,
+              pointerId: event.pointerId,
+              startX: event.clientX,
+              startY: event.clientY,
+            }
+          : null;
       dragRef.current = {
         startPhi: refs.currentPhi.current,
         startX: event.clientX,
@@ -349,6 +385,19 @@ export const useGlobeRenderer = ({
       }
       const drag = dragRef.current;
       if (drag) {
+        if (touchGesture) {
+          if (event.pointerId !== touchGesture.pointerId) {
+            return;
+          }
+          touchGesture.moved ||=
+            Math.hypot(
+              event.clientX - touchGesture.startX,
+              event.clientY - touchGesture.startY
+            ) > TOUCH_DRAG_THRESHOLD;
+          if (!touchGesture.moved) {
+            return;
+          }
+        }
         refs.currentPhi.current =
           drag.startPhi + (event.clientX - drag.startX) / 100;
         requestRender();
@@ -356,7 +405,41 @@ export const useGlobeRenderer = ({
         handleHover(event.offsetX, event.offsetY);
       }
     };
-    const onPointerUp = () => {
+    const onPointerUp = (event: PointerEvent) => {
+      if (touchGesture && event.pointerId !== touchGesture.pointerId) {
+        return;
+      }
+      dragRef.current = null;
+      if (
+        touchGesture &&
+        !touchGesture.moved &&
+        Math.hypot(
+          event.clientX - touchGesture.startX,
+          event.clientY - touchGesture.startY
+        ) <= TOUCH_DRAG_THRESHOLD &&
+        !contextLost &&
+        refs.options.current.interactive
+      ) {
+        const bounds = canvas.getBoundingClientRect();
+        touchTooltipPinned = handleHover(
+          event.clientX - bounds.left,
+          event.clientY - bounds.top,
+          true
+        );
+        if (touchTooltipPinned) {
+          pinnedActiveEntryId = refs.activeEntryId.current;
+          hoveringCanvasRef.current = true;
+          shownTooltip = null;
+        }
+      }
+      touchGesture = null;
+      requestRender();
+    };
+    const onPointerCancel = (event: PointerEvent) => {
+      if (touchGesture && event.pointerId !== touchGesture.pointerId) {
+        return;
+      }
+      touchGesture = null;
       dragRef.current = null;
       requestRender();
     };
@@ -374,11 +457,30 @@ export const useGlobeRenderer = ({
         requestRender();
       }
     };
-    const onPointerEnter = () => {
+    const onPointerEnter = (event: PointerEvent) => {
+      if (touchTooltipPinned && event.pointerType !== 'touch') {
+        touchTooltipPinned = false;
+        clearPointerTooltip();
+      }
       hoveringCanvasRef.current = refs.options.current?.interactive !== false;
       requestRender();
     };
-    const onPointerLeave = () => {
+    const onPointerLeave = (event: PointerEvent) => {
+      if (touchTooltipPinned && event.pointerType === 'touch') {
+        return;
+      }
+      touchTooltipPinned = false;
+      hoveringCanvasRef.current = false;
+      lastCell = null;
+      emitCountryHover(null);
+      clearPointerTooltip();
+      requestRender();
+    };
+    const onOutsidePointerDown = (event: PointerEvent) => {
+      if (!touchTooltipPinned || event.target === canvas) {
+        return;
+      }
+      touchTooltipPinned = false;
       hoveringCanvasRef.current = false;
       lastCell = null;
       emitCountryHover(null);
@@ -391,6 +493,9 @@ export const useGlobeRenderer = ({
       cancelFrame();
       globeRef.current = null;
       dragRef.current = null;
+      touchGesture = null;
+      touchTooltipPinned = false;
+      hoveringCanvasRef.current = false;
       lastCell = null;
       emitCountryHover(null);
       clearEntryTooltip();
@@ -405,11 +510,12 @@ export const useGlobeRenderer = ({
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerup', onPointerUp);
-    canvas.addEventListener('pointercancel', onPointerUp);
-    canvas.addEventListener('lostpointercapture', onPointerUp);
+    canvas.addEventListener('pointercancel', onPointerCancel);
+    canvas.addEventListener('lostpointercapture', onPointerCancel);
     canvas.addEventListener('pointerenter', onPointerEnter);
     canvas.addEventListener('pointerleave', onPointerLeave);
     canvas.addEventListener('keydown', onKeyDown);
+    document.addEventListener('pointerdown', onOutsidePointerDown);
     return () => {
       cancelFrame();
       observer?.disconnect();
@@ -420,11 +526,12 @@ export const useGlobeRenderer = ({
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerUp);
-      canvas.removeEventListener('pointercancel', onPointerUp);
-      canvas.removeEventListener('lostpointercapture', onPointerUp);
+      canvas.removeEventListener('pointercancel', onPointerCancel);
+      canvas.removeEventListener('lostpointercapture', onPointerCancel);
       canvas.removeEventListener('pointerenter', onPointerEnter);
       canvas.removeEventListener('pointerleave', onPointerLeave);
       canvas.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('pointerdown', onOutsidePointerDown);
       globe.destroy();
       globeRef.current = null;
     };

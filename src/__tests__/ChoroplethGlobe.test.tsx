@@ -266,6 +266,105 @@ describe(ChoroplethGlobe, () => {
     expect(onCountryHover).toHaveBeenLastCalledWith(null);
   });
 
+  it.each([true, false])(
+    'keeps a tapped tooltip visible with autoRotate=%s and an active entry',
+    (autoRotate) => {
+      const onCountryHover = vi.fn<(alpha2: string | null) => void>();
+      const renderTooltip = vi.fn<typeof renderTooltipSource>(renderTooltipSource);
+      const { getByLabelText, queryByText } = render(
+        <ChoroplethGlobe
+          activeEntryId="us"
+          autoRotate={autoRotate}
+          colors={colors}
+          data={data}
+          onCountryHover={onCountryHover}
+          renderTooltip={renderTooltip}
+          size={200}
+        />
+      );
+      const canvas = getByLabelText('Country choropleth globe');
+      vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
+        left: 10,
+        top: 20,
+      } as DOMRect);
+      runAnimationFrame();
+      expect(queryByText('entry')).not.toBeNull();
+
+      const touch = (type: string, x: number, y: number) =>
+        fireEvent(
+          canvas,
+          Object.assign(new Event(type, { bubbles: true }), {
+            clientX: x,
+            clientY: y,
+            isPrimary: true,
+            pointerId: 1,
+            pointerType: 'touch',
+          })
+        );
+      touch('pointerenter', 60, 80);
+      touch('pointerdown', 60, 80);
+      touch('pointerup', 60, 80);
+      touch('lostpointercapture', 60, 80);
+      touch('pointerleave', 60, 80);
+
+      expect(globe.unproject).toHaveBeenLastCalledWith(0.25, 0.3);
+      expect(renderTooltip).toHaveBeenLastCalledWith(
+        expect.objectContaining({ alpha2: 'US', source: 'pointer', x: 50, y: 60 })
+      );
+      expect({
+        hovered: onCountryHover.mock.lastCall,
+        pointerVisible: queryByText('pointer') !== null,
+      }).toStrictEqual({ hovered: ['US'], pointerVisible: true });
+      runAnimationFrame();
+      expect(queryByText('pointer')).not.toBeNull();
+
+      fireEvent.pointerDown(document.body);
+      expect({
+        hovered: onCountryHover.mock.lastCall,
+        pointerVisible: queryByText('pointer') !== null,
+      }).toStrictEqual({ hovered: [null], pointerVisible: false });
+      runAnimationFrame();
+      expect(queryByText('entry')).not.toBeNull();
+    }
+  );
+
+  it('does not show a tapped tooltip after a touch drag or cancellation', () => {
+    const renderTooltip = vi.fn<typeof renderTooltipSource>(renderTooltipSource);
+    const { getByLabelText, queryByText } = render(
+      <ChoroplethGlobe
+        autoRotate={false}
+        colors={colors}
+        data={data}
+        renderTooltip={renderTooltip}
+        size={200}
+      />
+    );
+    const canvas = getByLabelText('Country choropleth globe');
+    const touch = (type: string, x: number) =>
+      fireEvent(
+        canvas,
+        Object.assign(new Event(type, { bubbles: true }), {
+          clientX: x,
+          clientY: 60,
+          isPrimary: true,
+          pointerId: 1,
+          pointerType: 'touch',
+        })
+      );
+    touch('pointerdown', 50);
+    touch('pointermove', 70);
+    touch('pointerup', 70);
+    expect(queryByText('pointer')).toBeNull();
+    expect(globe.unproject).not.toHaveBeenCalled();
+    runAnimationFrame();
+    expect(globe.update).toHaveBeenCalledWith({ phi: 0.2 });
+
+    touch('pointerdown', 50);
+    touch('pointercancel', 50);
+    expect(queryByText('pointer')).toBeNull();
+    expect(globe.unproject).not.toHaveBeenCalled();
+  });
+
   it('requests controlled active-entry changes without applying them internally', () => {
     const ref = createRef<ChoroplethGlobeRef>();
     const onActiveEntryChange = vi.fn<(id: string | null) => void>();
