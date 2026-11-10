@@ -65,6 +65,7 @@ const styles = stylex.create({
     overflowX: 'auto',
     padding: '3px 8px',
   },
+  installPromptMarker: { userSelect: 'none' },
   link: {
     color: '#ABF1D0',
     outline: { ':focus-visible': '2px solid currentColor', default: null },
@@ -105,7 +106,13 @@ const Hero = () => (
           {...stylex.props(styles.installCommand)}
         >
           <code {...stylex.props(styles.installCode)}>
-            <span aria-hidden="true">$ </span>pnpm add @lachlanjc/chlobe
+            <span
+              aria-hidden="true"
+              {...stylex.props(styles.installPromptMarker)}
+            >
+              ${' '}
+            </span>
+            pnpm add @lachlanjc/chlobe
           </code>
         </pre>
         <div {...stylex.props(styles.installButton)}>

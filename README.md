@@ -98,15 +98,20 @@ export const InteractiveGlobe = () => {
         data={emissions}
         formatValue={(value) => `${value}B metric tons CO₂e`}
         onActiveEntryChange={setActiveEntryId}
+        style={{ containerType: 'inline-size' }}
         renderTooltip={(tooltip) => (
           <div
             role="tooltip"
             style={{
+              boxSizing: 'border-box',
               left: 0,
+              overflowWrap: 'anywhere',
               pointerEvents: 'none',
               position: 'absolute',
               top: 0,
-              transform: `translate(${tooltip.x}px, ${tooltip.y}px) translate(-50%, calc(-100% - 12px))`,
+              transform: `translate(clamp(0px, ${tooltip.x - 110}px, calc(100cqw - 220px)), calc(${tooltip.y}px - 100% - 12px))`,
+              whiteSpace: 'normal',
+              width: 'min(220px, 100%)',
             }}
           >
             <strong>

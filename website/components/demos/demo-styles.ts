@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 const demoStyles = stylex.create({
   button: {
+    WebkitTapHighlightColor: 'transparent',
     backgroundColor: 'transparent',
     borderRadius: 2,
     color: 'inherit',
@@ -50,7 +51,7 @@ const demoStyles = stylex.create({
     maxWidth: 510,
     textWrap: 'pretty',
   },
-  tooltip: (surface: string, accent: string, x: number, y: number) => ({
+  tooltip: (surface: string, accent: string) => ({
     backgroundColor: surface,
     borderColor: accent,
     borderRadius: 2,
@@ -58,13 +59,8 @@ const demoStyles = stylex.create({
     borderWidth: 1,
     color: accent,
     fontSize: 13,
-    left: 0,
     padding: '8px 10px',
     pointerEvents: 'none',
-    position: 'absolute',
-    top: 0,
-    transform: `translate(${x}px, ${y}px) translate(-50%, calc(-100% - 12px))`,
-    whiteSpace: 'nowrap',
     zIndex: 1,
   }),
   tooltipValue: { display: 'block' },

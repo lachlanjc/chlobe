@@ -16,7 +16,7 @@ interface GlobeExampleProps {
   getCode: typeof getBasicCode;
   globeProps: Pick<
     ComponentProps<typeof ChoroplethGlobe>,
-    'aria-label' | 'ref' | 'formatValue' | 'renderTooltip'
+    'aria-label' | 'ref' | 'formatValue' | 'renderTooltip' | 'style'
   >;
   label: string;
   title: string;

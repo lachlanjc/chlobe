@@ -17,6 +17,7 @@ const styles = stylex.create({
     marginTop: 16,
   },
   legendButton: {
+    WebkitTapHighlightColor: 'transparent',
     backgroundColor: { ':hover': '#dbeafe', default: '#eff6ff' },
     borderColor: '#bfdbfe',
     borderRadius: 2,

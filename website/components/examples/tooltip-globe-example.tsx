@@ -3,6 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import type { ChoroplethGlobeTooltip } from '../../../dist/index.js';
+import { getTooltipPosition } from '../tooltip-position';
 import { getTooltipCode } from './example-code';
 import { countryNames } from './example-data';
 import { GlobeExample } from './globe-example';
@@ -17,12 +18,8 @@ const styles = stylex.create({
     boxShadow: '0 4px 16px rgb(15 23 42 / 0.12)',
     color: '#354150',
     fontSize: 13,
-    left: 0,
     padding: '8px 10px',
     pointerEvents: 'none',
-    position: 'absolute',
-    top: 0,
-    whiteSpace: 'nowrap',
   },
   tooltipValue: { display: 'block' },
 });
@@ -40,9 +37,7 @@ const renderCountryTooltip = ({
   <div
     role="tooltip"
     {...stylex.props(styles.tooltip)}
-    style={{
-      transform: `translate(${x}px, ${y}px) translate(-50%, calc(-100% - 12px))`,
-    }}
+    style={getTooltipPosition(x, y)}
   >
     <strong>{label ?? countryNames.of(alpha2) ?? alpha2}</strong>
     <span {...stylex.props(styles.tooltipValue)}>
@@ -58,6 +53,7 @@ const TooltipGlobeExample = () => (
       'aria-label': 'Country tooltip globe preview',
       formatValue: formatRenewableValue,
       renderTooltip: renderCountryTooltip,
+      style: { containerType: 'inline-size' },
     }}
     label="Country tooltip example"
     title="globe-tooltip.tsx"

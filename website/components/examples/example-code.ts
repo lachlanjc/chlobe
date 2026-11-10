@@ -99,16 +99,20 @@ const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
   autoRotate={${autoRotate}}
   interactive={${interactive}}
   formatValue={(value) => \`\${value}% renewable electricity\`}
+  style={{ containerType: 'inline-size' }}
   renderTooltip={({ alpha2, label, formattedValue, x, y }) => (
     <div
       role="tooltip"
       style={{
         position: 'absolute',
-        left: 0,
+        boxSizing: 'border-box',
         top: 0,
-        transform: \`translate(\${x}px, \${y}px) translate(-50%, calc(-100% - 12px))\`,
+        left: 0,
+        transform: \`translate(clamp(0px, \${x - 110}px, calc(100cqw - 220px)), calc(\${y}px - 100% - 12px))\`,
+        width: 'min(220px, 100%)',
+        overflowWrap: 'anywhere',
+        whiteSpace: 'normal',
         pointerEvents: 'none',
-        whiteSpace: 'nowrap',
         background: '#ffffff',
         color: '#354150',
         border: '1px solid #cbd5e1',
