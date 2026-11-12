@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import type { ForwardRefExoticComponent, RefAttributes } from 'react';
 
 import { generateChoroplethPalette } from './choropleth-palette';
 import type { Globe } from './globe-renderer';
@@ -43,7 +44,9 @@ const getValuesByAlpha2 = (
   });
 };
 
-const ChoroplethGlobe = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
+const ChoroplethGlobe: ForwardRefExoticComponent<
+  ChoroplethGlobeProps & RefAttributes<ChoroplethGlobeRef>
+> = forwardRef<ChoroplethGlobeRef, ChoroplethGlobeProps>(
   // The React component rule requires a named function expression here.
   // oxlint-disable-next-line eslint/prefer-arrow-callback
   function ChoroplethGlobe(

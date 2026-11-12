@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsdown';
 
 export default defineConfig({
-  dts: true,
+  dts: { generator: 'oxc' },
   entry: ['src/index.ts'],
   fixedExtension: false,
   format: ['cjs', 'esm'],

@@ -1,13 +1,17 @@
 import { execFileSync } from 'node:child_process';
 import nodePath from 'node:path';
 
-const output = execFileSync('npm', ['pack', '--dry-run', '--json'], {
-  encoding: 'utf-8',
-  env: {
-    ...process.env,
-    npm_config_cache: nodePath.join(process.cwd(), '.npm-cache'),
-  },
-});
+const output = execFileSync(
+  'npm',
+  ['pack', '--dry-run', '--json', '--ignore-scripts'],
+  {
+    encoding: 'utf-8',
+    env: {
+      ...process.env,
+      npm_config_cache: nodePath.join(process.cwd(), '.npm-cache'),
+    },
+  }
+);
 const [{ files }] = JSON.parse(output);
 const allowedRootFiles = new Set([
   'package.json',

@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
+    "predev": "pnpm --dir .. build",
     "build": "pnpm --dir .. build && next build --webpack",
     "start": "next start",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@chlobe/react": "workspace:*",
     "@stylexjs/stylex": "^0.19.1",
     "@sugar-high/react": "^2.5.1",
     "next": "^16.4.5",

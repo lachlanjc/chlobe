@@ -83,6 +83,9 @@ importers:
 
   website:
     dependencies:
+      '@chlobe/react':
+        specifier: workspace:*
+        version: link:..
       '@stylexjs/stylex':
         specifier: ^0.19.1
         version: 0.19.1

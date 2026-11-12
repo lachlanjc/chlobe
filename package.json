@@ -6,8 +6,8 @@
     "choropleth",
     "cobe",
     "countries",
-    "globe",
     "dataviz",
+    "globe",
     "react",
     "webgl"
   ],
@@ -46,6 +46,7 @@
     "pull:environmental-data": "node scripts/pull-environmental-data.mjs",
     "generate:globe-shaders": "node scripts/generate-globe-shaders.mjs",
     "prebuild": "pnpm generate",
+    "prepack": "pnpm build",
     "test": "vitest run",
     "test:browser": "pnpm --filter website build && playwright test",
     "test:consumer": "pnpm build && node scripts/verify-consumer.mjs",
