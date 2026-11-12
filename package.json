@@ -36,10 +36,10 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsdown src/index.ts --format cjs,esm --dts --clean",
+    "build": "tsdown",
     "build:bundle-size": "tsdown --config tsdown.bundle-size.config.ts",
     "bundlemon": "bundlemon",
-    "dev": "tsdown src/index.ts --format cjs,esm --dts --clean --watch",
+    "dev": "tsdown --watch",
     "generate": "pnpm generate:country-data && pnpm generate:globe-shaders",
     "generate:country-data": "node scripts/generate-country-data.mjs",
     "pull:environmental-data": "node scripts/pull-environmental-data.mjs",
@@ -62,8 +62,8 @@
     "d3-geo": "^3.1.2",
     "iso-3166": "^4.4.0",
     "jsdom": "^31.0.0",
-    "oxfmt": "^0.77.0",
-    "oxlint": "^1.92.0",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
     "oxlint-plugin-react-doctor": "^0.9.22",
     "react": "catalog:",
     "topojson-client": "^3.1.0",

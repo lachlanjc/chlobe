@@ -3,6 +3,7 @@ import { defineConfig } from 'tsdown';
 export default defineConfig({
   clean: true,
   deps: { neverBundle: ['react', 'react-dom'] },
+  dts: false,
   entry: { index: 'scripts/bundle-size-entry.ts' },
   format: ['esm'],
   minify: true,
