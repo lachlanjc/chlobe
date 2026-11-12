@@ -12,7 +12,7 @@ const getBasicCode = (
   interactive: boolean
 ) => `'use client';
 
-import { ChoroplethGlobe } from '@lachlanjc/chlobe';
+import { ChoroplethGlobe } from '@chlobe/react';
 
 ${dataCode}
 
@@ -38,7 +38,7 @@ const getLegendCode = (
 ) => `'use client';
 
 import { useRef } from 'react';
-import { ChoroplethGlobe, type ChoroplethGlobeRef } from '@lachlanjc/chlobe';
+import { ChoroplethGlobe, type ChoroplethGlobeRef } from '@chlobe/react';
 
 ${dataCode}
 const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
@@ -84,7 +84,7 @@ const getTooltipCode = (
   interactive: boolean
 ) => `'use client';
 
-import { ChoroplethGlobe } from '@lachlanjc/chlobe';
+import { ChoroplethGlobe } from '@chlobe/react';
 
 ${dataCode}
 const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });

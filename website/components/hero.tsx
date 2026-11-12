@@ -112,7 +112,7 @@ const Hero = () => (
             >
               ${' '}
             </span>
-            pnpm add @lachlanjc/chlobe
+            pnpm add @chlobe/react
           </code>
         </pre>
         <div {...stylex.props(styles.installButton)}>

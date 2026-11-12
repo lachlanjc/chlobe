@@ -1,12 +1,13 @@
 {
-  "name": "@lachlanjc/chlobe",
-  "version": "0.0.1",
-  "description": "A lightweight, interactive React choropleth globe for visualizing country data with WebGL.",
+  "name": "@chlobe/react",
+  "version": "0.2.0",
+  "description": "A lightweight, interactive React choropleth globe for visualizing country data using WebGL.",
   "keywords": [
     "choropleth",
     "cobe",
     "countries",
     "globe",
+    "dataviz",
     "react",
     "webgl"
   ],

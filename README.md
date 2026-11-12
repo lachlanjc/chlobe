@@ -7,7 +7,7 @@ Chlobe is a lightweight React library for visualizing country-level data (e.g. p
 ## Install
 
 ```sh
-pnpm add @lachlanjc/chlobe
+pnpm add @chlobe/react
 ```
 
 `react` 18 or later is a peer dependency. The component needs a browser with WebGL support. Use it inside a Client Component (`'use client'`).
@@ -17,7 +17,7 @@ pnpm add @lachlanjc/chlobe
 ```tsx
 'use client';
 
-import { ChoroplethGlobe } from '@lachlanjc/chlobe';
+import { ChoroplethGlobe } from '@chlobe/react';
 
 const emissions = [
   { alpha2: 'US', value: 6 },
@@ -62,7 +62,7 @@ The package deliberately renders no tooltip DOM. Supply `renderTooltip` to rende
 ```tsx
 'use client';
 
-import { ChoroplethGlobe } from '@lachlanjc/chlobe';
+import { ChoroplethGlobe } from '@chlobe/react';
 import { useState } from 'react';
 
 // Illustrative annual emissions, in billions of metric tons CO₂e.
@@ -139,7 +139,7 @@ Ref methods use `entry.id ?? entry.alpha2`: `setActiveEntry(id)` requests an act
 Reuse the quick-start `emissions` data. Inside your component, attach a ref and loop over the entries:
 
 ```tsx
-import type { ChoroplethGlobeRef } from '@lachlanjc/chlobe';
+import type { ChoroplethGlobeRef } from '@chlobe/react';
 import { useRef } from 'react';
 
 // Inside your Client Component:
