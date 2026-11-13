@@ -1,8 +1,6 @@
 # chlobe
 
-[cobe](https://cobe.vercel.app/) is a brilliant, 5kb library for rendering globes on the web.
-
-Chlobe is a lightweight React library for visualizing country-level data (e.g. population density per country) on a cobe-style WebGL choropleth globe. Give it country values and a color ramp; it renders the globe while you can control labels, value formatting, and tooltip UI.
+chlobe is a lightweight React library for visualizing country-level data (e.g. population density per country) on a [cobe](https://cobe.vercel.app/)-style WebGL choropleth globe. Give it country values and a color scale, and get a high-performance interactive globe. You can control labels, value formatting, and tooltip UI.
 
 ## Install
 
@@ -172,7 +170,7 @@ Adjust behavior with top-level props and customize colors in `colors`:
 
 ```tsx
 <ChoroplethGlobe
-  aria-label="Country values"
+  aria-label="Electricity usage per capita"
   colors={{
     filled: [
       [219, 234, 254],
@@ -180,21 +178,39 @@ Adjust behavior with top-level props and customize colors in `colors`:
     ],
     missing: [148, 163, 184],
     missingAlpha: 0.25,
-    base: [255, 255, 255],
-    glow: [217, 217, 230],
   }}
   data={data}
+  colorScheme="dark"
   autoRotate={false}
   initialPhi={0.75}
   interactive={true}
 />
 ```
 
-- `autoRotate` defaults to `true`.
-- `interactive` defaults to `true`; it enables pointer dragging and arrow-key rotation. Set it to `false` for a non-interactive image; also set `autoRotate={false}` to stop rotation.
-- `initialPhi` is the starting horizontal rotation in radians (default `0`).
-- `colors.base` and `colors.glow` use the same 0–255 RGB convention as the country colors. Both default to colors from the selected color scheme.
-- `colorScheme` accepts `'light'` (default) or `'dark'`.
+### Props reference
+
+| Prop | Default | Purpose |
+| --- | --- | --- |
+| `data` | Required | Country entries with unique `alpha2`, numeric `value`, and optional stable `id` and display `label`. |
+| `colors` | Required | `filled` RGB ramp and `missing` RGB color. |
+| `colors.missingAlpha` | `0.25` | Opacity for countries without data. |
+| `colors.base` / `colors.glow` | Color scheme | Globe surface and outer glow colors, as 0–255 RGB tuples. Custom values override the scheme defaults. |
+| `size` | Container width | Omit for a responsive square; set a number for a fixed CSS-pixel square. |
+| `colorScheme` | `'light'` | `'light'` or `'dark'`; selects globe shading and default surface and glow colors. |
+| `autoRotate` | `true` | Rotate while idle; active selection, pointer hover, touch tooltips, and reduced motion pause rotation. |
+| `interactive` | `true` | Enable pointer dragging and hover, touch taps, and arrow-key rotation. Tooltips require `renderTooltip`. Set `false` for an image-role canvas. |
+| `initialPhi` | `0` | Starting horizontal rotation in radians. |
+| `activeEntryId` | Uncontrolled | Controlled active entry ID; pass `null` to clear it. |
+| `defaultActiveEntryId` | `null` | Initial active entry for uncontrolled use. |
+| `onActiveEntryChange` | — | Called by ref methods when they request a selection change. |
+| `onCountryHover` | — | Receives the pointer country code, or `null` when leaving a country. |
+| `formatValue` | — | Formats `(value, entry)` for tooltips. |
+| `renderTooltip` | — | Renders caller-owned tooltip UI; no tooltip DOM is added by default. |
+| `onError` | — | Receives WebGL initialization and context-loss errors. |
+| `aria-label` | `Country choropleth globe` | Accessible name for the canvas. |
+| `className` / `style` | — | Applied to the globe container. |
+
+`interactive` defaults to `true`; set it to `false` and `autoRotate={false}` for a static globe. When a controlled `activeEntryId` is provided, update it in response to `onActiveEntryChange` if you use the ref methods.
 
 Provide `onError={(error) => ...}` to handle unavailable WebGL, shader compilation or linking errors, and context loss. Initialization failures leave an inert canvas; the callback receives the diagnostic. When a WebGL context is lost, animation and interaction pause until the browser restores it. The library then recreates its GPU resources and reapplies the current palette, appearance, and rotation.
 

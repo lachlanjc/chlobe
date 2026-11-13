@@ -40,6 +40,17 @@ const fragmentMono = Fragment_Mono({
 export const metadata: Metadata = {
   description:
     'Lightweight WebGL globe for rendering values of countries as shaded regions.',
+  metadataBase: new URL('https://chlobe.lachlanjc.com'),
+  openGraph: {
+    videos: [
+      {
+        height: 630,
+        type: 'video/mp4',
+        url: 'https://chlobe.lachlanjc.com/og-video.mp4',
+        width: 1200,
+      },
+    ],
+  },
   title: 'Chlobe',
 };
 

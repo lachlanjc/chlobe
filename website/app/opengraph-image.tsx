@@ -45,7 +45,7 @@ export default async function Image() {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            fontSize: 96,
+            fontSize: 92,
             letterSpacing: '-0.055em',
             lineHeight: 0.98,
           }}
@@ -57,17 +57,17 @@ export default async function Image() {
           </div>
         </div>
         <div style={{ color: '#d5ddf7', fontSize: 28 }}>
-          A 15KB React choropleth globe.
+          A 15kb React choropleth globe.
         </div>
       </div>
       {/* ImageResponse embeds the local still directly; next/image requires a browser. */}
       {/* oxlint-disable-next-line nextjs/no-img-element */}
       <img
         alt="Country data rendered as blue dots on an off-white globe"
-        height={600}
+        height={560}
         src={`data:image/png;base64,${globe.toString('base64')}`}
-        style={{ left: 600, position: 'absolute', top: 15 }}
-        width={600}
+        style={{ left: 620, position: 'absolute', top: 35 }}
+        width={560}
       />
     </div>,
     {

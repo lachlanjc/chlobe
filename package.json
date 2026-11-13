@@ -47,6 +47,7 @@
     "generate:globe-shaders": "node scripts/generate-globe-shaders.mjs",
     "prebuild": "pnpm generate",
     "prepack": "pnpm build",
+    "render:og-video": "node scripts/render-og-video.mjs",
     "test": "vitest run",
     "test:browser": "pnpm --filter website build && playwright test",
     "test:consumer": "pnpm build && node scripts/verify-consumer.mjs",

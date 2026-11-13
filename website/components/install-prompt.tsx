@@ -1,9 +1,16 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { Tooltip, TooltipTrigger } from 'react-aria-components/Tooltip';
+import { Dialog } from 'react-aria-components/Dialog';
+import { Link } from 'react-aria-components/Link';
+import { Popover } from 'react-aria-components/Popover';
+import { PreviewTrigger } from 'react-aria-components/PreviewTrigger';
 
-import { installPrompt } from './install-prompt-text';
+import {
+  installPrompt,
+  installPromptPrefix,
+  installPromptUrl,
+} from './install-prompt-text';
 import { CopyButton } from './ui/copy-button';
 
 const styles = stylex.create({
@@ -19,6 +26,13 @@ const styles = stylex.create({
     padding: 16,
     width: 280,
   },
+  dialog: { outline: 'none' },
+  link: {
+    color: '#0B2471',
+    outline: { ':focus-visible': '2px solid currentColor', default: null },
+    outlineOffset: 3,
+    textUnderlineOffset: 3,
+  },
   prompt: {
     fontSize: 14,
     lineHeight: 1.5,
@@ -28,16 +42,31 @@ const styles = stylex.create({
 });
 
 const InstallPrompt = () => (
-  <TooltipTrigger delay={0}>
+  <PreviewTrigger delay={0}>
     <CopyButton
       code={installPrompt}
       copyLabel="Copy prompt"
       label="install prompt"
     />
-    <Tooltip offset={8} placement="bottom" {...stylex.props(styles.popover)}>
-      <p {...stylex.props(styles.prompt)}>{installPrompt}</p>
-    </Tooltip>
-  </TooltipTrigger>
+    <Popover
+      offset={8}
+      placement="bottom"
+      shouldSkipAnimation={false}
+      {...stylex.props(styles.popover)}
+    >
+      <Dialog
+        aria-label="Agents quickstart prompt"
+        {...stylex.props(styles.dialog)}
+      >
+        <p {...stylex.props(styles.prompt)}>
+          {installPromptPrefix}
+          <Link href={installPromptUrl} {...stylex.props(styles.link)}>
+            {installPromptUrl}
+          </Link>
+        </p>
+      </Dialog>
+    </Popover>
+  </PreviewTrigger>
 );
 
 export { InstallPrompt };
