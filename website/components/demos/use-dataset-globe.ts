@@ -9,9 +9,13 @@ import type { Dataset, DatasetEntry, Story } from './demo-data';
 
 const useDatasetGlobe = (dataset: Dataset, story: Story) => {
   const globeRef = useRef<ChoroplethGlobeRef>(null);
-  const [activeEntryId, setActiveEntryId] = useState<string | null>(
-    story === 'oil' ? 'US' : null
-  );
+  const featured = getFeaturedEntries(story, dataset.entries);
+  const [activeEntryId, setActiveEntryId] = useState<string | null>(() => {
+    if (story === 'water') {
+      return featured[0]?.alpha2 ?? null;
+    }
+    return story === 'oil' ? 'US' : null;
+  });
   const data = dataset.entries.map((entry) => ({
     alpha2: entry.alpha2,
     label: entry.label,
@@ -38,7 +42,7 @@ const useDatasetGlobe = (dataset: Dataset, story: Story) => {
     activeEntryId,
     data,
     entryProps,
-    featured: getFeaturedEntries(story, dataset.entries),
+    featured,
     formatTooltipValue,
     globeRef,
     handleActiveEntryChange: setActiveEntryId,
